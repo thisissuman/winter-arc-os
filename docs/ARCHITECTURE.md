@@ -2,7 +2,7 @@
 
 ## Status and ownership
 
-This is the accepted implementation blueprint, not an existing application/schema. Phase 0 establishes documentation only. Create each subsystem in its designated [phase](ROADMAP.md); record any schema refinement here before adding its migration. Product requirements are in [PRODUCT](../PRODUCT.md), calculations in [SCORING](SCORING.md), and visual conventions in [DESIGN](../DESIGN.md).
+Phase 1 implements the foundation described below: application shell, auth, profile/appearance settings, and four foundation tables. Later subsystems remain a blueprint. Hosted migration/auth verification is pending; see QA. Create each subsystem in its designated [phase](ROADMAP.md); record any schema refinement here before adding its migration. Product requirements are in [PRODUCT](../PRODUCT.md), calculations in [SCORING](SCORING.md), and visual conventions in [DESIGN](../DESIGN.md).
 
 ## Application boundaries
 
@@ -74,6 +74,22 @@ Ordinary actions use the publishable key and user's cookies, never a privileged 
 | `categories` | Name, optional life-area relationship, order, archive cutoff |
 
 Add selected-challenge ownership FK only when challenges exist in Phase 2. Preserve empty-account operation; starter life areas are optional onboarding data.
+
+### Implemented foundation details
+
+The foundation migration is `supabase/migrations/20260930000000_foundation.sql`. It initializes existing/new auth users transactionally and idempotently without starter areas, tracker definitions, or measurements. All four public tables use owned CRUD policies; anonymous table grants are revoked. Private trigger helpers have empty search paths and no public/anon/authenticated execution grant.
+
+- Profiles: display name defaults empty and is bounded to 80 characters. Auth owns email/password; no duplicated account credentials.
+- Preferences: timezone is validated against PostgreSQL's timezone catalog; ISO week start is 1–7; theme is dark/light/system. Defaults are Asia/Kolkata, Monday, dark, privacy off, hide-private off, onboarding incomplete. Challenge selection arrives with Phase 2.
+- Areas/categories: generated UUID, name length 1–80 after trimming, nonnegative order, optional archive timestamp. Area icon/color are optional. Categories may omit an area.
+- Category ownership is enforced by `(life_area_id, user_id)` → `(id, user_id)`, with a deferred NO ACTION relationship. Archive is the ordinary removal mechanism; auth-user deletion cascades all owned foundation data without a nullable-owner workaround.
+- Owner/order and owner/area indexes support the implemented relationships. Each table has created/updated timestamps and an update trigger.
+
+`requireAccount()` caches the verified identity and owned profile/preferences only within a request. Missing initialized rows produce a retryable application error rather than fabricated account data. Server Actions use the caller's cookie client, Zod validation, ownership filters, and revalidation. Theme settings persist to PostgreSQL and an HttpOnly presentation cookie; server rendering and the theme provider use that cookie to avoid another account's stale local theme overriding the saved choice.
+
+The proxy refreshes cookies using `getClaims()` and private/no-store response headers. Email links verify supported token hashes via `/auth/confirm`; trusted origin and local redirect allowlist prevent external redirects. Recovery requires a verified identity, changes the password, and revokes other sessions. Dynamic protected pages and independent action authorization remain necessary even with the proxy.
+
+Testing replays this SQL against isolated PGlite PostgreSQL with minimal test-only auth roles/catalog. This verifies database behavior but is not a Supabase HTTP/auth emulator. Generated public-table types currently come from that migrated catalog. Hosted types and full auth verification will follow project alignment.
 
 ### Challenges and core tracking — Phase 2
 
@@ -219,5 +235,8 @@ Every feature handles actual loading, absence, errors, long labels, archived sou
 | D06 | Incremental migrations by phase | Keep foundation bounded and verify each feature's security |
 | D07 | No private offline caching/sync in V1 | Keep local/private data handling explicit and manageable |
 | D08 | Canonical documents plus unchanged source | Durable operating memory without conflicting duplicated contracts |
+| D09 | Webpack build and packaged Geist | Turbopack initialization is restricted here; production compilation works without remote font fetches |
+| D10 | Isolated PostgreSQL foundation checks plus real browser integration | Verify RLS without Docker; keep hosted Auth/email gates explicit and unmocked |
+| D11 | Database theme plus server presentation cookie | Apply saved appearance during server rendering; avoid stale account-local overrides |
 
 Primary risks are ownership leaks, stale/duplicate writes, historical score drift, timer recovery, timezone errors, misleading coverage, and premature scope expansion. Their tests and release gates are in [QA](QA.md). Future verified decisions extend this log; do not mark draft behavior as implemented.

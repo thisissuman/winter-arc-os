@@ -1,109 +1,113 @@
 # Winter Arc OS
 
-A personal operating system for habits, fitness, interview preparation, planning, and reflection. It is built around fast daily logging, reusable challenges, and explainable performance measurements.
+A personal performance application for habits, fitness, career preparation, planning, and reflection. Built incrementally with Next.js and Supabase.
 
 ## Current delivery
 
-**Phase 0: project documentation.** This repository is not runnable yet. The application, database migrations, dependencies, `.env.example`, and automated test tooling will be created in Phase 1. No user performance data has been generated.
+**Phase 1 foundation is implemented; hosted verification is pending.** The application includes signup, confirmation, login, password recovery, logout, cookie sessions, a protected empty Today page, and working profile/theme settings. Navigation contains only Today and Settings. No tracking records, scores, or future feature pages are fabricated.
 
-Start with the [phase checklist](docs/ROADMAP.md). For implementation rules, read [AGENTS.md](AGENTS.md).
+The foundation migration has passed isolated PostgreSQL tests but has **not been applied to a hosted project**. The saved Codex MCP configuration now matches `.env.local`, but this chat’s active MCP still reports the previous project and database inspection times out. Reconnect the active MCP before any hosted migration. See [ROADMAP](docs/ROADMAP.md) for unmet gates and [QA](docs/QA.md) for executed checks.
 
 ## Documentation
 
 | Source of truth | Contents |
 | --- | --- |
-| [PRODUCT.md](PRODUCT.md) | Requirements, terminology, editable defaults, exclusions |
-| [ARCHITECTURE.md](docs/ARCHITECTURE.md) | Architecture, schema, routes, components, security, decisions |
-| [SCORING.md](docs/SCORING.md) | Date/schedule rules, formulas, streaks, examples |
-| [DESIGN.md](DESIGN.md) | Approved UI direction and implementation recording rules |
-| [ROADMAP.md](docs/ROADMAP.md) | Bounded phases and acceptance gates |
-| [QA.md](docs/QA.md) | Test strategy, release checklist, verified results |
-| [MASTER_SPEC.md](docs/MASTER_SPEC.md) | Original specification, preserved as historical input |
+| [AGENTS.md](AGENTS.md) | Operating rules and phase workflow |
+| [PRODUCT.md](PRODUCT.md) | Requirements, terminology, defaults, exclusions |
+| [ARCHITECTURE.md](docs/ARCHITECTURE.md) | Boundaries, schema, routes, security, decisions |
+| [SCORING.md](docs/SCORING.md) | Schedules, formulas, streaks, examples |
+| [DESIGN.md](DESIGN.md) | Implemented tokens and interface conventions |
+| [ROADMAP.md](docs/ROADMAP.md) | Phase checklists and acceptance gates |
+| [QA.md](docs/QA.md) | Test strategy and verified results |
+| [MASTER_SPEC.md](docs/MASTER_SPEC.md) | Unchanged historical specification |
 
-## Planned stack and architecture
+## Install and run
 
-Next.js App Router, TypeScript, Tailwind CSS, shadcn/ui, Supabase Auth/PostgreSQL, Recharts, Lucide, Zod, React Hook Form, and npm. Vitest covers domain calculations; database tests cover ownership and constraints; Playwright covers user flows.
+Use Node.js 22.15 or newer within version 22 (`.nvmrc`) and npm. The committed lockfile fixes the actual dependency versions.
 
-The application is one Next.js service with authenticated server reads/actions and Supabase RLS. Browser state is limited to interaction, presentation preferences, and timer display. Daily and weekly scores are separate. Challenge associations reuse the same tracker history. See [architecture](docs/ARCHITECTURE.md) and [scoring](docs/SCORING.md).
+```sh
+npm ci
+cp .env.example .env.local
+npm run dev
+```
 
-## Local setup — available after Phase 1
+Before starting, replace the example Supabase URL/public key and set `APP_ORIGIN` to `http://localhost:3000`. Open that address after starting the server. Apply the foundation migration to the same project first; auth alone cannot supply the missing application tables. Missing credentials disable submission with a setup notice.
 
-Phase 0 inspection found Node.js 22.15.0, npm 10.9.2, and a Docker CLI on the implementation machine. Docker daemon availability was not tested. Supabase CLI was not installed. These observations are not dependency requirements or installation guarantees.
+| Environment variable | Purpose |
+| --- | --- |
+| `NEXT_PUBLIC_SUPABASE_URL` | Local or hosted project's API URL |
+| `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | Publishable key (or legacy anon key); never an administrative key |
+| `APP_ORIGIN` | Trusted application origin for confirmation/recovery links |
+| `E2E_AUTH_EMAIL`, `E2E_AUTH_PASSWORD` | Optional dedicated confirmed test-account credentials; enable hosted browser tests |
 
-Phase 1 will record the supported Node version, install compatible stable dependencies, commit `package-lock.json`, and install the Supabase CLI as a project development dependency. Use a running Docker-compatible runtime for local Supabase. No cloud account is required for local development.
+Keep `.env.local` out of Git. Never paste credentials into documentation or chat. Account deletion and its server-only administrative key arrive in Phase 8.
 
-After Phase 1 is implemented:
-
-1. Install the documented Node runtime and run `npm ci` to reproduce locked dependencies.
-2. Start the local Supabase stack using the project command below.
-3. Populate `.env.local` from the future `.env.example` using local project details; keep it out of Git.
-4. Apply local migrations, then start the development server.
-5. Exercise email confirmation/recovery using the local email inbox identified by Supabase status.
-
-The steps above are planned, not a claim that they work in this documentation-only checkout.
-
-## Environment variables — planned contract
-
-| Name | Purpose | First needed |
-| --- | --- | --- |
-| `NEXT_PUBLIC_SUPABASE_URL` | URL of the local or hosted Supabase project | Phase 1 |
-| `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | Public project key; RLS provides data protection | Phase 1 |
-| `APP_ORIGIN` | Trusted application origin for email redirects and server URLs | Phase 1 |
-| `SUPABASE_SECRET_KEY` | Server-only administrative key for account deletion | Phase 8 |
-
-Use only example placeholders in `.env.example`. Local CLI authentication and hosted migration credentials are operational secrets, not browser environment variables. Never expose an administrative key with a `NEXT_PUBLIC_` prefix.
-
-## Planned application commands
-
-These scripts do not exist yet. Phase 1 must implement and verify the applicable scripts; feature phases add tests as their behavior arrives.
+## Commands
 
 | Command | Meaning |
 | --- | --- |
-| `npm run dev` | Start the local Next.js development server |
-| `npm run lint` | Check code with ESLint without rewriting files |
-| `npm run typecheck` | Check TypeScript types without emitting application files |
-| `npm run test` | Run domain unit tests once |
-| `npm run test:db` | Run local database ownership/constraint tests |
-| `npm run test:e2e` | Run Playwright user-flow tests |
-| `npm run build` | Build the production application |
-| `npm run start` | Serve the previously built production application |
+| `npm ci` | Reproduce the locked dependency installation |
+| `npm run dev` | Start Next.js development on port 3000 |
+| `npm run lint` | Check code with ESLint |
+| `npm run typecheck` | Generate route declarations and check TypeScript |
+| `npm run test` | Run auth validation/redirect unit tests |
+| `npm run test:db` | Replay migrations in isolated PostgreSQL and verify RLS/constraints; no Docker or remote changes |
+| `npm run test:e2e` | Build production, start port 3100, and run desktop/mobile browser tests |
+| `npm run build` | Compile a production application |
+| `npm run start` | Serve an existing production build |
+| `npm run db:types` | Generate foundation public-table types from migrated isolated PostgreSQL |
+| `npm run db:start` | Start the local Supabase stack; requires a running Docker-compatible runtime |
+| `npm run db:reset` | Rebuild the disposable local Supabase database from migrations; erases local data |
 
-The lint script runs ESLint directly, following [Next.js guidance](https://nextjs.org/docs/app/getting-started/installation).
+Install Playwright's browser once with `npx playwright install chromium`. Browser tests skip authenticated flows unless dedicated test credentials are supplied. They do not mock Supabase or manufacture successful authentication.
 
-## Supabase setup and migrations — future workflow
+The scaffold uses Next.js 16.3.8, React 19.2.8, Tailwind 4, shadcn/ui, Lucide, Geist, Zod, and Supabase SSR. Recharts and React Hook Form will be added where their feature work needs them. Fonts ship locally, so builds do not fetch Google Fonts.
 
-Use the project-installed CLI through `npx supabase`; once installed, `npx` should resolve the locked local dependency. These commands have been checked against official documentation but have not been run in this repository.
+Webpack is selected explicitly for development/build because the available environment rejected Turbopack's process/port initialization. ESLint 10 uses the official `@eslint/compat` adapter for bundled Next.js plugins. npm reports their older peer ranges; the locked installation and actual lint checks succeed without legacy-peer installation flags. Re-evaluate this compatibility bridge when updating Next.js/plugins.
 
-| Command | Meaning |
-| --- | --- |
-| `npx supabase init` | Create local configuration once during Phase 1 |
-| `npx supabase start` | Start the local database/auth stack in containers |
-| `npx supabase status` | Inspect local services, URLs, and keys; do not publish secret output |
-| `npx supabase migration new foundation` | Create a timestamped SQL migration for the foundation |
-| `npx supabase db reset --local` | Rebuild the disposable local database from migrations; erases local data |
-| `npx supabase gen types typescript --local` | Generate TypeScript definitions from the local schema |
-| `npx supabase test db` | Run SQL/database tests against the local stack |
+## Local Supabase
 
-Phase 1 will provide a project script that writes generated types to their actual source file. Commit migrations and generated types together. Add an incremental migration for each schema change; do not rewrite already deployed history. Do not manually create production tables through the dashboard.
+Configuration already exists in `supabase/config.toml`; do not reinitialize it. The CLI is a locked project development dependency.
 
-The [Supabase migration guide](https://supabase.com/docs/guides/local-development/database-migrations) describes this workflow. The archived specification's `supabase db commit` example is superseded.
+```sh
+npm run db:start
+npx supabase status
+npm run db:reset
+```
 
-## Hosted Supabase and Vercel deployment — Phase 9 runbook
+Copy the local API URL and **public** key into `.env.local`; do not publish the full status output. Inspect the local inbox URL reported by the CLI to test confirmation/recovery emails. Local config enables email confirmation, minimum 12-character passwords, and the committed email templates. Seed execution is disabled until optional onboarding is implemented.
 
-No remote, hosted project, or deployment is configured in Phase 0.
+The isolated `test:db` runner executes real PostgreSQL through PGlite and supplies minimal test-only `auth.users`, roles, and `auth.uid()`. It verifies SQL/RLS without a container, but it does not run GoTrue, PostgREST, email delivery, or a full Supabase reset. Full local-stack checks remain unverified on this machine because no Docker daemon is running.
 
-Before an authorized release, create separate local/staging/production configurations; configure email delivery, application origin, allowed redirects, and confirmation/recovery templates. Link the CLI to the explicitly chosen hosted project and apply tested migrations with `npx supabase db push`. This changes the remote database: verify the target and backup/recovery requirements first. Never use a remote reset as a deployment shortcut.
+## Migrations and generated types
 
-Deploy the Next.js project to Vercel with the corresponding environment values. Keep previews isolated from production personal data. Verify auth cookies, redirects, private caching behavior, and release gates in [QA](docs/QA.md). Actual deployment identifiers and recovery steps must be recorded once configured.
+Add incremental SQL under `supabase/migrations`, using `npx supabase migration new <name>`. Never edit a migration after deploying it. The foundation creates only profiles, preferences, life areas, categories, their constraints/RLS, and the transactional new-user initializer.
 
-## Database overview
+`npm run db:types` is a foundation-only catalog generator: it derives rows, optional insert/update fields, and public relationships from the migrated schema. It rejects unknown SQL types. Once a full stack is available, prefer Supabase's generator:
 
-Foundation tables are profiles, preferences, life areas, and categories. Later migrations add shared challenge trackers, habit schedules/logs, raw numerical metrics, frequency targets, versioned scoring configuration, workouts, sleep, study/timers, planning, and reflection. Every owned table and child relationship enforces user isolation. The complete proposed model and migration order live in [ARCHITECTURE.md](docs/ARCHITECTURE.md).
+```sh
+npx supabase gen types typescript --local --schema public > src/types/database.ts
+```
 
-## PWA and offline limitations
+Hosted MCP generation can also supply the types after applying the migration. Review and commit generated types alongside schema changes. Extend or replace the isolated generator as later SQL types/functions arrive.
 
-Phase 8 adds a manifest, installable icons, theme metadata, and a public offline fallback. It will cache public assets only. Private pages, exports, auth responses, and API responses must not enter the service-worker cache. Offline tracking writes and full database synchronization are outside V1. A running timer may continue displaying elapsed time offline, but saving requires connectivity.
+## Hosted configuration
 
-## Verification
+1. Choose a development/test project. Ensure its URL matches `.env.local` and any connected MCP before inspecting or changing schema.
+2. Inspect existing tables and migration history. Apply the tested foundation SQL using the authorized MCP migration tool, or link the CLI with `npx supabase link --project-ref <reference>` and deploy using `npx supabase db push`.
+3. When MCP assigns a migration timestamp, align the local migration filename with its recorded version to prevent a later CLI push from replaying it.
+4. Configure Supabase Auth Site URL to `APP_ORIGIN`, enable email confirmations, and add the application confirmation URL to allowed redirects. Configure production-like email delivery independently.
+5. Copy `supabase/templates/confirmation.html` and `recovery.html` into the hosted Auth email templates. They use the token-hash callback expected by `/auth/confirm`; the default implicit-flow template is not interchangeable.
+6. Supply a dedicated test account and run the browser suite, then exercise real confirmation/recovery emails, session expiry/refresh, and two-user hosted isolation.
 
-Phase 0 verification covers document links, requirement coverage, calculation examples, status consistency, and whitespace. Application lint, typecheck, tests, build, and database checks are not available yet. See the dated [QA verification record](docs/QA.md) for actual results.
+Local `config.toml` does not automatically configure hosted Auth settings. MCP migration deployment does not change email templates or redirect allowlists. Do not reset a hosted project to test migrations. Follow the [Supabase migration workflow](https://supabase.com/docs/guides/local-development/database-migrations); the historical `supabase db commit` example is superseded.
+
+## Vercel and recovery
+
+No Vercel deployment or Git remote is configured. For an authorized release, use separate staging/production projects and environment values, apply tested migrations, configure Auth/email URLs for the deployed origin, then run the [release checklist](docs/QA.md). Preview deployments must not share production personal data.
+
+For a migration failure, stop subsequent deployment, inspect migration history, and correct the schema with an incremental repair migration. Do not rewrite an already-applied file or use remote reset. Confirm provider backup/PITR availability and rehearse restoration on a separate project before release; actual recovery identifiers belong in QA when configured.
+
+## Later features
+
+Phase 2 adds optional onboarding, challenges, habits, metrics, frequency targets, and scoring. Fitness, career, planning, insights, and reflection follow their bounded phases. Phase 8 adds an installable PWA with a public offline shell; private pages/API responses will not be cached, and offline writes remain unavailable.

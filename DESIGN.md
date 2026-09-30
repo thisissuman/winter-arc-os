@@ -2,7 +2,7 @@
 
 ## Status
 
-**Approved direction; not an implemented design system.** Phase 0 contains no UI, CSS tokens, components, or screenshots. Phase 1 must replace planned conventions with values and patterns verified in the actual application. Do not claim visual or accessibility verification from this document alone.
+**Foundation design system implemented.** Phase 1 delivers auth screens, the responsive workspace shell, empty Today, and profile/appearance forms. Dark auth screens have been visually reviewed on desktop/mobile; authenticated shell and light-theme browser review await hosted verification. Future tracking layouts remain planned. See QA for actual checks.
 
 Product truth lives in [PRODUCT](PRODUCT.md), route/component responsibilities in [ARCHITECTURE](docs/ARCHITECTURE.md), and validation in [QA](docs/QA.md).
 
@@ -21,11 +21,32 @@ Charts are secondary on Today and primary on feature/Insights pages. Keep elapse
 - Original application composition and copy; quality references are not layout templates.
 - No ornamental gradients, neon glows, excessive glass, hype language, or decorative animation libraries.
 
-Exact color values, spacing scales, and component variants will be recorded from the verified Phase 1 implementation, not guessed as already existing tokens.
+Actual semantic variables live in `src/app/globals.css`:
+
+| Role | Dark | Light |
+| --- | --- | --- |
+| Background | `#101115` | `#f7f7fa` |
+| Text | `#ededf2` | `#202129` |
+| Card | `#181a20` | `#ffffff` |
+| Sidebar | `#15161b` | `#efeff4` |
+| Primary / focus | `#a89af3` | `#6852d6` |
+| Primary text | `#181322` | `#ffffff` |
+| Secondary | `#22242c` | `#eeedf3` |
+| Muted text | `#a5a7b2` | `#626875` |
+| Accent | `#28243b` | `#e9e5fa` |
+| Border | `#2b2d36` | `#dddde5` |
+| Input border | `#393c48` | `#d0d0dc` |
+| Success | `#87d5a4` | `#237844` |
+| Warning | `#eac079` | `#925600` |
+| Destructive | `#ffb4ab` | `#b42318` |
+
+Geist variable sans is packaged locally and loaded with `next/font/local`. Controls/body use 14–16 px text; section headings use compact 24–30 px sizing. The auth introduction uses a larger desktop heading. Spacing uses Tailwind's 4 px base, with 24 px mobile page gutters and wider desktop spacing. Radii are 6/8/14/16 px. Primary controls and navigation targets are at least 44 px high. Focus uses a 2 px semantic outline with 4 px offset.
+
+Shared shadcn primitives are Button, Input, Label, Badge, Separator, and Skeleton; interactive feature forms remain under their feature directories. Semantic colors, visible labels, actual pending/error feedback, and reduced-motion CSS apply across foundation screens.
 
 ## Navigation and responsive behavior
 
-Desktop: sidebar groups Today, Track, Plan, Insights, Reflection, and More. Mobile: Today, Track, Plan, Insights, More bottom navigation with safe-area spacing. Both use the same routes.
+Implemented: desktop uses a 240 px sidebar from 768 px upward; mobile uses a header and fixed two-link bottom navigation with safe-area spacing. Today and Settings are the only delivered destinations. Auth uses a split introduction/form layout from 1024 px upward and a single form column below it. Both presentations use the same URLs. Later navigation expands to the approved Track, Plan, Insights, Reflection, and More destinations only as their features arrive.
 
 At small widths, prioritize a single reading column, sheets for short editing flows, reachable quick-add controls, and clear sticky actions when useful. Weekly planners can show one selected day with a week switcher. The habit grid may scroll horizontally but keeps habit identity readable and supports keyboard cell interaction.
 
@@ -49,9 +70,11 @@ Missing measurements do not display as measured zero. Empty scores read “No sc
 
 ## Implementation recording checklist
 
-- [ ] Record actual semantic tokens for both themes.
-- [ ] Record font/type/spacing rules from delivered components.
-- [ ] Record navigation adaptation and dialog/sheet behavior.
+- [x] Record actual semantic tokens for both themes.
+- [x] Record font/type/spacing rules from delivered components.
+- [x] Record delivered navigation adaptation; no dialogs/sheets are needed in this phase.
 - [ ] Verify mobile, tablet, desktop, keyboard, contrast, and reduced motion.
 - [ ] Verify privacy masking across secondary labels and accessible names.
 - [ ] Link any verified visual artifacts from the QA record; do not fabricate screenshots.
+
+Auth screenshots were inspected at 1440 px desktop and 390 px mobile; automated WCAG checks and keyboard skip-link checks pass. The generated artifacts remain under ignored `test-results/`; QA records their filenames. No privacy-mask implementation is claimed before tracker/private content exists.

@@ -16,7 +16,7 @@ The [original specification](docs/MASTER_SPEC.md) is an unchanged historical ref
 
 ## Current state
 
-Phase 0 is documentation only. No package manifest, application, SQL migrations, environment template, or test runner exists yet. Planned commands are not verified application commands. See ROADMAP and QA for evidence; never infer completion from a file being present.
+Phase 0 is complete. Phase 1 foundation code, SQL, tooling, and browser tests are implemented; hosted authentication verification is pending. Read ROADMAP and QA for current gates and evidence. Do not start Phase 2 until the foundation handoff is complete. The saved MCP configuration matches `.env.local`, but the active MCP still reports the old project and SQL inspection times out. Reconnect it before hosted deployment; no hosted migration has been applied.
 
 ## Phase workflow
 
@@ -48,10 +48,24 @@ Keep SQL migrations under `supabase/migrations`. Add tables, constraints, indexe
 
 Use project-managed Supabase CLI commands documented in README. Do not use the historical `supabase db commit` example. Local `db reset` destroys local development data; never substitute a remote database reset. Remote migration deployment is a separate explicitly targeted operation.
 
-Keep project-specific commands in the repository. Add runnable npm scripts during Phase 1, document their purpose in simple language, and mark them verified only after execution. See [QA](docs/QA.md) for the check matrix.
+Keep project-specific commands in the repository. README lists actual scripts and their meaning. Before a handoff, run `npm run lint`, `npm run typecheck`, relevant Vitest checks, and a production build. `npm run test:db` uses migrated PGlite PostgreSQL and test-only auth infrastructure; it cannot establish that hosted Auth/email or a full Supabase stack works. `npm run test:e2e` builds and tests production on port 3100; dedicated test credentials enable authenticated checks. Never silently substitute mocked authentication.
+
+Next.js uses `src/proxy.ts` for cookie refresh; pages/actions independently verify identity with `getClaims()`/`getUser()`. Preserve the proxy's response cookies and private/no-store headers. Redirects use validated `APP_ORIGIN` and a local allowlist. Local fonts and Webpack make this environment's production builds reproducible. ESLint uses the official compatibility adapter; revisit old bundled plugin peer ranges when upgrading.
+
+Before a hosted schema mutation, compare the MCP/CLI project URL with local configuration, inspect existing tables/history, and verify authorization targets that project. Never resolve a mismatch by silently changing credentials or applying to another project. If MCP creates a migration version, rename the local SQL file to that recorded timestamp before a subsequent CLI push. Hosted Auth/email settings are separate from migrations and local config. Never print privileged keys or test passwords.
 
 ## Git and handoffs
 
 Use a feature branch; default prefix is `codex/`. Never push directly to the production branch. Use focused Conventional Commits, e.g. `docs: establish phased build documentation` or `feat(auth): add cookie-based sign-in`. Preserve unrelated work. Do not push, merge, or deploy unless authorized.
 
 The repository began with an unborn `master` branch and no remote. Document the chosen production branch and remote when configured; do not assume an existing `main` or invent a repository URL. Review the diff before committing. Attach any created pull request to this chat.
+
+<!-- BEGIN:nextjs-agent-rules -->
+
+# This is NOT the Next.js you know
+
+This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` (resolved from this file's directory; in monorepos the `next` package may not be visible from the repo root) before writing any code. Heed deprecation notices.
+
+This block is written and re-added by `next dev` — verify at `node_modules/next/dist/server/lib/generate-agent-files.js`. Removing it from a diff only re-creates the uncommitted change; committing it with your work keeps the tree clean.
+
+<!-- END:nextjs-agent-rules -->

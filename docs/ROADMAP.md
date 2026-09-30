@@ -2,7 +2,7 @@
 
 ## Status
 
-**Phase 0 is complete and verified as of September 30, 2026.** Phases 1–9 are not started. No application, schema, migration, dependencies, or automated tests have been implemented. Phase 1 is next.
+**Phase 0 is complete. Phase 1 foundation is implemented and locally validated as of September 30, 2026; its hosted authentication gates remain pending.** Phases 2–9 are not started. The saved MCP configuration matches `.env.local`, but the active connection still reports the old project and SQL inspection times out; the hosted migration has not been applied. Complete the remaining foundation verification before Phase 2.
 
 The accepted plan calls for one phase at a time. Start with the earliest incomplete phase unless the user names a phase whose dependencies are already complete. Finish the phase's validation/documentation and stop with a handoff. Do not expand a phase into the entire application.
 
@@ -13,7 +13,7 @@ Read [AGENTS](../AGENTS.md), [PRODUCT](../PRODUCT.md), and the relevant [archite
 | Phase | Dependencies | State |
 | --- | --- | --- |
 | 0 — Documentation | None | Complete; documentation checks passed |
-| 1 — Foundation | 0 | Not started |
+| 1 — Foundation | 0 | Implemented; hosted verification pending |
 | 2 — Core tracking | 1 | Not started |
 | 3 — Fitness | 2 | Not started |
 | 4 — Career | 2 | Not started |
@@ -46,28 +46,32 @@ Boundary: application/tooling, authentication, minimal account/organization sche
 
 ### 1A — Scaffold and shared system
 
-- [ ] Scaffold Next.js App Router with TypeScript, `src`, Tailwind, ESLint, npm, and compatible stable versions.
-- [ ] Set up shadcn/ui, Lucide, Geist, semantic dark/light tokens, shared controls, and responsive shell.
-- [ ] Add `.gitignore`, placeholder-only `.env.example`, lockfile, supported runtime declaration, lint/typecheck/build/test scripts, and project-managed Supabase CLI.
-- [ ] Establish Vitest, local database test setup, and Playwright configuration for meaningful auth tests.
+- [x] Scaffold Next.js App Router with TypeScript, `src`, Tailwind, ESLint, npm, and compatible stable versions.
+- [x] Set up shadcn/ui, Lucide, Geist, semantic dark/light tokens, shared controls, and responsive shell.
+- [x] Add `.gitignore`, placeholder-only `.env.example`, lockfile, supported runtime declaration, lint/typecheck/build/test scripts, and project-managed Supabase CLI.
+- [x] Establish Vitest, local database test setup, and Playwright configuration for meaningful auth tests.
 
 ### 1B — Database and authentication
 
-- [ ] Create foundation SQL for profiles, preferences, life areas, categories, update triggers, same-owner relationships, indexes, and RLS.
-- [ ] Add tested idempotent auth-user initialization and generate database types.
-- [ ] Add SSR clients/session refresh, authenticated data boundaries, signup/confirmation/login/logout/recovery, and safe redirects.
-- [ ] Add protected Today/account pages, working responsive navigation, and honest empty/loading/error states.
-- [ ] Update README with actual installation, environment, local email, migration, generated-type, and validation commands; record actual UI tokens in DESIGN.
+- [x] Create foundation SQL for profiles, preferences, life areas, categories, update triggers, same-owner relationships, indexes, and RLS.
+- [x] Add tested idempotent auth-user initialization and generate database types.
+- [x] Add SSR clients/session refresh, authenticated data boundaries, signup/confirmation/login/logout/recovery, and safe redirects.
+- [x] Add protected Today/account pages, working responsive navigation, and honest empty/loading/error states.
+- [x] Update README with actual installation, environment, local email, migration, generated-type, and validation commands; record actual UI tokens in DESIGN.
 
 ### Acceptance gate
 
-- [ ] Locked dependency installation, lint, typecheck, relevant tests, and production build succeed.
-- [ ] A fresh local database can replay foundation migrations.
+- [x] Locked dependency installation, lint, typecheck, relevant tests, and production build succeed.
+- [x] Fresh isolated PostgreSQL replays foundation migrations; full Supabase container reset is separately unverified.
 - [ ] Signup/confirmation/login/logout/recovery, persistent session, expiry/refresh, and safe redirect checks pass.
-- [ ] Anonymous and two-user ownership tests pass for all four foundation tables, including category-to-area relationships.
+- [x] Isolated anonymous and two-user ownership tests pass for all four foundation tables, including category-to-area relationships.
 - [ ] Desktop/mobile/keyboard shell review passes with no broken future navigation.
 
 Handoff: created foundation, architectural decisions, exact checks, configuration still needed, remaining verification limitations, and Phase 2.
+
+Current handoff evidence: lint, typecheck, 10 auth unit tests, 65 isolated SQL checks, 14 public browser checks, locked installation, and production build pass. Authenticated browser tests remain conditional and skipped without a dedicated confirmed test account. Desktop/mobile auth screens were inspected; private shell/theme, confirmation/recovery email delivery, session refresh, and hosted ownership still need live checks.
+
+Remaining configuration: align MCP and `.env.local`, inspect/apply the migration to the authorized development project, generate hosted types, configure hosted token-hash email templates and allowed origins, then complete auth/browser checks. No hosted schema mutation occurred while the project target was ambiguous.
 
 ## Phase 2 — Core tracking
 

@@ -1,0 +1,83 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+@custom-variant dark (&:is(.dark *));
+@theme inline {
+  --font-sans: var(--font-geist-sans);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--foreground);
+  --color-popover: var(--card);
+  --color-popover-foreground: var(--foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--foreground);
+  --color-muted: var(--secondary);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-success: var(--success);
+  --color-warning: var(--warning);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--foreground);
+  --color-sidebar-accent: var(--accent);
+  --color-sidebar-accent-foreground: var(--foreground);
+  --color-sidebar-border: var(--border);
+  --radius-sm: 0.375rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 0.875rem;
+  --radius-xl: 1rem;
+}
+:root {
+  --background: #f7f7fa;
+  --foreground: #202129;
+  --card: #ffffff;
+  --primary: #6852d6;
+  --primary-foreground: #ffffff;
+  --secondary: #eeedf3;
+  --muted-foreground: #626875;
+  --accent: #e9e5fa;
+  --destructive: #b42318;
+  --border: #dddde5;
+  --input: #d0d0dc;
+  --ring: #6852d6;
+  --success: #237844;
+  --warning: #925600;
+  --sidebar: #efeff4;
+  color-scheme: light;
+}
+.dark {
+  --background: #101115;
+  --foreground: #ededf2;
+  --card: #181a20;
+  --primary: #a89af3;
+  --primary-foreground: #181322;
+  --secondary: #22242c;
+  --muted-foreground: #a5a7b2;
+  --accent: #28243b;
+  --destructive: #ffb4ab;
+  --border: #2b2d36;
+  --input: #393c48;
+  --ring: #a89af3;
+  --success: #87d5a4;
+  --warning: #eac079;
+  --sidebar: #15161b;
+  color-scheme: dark;
+}
+@layer base {
+  * { @apply border-border; }
+  body { @apply bg-background text-foreground font-sans antialiased; }
+  button, a, input, select { -webkit-tap-highlight-color: transparent; }
+  button, a { touch-action: manipulation; }
+  :focus-visible { outline: 2px solid var(--ring); outline-offset: 4px; }
+  ::selection { background: var(--accent); color: var(--foreground); }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; scroll-behavior: auto !important; }
+}
