@@ -16,7 +16,7 @@ The [original specification](docs/MASTER_SPEC.md) is an unchanged historical ref
 
 ## Current state
 
-Phase 0 is complete. Phase 1 foundation code, SQL, tooling, and browser tests are implemented; hosted authentication verification is pending. Read ROADMAP and QA for current gates and evidence. Do not start Phase 2 until the foundation handoff is complete. The saved MCP configuration matches `.env.local`, but the active MCP still reports the old project and SQL inspection times out. Reconnect it before hosted deployment; no hosted migration has been applied.
+Phase 0 is complete. Phase 1 foundation code, SQL, tooling, and browser tests are implemented; hosted authentication verification is pending. Read ROADMAP and QA for current gates and evidence. Do not start Phase 2 until the foundation handoff is complete. The active Supabase MCP now matches `.env.local`, and read-only SQL succeeds. Its configuration includes `read_only=true`, so `apply_migration` is unavailable. No hosted migration has been applied; enable write access on the authorized development project before deployment. Never bypass a read-only connection through another tool.
 
 ## Phase workflow
 

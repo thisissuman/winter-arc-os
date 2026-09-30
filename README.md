@@ -6,7 +6,7 @@ A personal performance application for habits, fitness, career preparation, plan
 
 **Phase 1 foundation is implemented; hosted verification is pending.** The application includes signup, confirmation, login, password recovery, logout, cookie sessions, a protected empty Today page, and working profile/theme settings. Navigation contains only Today and Settings. No tracking records, scores, or future feature pages are fabricated.
 
-The foundation migration has passed isolated PostgreSQL tests but has **not been applied to a hosted project**. The saved Codex MCP configuration now matches `.env.local`, but this chat’s active MCP still reports the previous project and database inspection times out. Reconnect the active MCP before any hosted migration. See [ROADMAP](docs/ROADMAP.md) for unmet gates and [QA](docs/QA.md) for executed checks.
+The foundation migration has passed isolated PostgreSQL tests but has **not been applied to a hosted project**. The active Supabase MCP now matches `.env.local`, and a read-only SQL query succeeds. The connection is configured with `read_only=true`, so its migration tool is unavailable. Hosted inspection found no public application tables or migration history. Write access on the authorized development project is needed before deploying the foundation. See [ROADMAP](docs/ROADMAP.md) for unmet gates and [QA](docs/QA.md) for executed checks.
 
 ## Documentation
 
@@ -93,7 +93,7 @@ Hosted MCP generation can also supply the types after applying the migration. Re
 
 ## Hosted configuration
 
-1. Choose a development/test project. Ensure its URL matches `.env.local` and any connected MCP before inspecting or changing schema.
+1. Choose a development/test project. Ensure its URL matches `.env.local` and any connected MCP before inspecting or changing schema. A connection configured with `read_only=true` supports inspection but cannot apply migrations; enable write access only for the intended development project before deployment.
 2. Inspect existing tables and migration history. Apply the tested foundation SQL using the authorized MCP migration tool, or link the CLI with `npx supabase link --project-ref <reference>` and deploy using `npx supabase db push`.
 3. When MCP assigns a migration timestamp, align the local migration filename with its recorded version to prevent a later CLI push from replaying it.
 4. Configure Supabase Auth Site URL to `APP_ORIGIN`, enable email confirmations, and add the application confirmation URL to allowed redirects. Configure production-like email delivery independently.

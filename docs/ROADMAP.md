@@ -2,7 +2,7 @@
 
 ## Status
 
-**Phase 0 is complete. Phase 1 foundation is implemented and locally validated as of September 30, 2026; its hosted authentication gates remain pending.** Phases 2–9 are not started. The saved MCP configuration matches `.env.local`, but the active connection still reports the old project and SQL inspection times out; the hosted migration has not been applied. Complete the remaining foundation verification before Phase 2.
+**Phase 0 is complete. Phase 1 foundation is implemented and locally validated as of September 30, 2026; its hosted authentication gates remain pending.** Phases 2–9 are not started. The active Supabase MCP now matches `.env.local` and executes read-only SQL. It is configured with `read_only=true`, so migration deployment remains unavailable and the hosted migration has not been applied. Complete the remaining foundation verification before Phase 2.
 
 The accepted plan calls for one phase at a time. Start with the earliest incomplete phase unless the user names a phase whose dependencies are already complete. Finish the phase's validation/documentation and stop with a handoff. Do not expand a phase into the entire application.
 
@@ -71,7 +71,7 @@ Handoff: created foundation, architectural decisions, exact checks, configuratio
 
 Current handoff evidence: lint, typecheck, 10 auth unit tests, 65 isolated SQL checks, 14 public browser checks, locked installation, and production build pass. Authenticated browser tests remain conditional and skipped without a dedicated confirmed test account. Desktop/mobile auth screens were inspected; private shell/theme, confirmation/recovery email delivery, session refresh, and hosted ownership still need live checks.
 
-Remaining configuration: align MCP and `.env.local`, inspect/apply the migration to the authorized development project, generate hosted types, configure hosted token-hash email templates and allowed origins, then complete auth/browser checks. No hosted schema mutation occurred while the project target was ambiguous.
+Remaining configuration: enable write access for the authorized development MCP project, apply the foundation migration, generate hosted types, configure hosted token-hash email templates and allowed origins, then complete auth/browser checks. The active project URL now matches `.env.local`; the SQL connection check succeeded, and hosted tables/migration history are empty. No schema mutation occurred.
 
 ## Phase 2 — Core tracking
 
