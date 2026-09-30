@@ -8,7 +8,11 @@ web
 
 ## Status and authority
 
-Accepted product contract for V1; application implementation has not begun. This document records the user's specification and confirmed planning decisions. The [original specification](docs/MASTER_SPEC.md) is preserved unchanged. Calculation details belong in [SCORING](docs/SCORING.md), implementation details in [ARCHITECTURE](docs/ARCHITECTURE.md), and delivery status in [ROADMAP](docs/ROADMAP.md).
+Accepted product contract for V1; Phase 1 foundation is delivered. Feature implementation continues one requested phase at a time. This document records the user's specification and confirmed planning decisions. The [original specification](docs/MASTER_SPEC.md) is preserved unchanged. Calculation details belong in [SCORING](docs/SCORING.md), implementation details in [ARCHITECTURE](docs/ARCHITECTURE.md), and delivery status in [ROADMAP](docs/ROADMAP.md).
+
+## Verification decision — October 1, 2026
+
+The user explicitly deferred signup-confirmation and password-recovery email delivery tests until custom SMTP is configured before production. Phase 1 may close after real confirmed-account login, session refresh, settings, logout, and all other foundation checks pass. Signup/recovery implementation remains in scope; successful email callbacks and delivery are unverified, not reported as passing. Restore these checks in the Phase 9 release gate before production. No email-confirmation protection is disabled to accommodate this deferral.
 
 ## Users
 

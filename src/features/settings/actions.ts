@@ -7,7 +7,7 @@ import { appearanceSchema, profileSchema, type FormState } from "@/lib/auth/vali
 
 export async function updateProfile(_previous: FormState, form: FormData): Promise<FormState> {
   const parsed = profileSchema.safeParse(Object.fromEntries(form));
-  if (!parsed.success) return { status: "error", message: "Enter a name between 1 and 80 characters." };
+  if (!parsed.success) return { status: "error", message: "Use a name up to 80 characters." };
   const { supabase, userId } = await requireAccount();
   try {
     const { data, error } = await supabase.from("profiles").update({ display_name: parsed.data.displayName }).eq("user_id", userId).select("user_id").single();

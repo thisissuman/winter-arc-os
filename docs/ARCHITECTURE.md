@@ -2,7 +2,7 @@
 
 ## Status and ownership
 
-Phase 1 implements the foundation described below: application shell, auth, profile/appearance settings, and four foundation tables. Later subsystems remain a blueprint. Hosted migration/auth verification is pending; see QA. Create each subsystem in its designated [phase](ROADMAP.md); record any schema refinement here before adding its migration. Product requirements are in [PRODUCT](../PRODUCT.md), calculations in [SCORING](SCORING.md), and visual conventions in [DESIGN](../DESIGN.md).
+Phase 1 implements the foundation described below: application shell, auth, profile/appearance settings, and four foundation tables. Later subsystems remain a blueprint. Hosted migrations, ownership checks, and dedicated-account login/session/settings/logout browser verification are complete; signup/confirmation/recovery email verification is deferred by the user until SMTP setup before production; see PRODUCT and QA. Create each subsystem in its designated [phase](ROADMAP.md); record any schema refinement here before adding its migration. Product requirements are in [PRODUCT](../PRODUCT.md), calculations in [SCORING](SCORING.md), and visual conventions in [DESIGN](../DESIGN.md).
 
 ## Application boundaries
 
@@ -46,7 +46,7 @@ Use `@supabase/supabase-js` plus `@supabase/ssr`, with separate clients and the 
 
 Phase 1 creates profiles/preferences with a small transactional new-user initializer; test its failure behavior and idempotence. Optional starter tracking data is a later authenticated operation, never an auth trigger with fabricated records.
 
-Email confirmation/recovery validates token hashes and supported flow types. Recovery leads to password update only after successful verification. Redirect destinations are an allowlisted local path, using trusted `APP_ORIGIN`; reject external, protocol-relative, and malformed redirects. Configure local/staging/production email templates and allowed URLs independently.
+Email confirmation/recovery supports direct token hashes with explicit signup/recovery types, and PKCE `code` exchange for default hosted templates. PKCE requires the initiating browser’s verifier cookie; no raw session object is trusted for authorization. The configured free project cannot edit email templates without custom SMTP, so both callback formats are retained. Positive email callback verification still requires an inbox; negative code/hash handling is covered by browser checks. Recovery leads to password update only after successful verification. Redirect destinations are an allowlisted local path, using trusted `APP_ORIGIN`; reject external, protocol-relative, and malformed redirects. Configure local/staging/production email templates and allowed URLs independently.
 
 Every owned table has RLS for SELECT, INSERT, UPDATE, and DELETE with authenticated ownership checks. UPDATE must validate both the old row and the replacement owner. Child rows also carry `user_id` and use owner-matching foreign keys, such as `(parent_id, user_id)` referencing `(id, user_id)`. RLS alone does not make cross-owner foreign keys safe. Join tables enforce ownership on both parents.
 
@@ -77,19 +77,19 @@ Add selected-challenge ownership FK only when challenges exist in Phase 2. Prese
 
 ### Implemented foundation details
 
-The foundation migration is `supabase/migrations/20260930000000_foundation.sql`. It initializes existing/new auth users transactionally and idempotently without starter areas, tracker definitions, or measurements. All four public tables use owned CRUD policies; anonymous table grants are revoked. Private trigger helpers have empty search paths and no public/anon/authenticated execution grant.
+The foundation migration is `supabase/migrations/20260930180649_foundation.sql`, applied to the configured development project through MCP. Its filename matches the hosted migration ledger. It initializes existing/new auth users transactionally and idempotently without starter areas, tracker definitions, or measurements. All four public tables use owned CRUD policies; anonymous table grants are revoked. Private trigger helpers have empty search paths and no public/anon/authenticated execution grant.
 
-- Profiles: display name defaults empty and is bounded to 80 characters. Auth owns email/password; no duplicated account credentials.
+- Profiles: display name defaults empty and is bounded to 80 characters. Profile settings allow clearing it to use the default greeting; signup still requires a name. Auth owns email/password; no duplicated account credentials.
 - Preferences: timezone is validated against PostgreSQL's timezone catalog; ISO week start is 1–7; theme is dark/light/system. Defaults are Asia/Kolkata, Monday, dark, privacy off, hide-private off, onboarding incomplete. Challenge selection arrives with Phase 2.
 - Areas/categories: generated UUID, name length 1–80 after trimming, nonnegative order, optional archive timestamp. Area icon/color are optional. Categories may omit an area.
 - Category ownership is enforced by `(life_area_id, user_id)` → `(id, user_id)`, with a deferred NO ACTION relationship. Archive is the ordinary removal mechanism; auth-user deletion cascades all owned foundation data without a nullable-owner workaround.
-- Owner/order and owner/area indexes support the implemented relationships. Each table has created/updated timestamps and an update trigger.
+- Owner/order and owner/area indexes support account-scoped lists. Migration `20260930181434_categories_parent_index.sql` adds a parent-first `(life_area_id, user_id)` category index matching the composite foreign key, following the hosted performance advisor. Each table has created/updated timestamps and an update trigger.
 
 `requireAccount()` caches the verified identity and owned profile/preferences only within a request. Missing initialized rows produce a retryable application error rather than fabricated account data. Server Actions use the caller's cookie client, Zod validation, ownership filters, and revalidation. Theme settings persist to PostgreSQL and an HttpOnly presentation cookie; server rendering and the theme provider use that cookie to avoid another account's stale local theme overriding the saved choice.
 
 The proxy refreshes cookies using `getClaims()` and private/no-store response headers. Email links verify supported token hashes via `/auth/confirm`; trusted origin and local redirect allowlist prevent external redirects. Recovery requires a verified identity, changes the password, and revokes other sessions. Dynamic protected pages and independent action authorization remain necessary even with the proxy.
 
-Testing replays this SQL against isolated PGlite PostgreSQL with minimal test-only auth roles/catalog. This verifies database behavior but is not a Supabase HTTP/auth emulator. Generated public-table types currently come from that migrated catalog. Hosted types and full auth verification will follow project alignment.
+Testing replays this SQL against isolated PGlite PostgreSQL with minimal test-only auth roles/catalog. This verifies database behavior but is not a Supabase HTTP/auth emulator. Committed public types are generated from the hosted schema using Supabase MCP; the isolated catalog generator remains a foundation-only fallback. A rollback-only hosted script verifies actual PostgreSQL roles, RLS, ownership relationships, and initializer/cascade behavior. Authenticated browser and email verification require the dedicated test account and hosted email setup; the SQL script does not replace them.
 
 ### Challenges and core tracking — Phase 2
 
@@ -238,5 +238,7 @@ Every feature handles actual loading, absence, errors, long labels, archived sou
 | D09 | Webpack build and packaged Geist | Turbopack initialization is restricted here; production compilation works without remote font fetches |
 | D10 | Isolated PostgreSQL foundation checks plus real browser integration | Verify RLS without Docker; keep hosted Auth/email gates explicit and unmocked |
 | D11 | Database theme plus server presentation cookie | Apply saved appearance during server rendering; avoid stale account-local overrides |
+| D12 | Token-hash and default-template PKCE callback support | Current hosted free plan locks custom templates without SMTP; retain secure cookie-bound code exchange and same-browser instructions |
+| D13 | Defer email delivery/callback verification before production | Explicit user instruction on October 1, 2026; Phase 1 closes with confirmed-account flows verified, email tests remain a release gate |
 
 Primary risks are ownership leaks, stale/duplicate writes, historical score drift, timer recovery, timezone errors, misleading coverage, and premature scope expansion. Their tests and release gates are in [QA](QA.md). Future verified decisions extend this log; do not mark draft behavior as implemented.

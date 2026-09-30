@@ -44,7 +44,7 @@ export async function signup(_previous: FormState, form: FormData): Promise<Form
     });
     if (error) return { status: "error", message: "Unable to create an account. Try again shortly or sign in if you already have an account." };
   } catch { return unavailable; }
-  return { status: "success", message: "Check your email for a confirmation link. If you already have an account, sign in instead." };
+  return { status: "success", message: "Check your email for a confirmation link and open it in this browser. If you already have an account, sign in instead." };
 }
 
 export async function requestRecovery(_previous: FormState, form: FormData): Promise<FormState> {
@@ -58,7 +58,7 @@ export async function requestRecovery(_previous: FormState, form: FormData): Pro
     });
     if (error) return { status: "error", message: "The recovery email could not be requested. Try again shortly." };
   } catch { return unavailable; }
-  return { status: "success", message: "If an account matches this email, a recovery link will arrive shortly." };
+  return { status: "success", message: "If an account matches this email, a recovery link will arrive shortly. Open it in this browser." };
 }
 
 export async function resetPassword(_previous: FormState, form: FormData): Promise<FormState> {

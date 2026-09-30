@@ -14,7 +14,7 @@ export const passwordSchema = z.object({ password, confirmPassword: z.string() }
   (input) => input.password === input.confirmPassword,
   { message: "Passwords must match.", path: ["confirmPassword"] },
 );
-export const profileSchema = z.object({ displayName: z.string().trim().min(1, "Enter your name.").max(80) });
+export const profileSchema = z.object({ displayName: z.string().trim().max(80, "Use no more than 80 characters.") });
 export const appearanceSchema = z.object({ theme: z.enum(["dark", "light", "system"]) });
 
 export type FormState = {

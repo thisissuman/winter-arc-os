@@ -10,7 +10,7 @@ import { updateAppearance, updateProfile } from "./actions";
 export function ProfileForm({ name, email }: { name: string; email: string }) {
   const [state, action, pending] = useActionState(updateProfile, initialFormState);
   return <form action={action} className="max-w-md space-y-5">
-    <div className="space-y-2"><Label htmlFor="displayName">Display name</Label><Input className="h-11 bg-card" id="displayName" name="displayName" defaultValue={name} autoComplete="name" required maxLength={80} disabled={pending} /></div>
+    <div className="space-y-2"><Label htmlFor="displayName">Display name</Label><Input className="h-11 bg-card" id="displayName" name="displayName" defaultValue={name} autoComplete="name" maxLength={80} disabled={pending} aria-describedby="name-help" /><p id="name-help" className="text-xs text-muted-foreground">Optional. Leave blank to use the default greeting.</p></div>
     <div><p className="text-sm font-medium">Email address</p><p className="mt-2 break-all text-sm text-muted-foreground">{email}</p><p className="mt-1 text-xs text-muted-foreground">Used to sign in and recover your account.</p></div>
     <Button className="h-11 px-4" type="submit" disabled={pending}>{pending ? "Saving…" : "Save profile"}</Button>
     <FormFeedback state={state} />

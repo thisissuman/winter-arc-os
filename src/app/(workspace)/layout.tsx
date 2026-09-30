@@ -19,7 +19,7 @@ export default async function WorkspaceLayout({ children }: { children: React.Re
       </div>
     </aside>
     <header className="border-b bg-sidebar px-6 py-5 md:hidden"><Link href="/today" aria-label="Winter Arc OS Today"><Brand /></Link></header>
-    <div className="md:pl-60"><main id="workspace-content" className="mx-auto max-w-[1200px] px-6 pt-8 pb-28 sm:px-10 md:py-12 lg:px-14">{children}</main></div>
+    <div className="md:pl-60"><main id="workspace-content" tabIndex={-1} className="mx-auto max-w-[1200px] px-6 pt-8 pb-28 sm:px-10 md:py-12 lg:px-14">{children}</main></div>
     <div className="fixed inset-x-0 bottom-0 z-20 border-t bg-sidebar md:hidden"><Navigation mobile /></div>
   </div>;
 }

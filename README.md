@@ -4,9 +4,9 @@ A personal performance application for habits, fitness, career preparation, plan
 
 ## Current delivery
 
-**Phase 1 foundation is implemented; hosted verification is pending.** The application includes signup, confirmation, login, password recovery, logout, cookie sessions, a protected empty Today page, and working profile/theme settings. Navigation contains only Today and Settings. No tracking records, scores, or future feature pages are fabricated.
+**Phase 1 foundation is complete with a user-approved email-test deferral.** The application includes signup, confirmation, login, password recovery, logout, cookie sessions, a protected empty Today page, and working profile/theme settings. Navigation contains only Today and Settings. No tracking records, scores, or future feature pages are fabricated.
 
-The foundation migration has passed isolated PostgreSQL tests but has **not been applied to a hosted project**. The active Supabase MCP now matches `.env.local`, and a read-only SQL query succeeds. The connection is configured with `read_only=true`, so its migration tool is unavailable. Hosted inspection found no public application tables or migration history. Write access on the authorized development project is needed before deploying the foundation. See [ROADMAP](docs/ROADMAP.md) for unmet gates and [QA](docs/QA.md) for executed checks.
+The foundation and category relationship index migrations are applied to the configured hosted development project. Its MCP URL matches `.env.local`, write access works, and generated types come from the hosted public schema. Hosted ownership checks and anonymous API denial pass; both security/performance advisors report no findings. All 16 desktop/mobile browser checks pass with the configured dedicated account, including real login, refresh-token rotation, profile/theme persistence, and logout. The user deferred signup/confirmation/recovery email delivery tests until custom SMTP is configured before production. These remain unverified release gates; the supplied confirmed test account uses an example-domain address. See [ROADMAP](docs/ROADMAP.md) for unmet gates and [QA](docs/QA.md) for executed checks.
 
 ## Documentation
 
@@ -81,7 +81,7 @@ The isolated `test:db` runner executes real PostgreSQL through PGlite and suppli
 
 ## Migrations and generated types
 
-Add incremental SQL under `supabase/migrations`, using `npx supabase migration new <name>`. Never edit a migration after deploying it. The foundation creates only profiles, preferences, life areas, categories, their constraints/RLS, and the transactional new-user initializer.
+Add incremental SQL under `supabase/migrations`, using `npx supabase migration new <name>`. Never edit a migration after deploying it. The foundation creates only profiles, preferences, life areas, categories, their constraints/RLS, and the transactional new-user initializer. Applied versions are `20260930180649_foundation` and `20260930181434_categories_parent_index`; local filenames match the hosted ledger. The second migration adds the parent-first category relationship index without rewriting deployed SQL.
 
 `npm run db:types` is a foundation-only catalog generator: it derives rows, optional insert/update fields, and public relationships from the migrated schema. It rejects unknown SQL types. Once a full stack is available, prefer Supabase's generator:
 
@@ -89,7 +89,7 @@ Add incremental SQL under `supabase/migrations`, using `npx supabase migration n
 npx supabase gen types typescript --local --schema public > src/types/database.ts
 ```
 
-Hosted MCP generation can also supply the types after applying the migration. Review and commit generated types alongside schema changes. Extend or replace the isolated generator as later SQL types/functions arrive.
+The committed types were generated through hosted MCP after applying the foundation migration. `db:types` remains the isolated foundation fallback; use Supabase generation after hosted changes so the committed types retain its complete generated helpers and API version metadata. Review and commit generated types alongside schema changes. Extend or replace the isolated generator as later SQL types/functions arrive.
 
 ## Hosted configuration
 
@@ -97,8 +97,15 @@ Hosted MCP generation can also supply the types after applying the migration. Re
 2. Inspect existing tables and migration history. Apply the tested foundation SQL using the authorized MCP migration tool, or link the CLI with `npx supabase link --project-ref <reference>` and deploy using `npx supabase db push`.
 3. When MCP assigns a migration timestamp, align the local migration filename with its recorded version to prevent a later CLI push from replaying it.
 4. Configure Supabase Auth Site URL to `APP_ORIGIN`, enable email confirmations, and add the application confirmation URL to allowed redirects. Configure production-like email delivery independently.
-5. Copy `supabase/templates/confirmation.html` and `recovery.html` into the hosted Auth email templates. They use the token-hash callback expected by `/auth/confirm`; the default implicit-flow template is not interchangeable.
-6. Supply a dedicated test account and run the browser suite, then exercise real confirmation/recovery emails, session expiry/refresh, and two-user hosted isolation.
+5. With custom SMTP configured, copy `supabase/templates/confirmation.html` and `recovery.html` into hosted Auth email templates for direct token-hash verification. The current free dashboard locks template editing without SMTP. Default templates can instead use the existing SSR PKCE flow: `/auth/confirm` exchanges the returned `code` using the verifier cookie. Open the email link in the same browser/device that requested it; another browser cannot supply that verifier. See the [PKCE flow guide](https://supabase.com/docs/guides/auth/sessions/pkce-flow).
+6. Create a dedicated account in Supabase Auth → Users and confirm its email. Add `E2E_AUTH_EMAIL` and `E2E_AUTH_PASSWORD` to ignored `.env.local`, then run `npm run test:e2e`. This exercises real login, reload persistence, refresh-token rotation, settings, theme changes, keyboard access, and logout. Use a test account because these checks temporarily change its name/theme; ordinary owner-scoped API cleanup restores both in `finally` even on assertion failure. Traces can contain test credentials and remain ignored; never publish them.
+7. Separately exercise signup and confirmation/recovery emails against a real inbox. The default email service sends only to pre-authorized organization team addresses and has restrictive limits; configure [custom SMTP](https://supabase.com/docs/guides/auth/auth-smtp) for other recipients. A manually confirmed example-domain test account establishes login, not email delivery. After resetting a dedicated fixture password, update its ignored E2E password locally before rerunning tests. Never send passwords or email links in chat.
+
+Hosted PostgreSQL isolation is verified by `supabase/tests/hosted-foundation.sql`. Read and validate it with `npm run test:db` before executing through the authorized development-project MCP. It inserts only temporary security fixtures, exercises owned CRUD and anonymous/cross-owner denial, then rolls back all fixture changes. It does not create a usable Auth API test account or send email.
+
+The current hosted Site URL is `http://localhost:3000`. Exact allowed callbacks are `http://localhost:3000/auth/confirm` and `http://localhost:3000/auth/confirm?next=/reset-password`; no wildcard was added. Hosted templates remain the provider defaults. These are development settings, not a deployed release.
+
+The browser refresh test changes only cookie `expires_at` metadata to a past value, preserving server-issued tokens, then verifies a real Auth refresh and rotated refresh token. It does not wait for or manufacture an expired signed JWT.
 
 Local `config.toml` does not automatically configure hosted Auth settings. MCP migration deployment does not change email templates or redirect allowlists. Do not reset a hosted project to test migrations. Follow the [Supabase migration workflow](https://supabase.com/docs/guides/local-development/database-migrations); the historical `supabase db commit` example is superseded.
 

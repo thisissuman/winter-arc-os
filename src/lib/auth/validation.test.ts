@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { safeRedirect } from "./redirect";
-import { loginSchema, passwordSchema, signupSchema } from "./validation";
+import { loginSchema, passwordSchema, profileSchema, signupSchema } from "./validation";
 
 describe("authentication validation", () => {
   it("accepts valid login without imposing signup rules on an existing password", () => {
@@ -12,6 +12,11 @@ describe("authentication validation", () => {
   });
   it("requires matching recovery passwords", () => {
     expect(passwordSchema.safeParse({ password: "a-long-password", confirmPassword: "different" }).success).toBe(false);
+  });
+  it("allows clearing an optional profile name while signup still requires a name", () => {
+    expect(profileSchema.parse({ displayName: "  " }).displayName).toBe("");
+    expect(profileSchema.safeParse({ displayName: "a".repeat(81) }).success).toBe(false);
+    expect(signupSchema.safeParse({ displayName: "", email: "a@example.com", password: "a-long-password" }).success).toBe(false);
   });
 });
 

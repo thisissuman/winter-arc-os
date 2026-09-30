@@ -2,7 +2,7 @@
 
 ## Truthful status
 
-Phase 0 is complete. Phase 1 includes runnable application/auth/database/browser checks. Local outcomes are recorded below; the hosted MCP connection is verified, while migration deployment and authentication verification remain pending write access and Auth configuration. Future feature matrices remain required checks, not passing results.
+Phases 0 and 1 are complete; Phase 1 closes with the user-approved email-test deferral recorded in PRODUCT. Phase 1 includes runnable application/auth/database/browser checks. Local outcomes are recorded below; the hosted MCP connection is verified, and its migrations/ownership rules are verified; all 16 dedicated-account browser checks pass; signup/confirmation/recovery email verification is deferred until SMTP setup before production, not reported as passing. Future feature matrices remain required checks, not passing results.
 
 Read [ROADMAP](ROADMAP.md) for phase gates, [SCORING](SCORING.md) for expected math, and [ARCHITECTURE](ARCHITECTURE.md) for ownership/source contracts.
 
@@ -65,7 +65,7 @@ Review privacy masking before hydration and in tooltips, accessible names, searc
 - [ ] Fresh local migrations replay; generated types match schema; no real secrets or personal fixture exports are tracked.
 - [ ] All ownership matrix rows and retry/concurrency contracts pass.
 - [ ] Supported desktop/mobile/keyboard flows pass with no material console/network errors.
-- [ ] Production-like confirmation/recovery/session cookies and allowed redirects work.
+- [ ] Production-like confirmation/recovery/session cookies and allowed redirects work, including the signup-confirmation and password-recovery email tests explicitly deferred at the Phase 1 handoff.
 - [ ] Privacy, export, deletion, themes, PWA installation, and public-only offline behavior pass.
 - [ ] Staging/production environment and database targets are explicit and separate.
 - [ ] Backup/recovery procedures are documented against actual configured services.
@@ -111,27 +111,46 @@ Implemented scope: Next.js/TypeScript/Tailwind/shadcn foundation, four-table mig
 | `npm ci` | Passed; 713 installed packages, zero audit vulnerabilities |
 | `npm run lint` | Passed using ESLint compatibility adapter |
 | `npm run typecheck` | Passed, including generated Next.js route declarations |
-| `npm run test` | 10 auth validation/redirect tests passed |
-| `npm run test:db` | 65 SQL checks passed against freshly migrated isolated PostgreSQL |
+| `npm run test` | 11 auth validation/redirect tests passed, including optional profile-name clearing |
+| `npm run test:db` | 66 checks passed: existing SQL cases plus local validation/rollback of the hosted security script |
 | Production build | Passed using Webpack; local Geist requires no font network fetch |
-| Production Playwright | 14 public checks passed across desktop/mobile; 2 authenticated checks skipped |
-| Automated accessibility | Auth screens passed WCAG 2 A/AA and 2.1 AA axe checks in both browser projects |
-| Keyboard | Skip-to-form and input focus checks passed in both projects |
-| Visual review | Dark login inspected at 1440×1000 and iPhone 13 viewport (390×664 CSS px) |
+| Production Playwright | All 16 checks passed across desktop/mobile; no authenticated checks skipped |
+| Automated accessibility | Auth screens, dark Today, and light Settings passed WCAG 2 A/AA and 2.1 AA axe checks in both projects |
+| Keyboard | Auth skip-to-form/input focus and workspace skip-to-main/CTA focus passed in both projects |
+| Visual review | Dark login/Today and light Settings inspected on desktop/mobile; Today also inspected at 768×1024 tablet; reduced-motion rendering verified |
 | Impeccable detector | No reported source matches |
-| Hosted project probe | Configured Auth endpoint responded successfully; application tables were absent |
-| Hosted MCP target | Active URL matches `.env.local`; read-only SQL succeeds; no public application tables/migrations; `read_only=true` disables migration deployment |
+| Hosted project probe | Auth settings HTTP 200: email enabled, signup enabled, email confirmation required; all four anonymous table reads denied with HTTP 401 / SQL `42501` |
+| Hosted MCP target | Matches `.env.local`; write access and both migrations succeeded |
+| Hosted ownership SQL | Passed on the actual project; all temporary fixtures rolled back |
+| Hosted generated types | Regenerated through MCP; typecheck/build passed |
+| Supabase advisors | Security and performance return no findings |
 | Full local Supabase | Not run: Docker CLI exists but no running daemon |
 
 SQL checks cover all four tables under anonymous and two distinct authenticated identities, owned CRUD, forged ownership inserts, owner-transfer updates, cross-owner parent links, timezone/theme/week-start/name constraints, update triggers, cascades, initializer idempotence, rollback on initializer failure, and revoked private helper execution. Test-only auth infrastructure is isolated and is not committed as a deployable migration.
 
 Public browser tests cover form navigation, meaningful server validation, field/alert association, unauthorized route protection, unsafe confirmation redirects, no-store response headers, horizontal overflow, accessibility, and keyboard navigation. They run against the actual production Next.js server. They do not fake successful Auth HTTP responses.
 
-Reviewed artifacts are regenerated by the browser suite in ignored `test-results/login-desktop.png` and `login-mobile.png`; mobile screenshot pixels reflect its device scale factor. No screenshot of a successfully authenticated workspace is claimed yet.
+Reviewed artifacts are regenerated in ignored `test-results/`: `login-desktop.png`, `login-mobile.png`, `today-desktop.png`, `today-mobile.png`, `today-tablet.png`, and `settings-light-desktop.png` / `settings-light-mobile.png`. Mobile screenshots reflect device scale and full-page captures. All named private-screen artifacts came from real authenticated sessions. Never publish browser traces, which can contain test credentials.
 
 Known environment/tooling details: Next.js Turbopack initialization failed under the current process/port restrictions, so Webpack is explicit. npm warns that bundled import/React/accessibility plugins advertise older ESLint peer ranges; the official compatibility adapter, clean locked install, and lint execution were verified. Full-stack Docker/auth checks are not replaced by the isolated SQL results.
 
-Remaining gates: enable write access on the authorized development MCP connection, apply the foundation migration, compare generated hosted types, configure hosted Auth URLs/email templates, and verify signup/confirmation/recovery, persistent/expired sessions, authenticated settings/light theme/shell, and hosted two-user access. Email delivery and staging/production deployment remain unverified. Phase 1 is not marked complete.
+Deferred release gate, by explicit user instruction on October 1, 2026: signup/confirmation/recovery through a real deliverable inbox, including a successful email callback and password update. Hosted Site URL/callbacks are configured; login, persistence, real refresh, settings/themes, private-shell accessibility, and logout pass. Hosted custom SMTP is not configured, and the current free dashboard locks custom templates; the app now also supports default-template PKCE codes. Staging/production deployment and a full local Supabase container replay remain unverified. Phase 1 is complete under this approved verification deferral; production release is not approved or verified.
 
 
-Connection recheck — September 30, 2026: `get_project_url` returned the configured development project. `select 1 as connection_ok, current_database() as database_name;` returned `connection_ok = 1` and `database_name = postgres`. Public-table and migration inspection returned empty lists. The saved MCP URL has `read_only=true`; the available tool inventory omits `apply_migration`. No hosted SQL mutation, migration, or credential change was performed.
+Earlier connection recheck — September 30, 2026: `get_project_url` returned the configured development project. `select 1 as connection_ok, current_database() as database_name;` returned `connection_ok = 1` and `database_name = postgres`. Public-table and migration inspection returned empty lists. The saved MCP URL has `read_only=true`; the available tool inventory omits `apply_migration`. No hosted SQL mutation, migration, or credential change was performed.
+
+
+Write-access verification — September 30, 2026: the project URL matched `.env.local`, and pre-migration inspection found no public tables or migration history. Authorized MCP deployment applied `20260930180649_foundation` and `20260930181434_categories_parent_index`; local SQL filenames match those recorded versions. All four tables have RLS enabled. A [missing foreign-key covering index advisory](https://supabase.com/docs/guides/database/database-linter?lint=0001_unindexed_foreign_keys) was resolved by the second incremental migration; security and performance advisors then returned no findings.
+
+The hosted rollback-only script verifies actual anonymous read/write denial on all four tables, A/B read isolation, cross-owner update/delete denial, forged owner insert/transfer denial, owned CRUD, category parent ownership, initializer defaults, private initializer privileges, and auth-user cascades. Its fixtures are generated UUIDs in a rolled-back transaction and never become personal tracking data. Separately, real PostgREST anonymous reads return HTTP 401 / `42501` for every foundation table. SQL role tests do not establish that Auth-issued JWTs, email delivery, or browser sessions work.
+
+Latest execution after dedicated-account setup: lint, typecheck, 11 auth unit tests, 66 database tests, production build, and all 16 desktop/mobile browser checks pass. No successful Auth responses are mocked. The user-created confirmed account signs in through the app; profile updates (including clearing an empty initial name), theme updates, reloading, keyboard access, and logout/protected redirects pass. Fixture values are restored through caller-scoped API requests in `finally`. A navigation race in the mobile test was fixed by waiting for Settings before reloading.
+
+The refresh check expires only the persisted `expires_at` cookie metadata while keeping real Auth-issued credentials, then reloads through the proxy and verifies future expiry plus actual refresh-token rotation. It does not manufacture a signed JWT or verify waiting until its real expiry. No credential values appear in test output or documentation.
+
+Browser checks found the global Next.js `Referrer-Policy` overriding the callback handler. A route-specific configuration now ensures callbacks return `no-referrer`, verified alongside `private, no-store`. Both missing/invalid token parameters and invalid PKCE codes reject unsafe redirect destinations.
+
+Hosted dashboard verification: Site URL is localhost:3000; exact confirmation and recovery redirect URLs are saved without wildcards. Default confirmation template uses `.ConfirmationURL`; template editing is disabled without SMTP on this free project. The application adds cookie-bound [PKCE code exchange](https://supabase.com/docs/guides/auth/sessions/pkce-flow) while retaining direct token-hash verification. The default service sends only to [authorized organization team addresses](https://supabase.com/docs/guides/auth/auth-smtp). The configured example-domain fixture has no deliverable inbox, so email gates remain explicitly unverified. The user explicitly instructed skipping signup-confirmation and password-recovery email delivery tests for now and configuring SMTP before production. No email tests were performed after that instruction. Phase 1 closes with this deferral; repeat the email/callback/password-update checks before release. Passwords and email links must remain out of chat.
+
+
+Phase 1 closeout — October 1, 2026: documented the explicit user-approved email-test deferral in PRODUCT, ARCHITECTURE, ROADMAP, README, and AGENTS. All nine Markdown documents pass title/fence checks and 47 local link destinations exist. Diff whitespace checks pass. Phase 2 remains unstarted; no push, merge, or application deployment was performed.

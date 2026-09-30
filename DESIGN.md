@@ -2,7 +2,7 @@
 
 ## Status
 
-**Foundation design system implemented.** Phase 1 delivers auth screens, the responsive workspace shell, empty Today, and profile/appearance forms. Dark auth screens have been visually reviewed on desktop/mobile; authenticated shell and light-theme browser review await hosted verification. Future tracking layouts remain planned. See QA for actual checks.
+**Foundation design system implemented.** Phase 1 delivers auth screens, the responsive workspace shell, empty Today, and profile/appearance forms. Dark auth screens and the authenticated Today shell have been visually reviewed on desktop/mobile/tablet; light Settings has been reviewed on desktop/mobile. Auth and private screens pass automated WCAG checks; the workspace skip link is keyboard verified. Future tracking layouts remain planned. See QA for actual checks.
 
 Product truth lives in [PRODUCT](PRODUCT.md), route/component responsibilities in [ARCHITECTURE](docs/ARCHITECTURE.md), and validation in [QA](docs/QA.md).
 
@@ -73,8 +73,8 @@ Missing measurements do not display as measured zero. Empty scores read “No sc
 - [x] Record actual semantic tokens for both themes.
 - [x] Record font/type/spacing rules from delivered components.
 - [x] Record delivered navigation adaptation; no dialogs/sheets are needed in this phase.
-- [ ] Verify mobile, tablet, desktop, keyboard, contrast, and reduced motion.
+- [x] Verify foundation mobile/tablet/desktop layouts, keyboard skip links, automated contrast/accessibility, and rendering with reduced motion enabled.
 - [ ] Verify privacy masking across secondary labels and accessible names.
-- [ ] Link any verified visual artifacts from the QA record; do not fabricate screenshots.
+- [x] Record regenerated auth/private-screen artifact filenames in [QA](docs/QA.md); artifacts are ignored, not committed as fixture data.
 
-Auth screenshots were inspected at 1440 px desktop and 390 px mobile; automated WCAG checks and keyboard skip-link checks pass. The generated artifacts remain under ignored `test-results/`; QA records their filenames. No privacy-mask implementation is claimed before tracker/private content exists.
+Auth/Today screenshots were inspected at 1440 px desktop and 390 px mobile, plus Today at 768 px tablet; light Settings was inspected on desktop/mobile. Automated WCAG checks and keyboard skip-link checks pass, including the authenticated workspace; reduced-motion rendering passes. The generated artifacts remain under ignored `test-results/`; QA records their filenames. No privacy-mask implementation is claimed before tracker/private content exists.

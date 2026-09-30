@@ -2,7 +2,7 @@
 
 ## Status
 
-**Phase 0 is complete. Phase 1 foundation is implemented and locally validated as of September 30, 2026; its hosted authentication gates remain pending.** Phases 2–9 are not started. The active Supabase MCP now matches `.env.local` and executes read-only SQL. It is configured with `read_only=true`, so migration deployment remains unavailable and the hosted migration has not been applied. Complete the remaining foundation verification before Phase 2.
+**Phases 0 and 1 are complete as of October 1, 2026. The user explicitly deferred signup-confirmation/recovery email tests until SMTP setup before production.** Phases 2–9 are not started. The foundation and category-index migrations are applied to the matching hosted development project, and generated types/hosted ownership checks are verified. Dedicated-account browser checks and real refresh-token rotation pass; signup/confirmation/recovery email verification remains an unmet release gate under the user-approved deferral. Phase 2 is next, when requested.
 
 The accepted plan calls for one phase at a time. Start with the earliest incomplete phase unless the user names a phase whose dependencies are already complete. Finish the phase's validation/documentation and stop with a handoff. Do not expand a phase into the entire application.
 
@@ -13,7 +13,7 @@ Read [AGENTS](../AGENTS.md), [PRODUCT](../PRODUCT.md), and the relevant [archite
 | Phase | Dependencies | State |
 | --- | --- | --- |
 | 0 — Documentation | None | Complete; documentation checks passed |
-| 1 — Foundation | 0 | Implemented; hosted verification pending |
+| 1 — Foundation | 0 | Complete; email tests deferred by user until before production |
 | 2 — Core tracking | 1 | Not started |
 | 3 — Fitness | 2 | Not started |
 | 4 — Career | 2 | Not started |
@@ -63,15 +63,16 @@ Boundary: application/tooling, authentication, minimal account/organization sche
 
 - [x] Locked dependency installation, lint, typecheck, relevant tests, and production build succeed.
 - [x] Fresh isolated PostgreSQL replays foundation migrations; full Supabase container reset is separately unverified.
-- [ ] Signup/confirmation/login/logout/recovery, persistent session, expiry/refresh, and safe redirect checks pass.
-- [x] Isolated anonymous and two-user ownership tests pass for all four foundation tables, including category-to-area relationships.
-- [ ] Desktop/mobile/keyboard shell review passes with no broken future navigation.
+- [x] Dedicated-account login/logout, persistent sessions, real refresh-token rotation after expiring cookie metadata, and safe redirect/header checks pass on desktop/mobile.
+- [x] User-approved gate adjustment: signup/confirmation/recovery email delivery and positive email callbacks are deferred until custom SMTP setup before production; see PRODUCT and the unmet QA release gate. No passing email result is claimed.
+- [x] Isolated and hosted anonymous/two-user ownership tests pass for all four foundation tables, including category-to-area relationships.
+- [x] Desktop/mobile/keyboard shell and light-theme review pass; tablet Today is readable without horizontal overflow and navigation exposes delivered routes only.
 
 Handoff: created foundation, architectural decisions, exact checks, configuration still needed, remaining verification limitations, and Phase 2.
 
-Current handoff evidence: lint, typecheck, 10 auth unit tests, 65 isolated SQL checks, 14 public browser checks, locked installation, and production build pass. Authenticated browser tests remain conditional and skipped without a dedicated confirmed test account. Desktop/mobile auth screens were inspected; private shell/theme, confirmation/recovery email delivery, session refresh, and hosted ownership still need live checks.
+Current handoff evidence: lint, typecheck, 11 auth unit tests, 66 isolated SQL checks, rollback-only hosted ownership checks, four anonymous API denial checks, all 16 production browser checks, locked installation, and production build pass. Authenticated checks use actual Supabase-issued sessions, verify rotation after expiring only persisted metadata, and restore fixture name/theme even on test failure. Dark Today was inspected on desktop/tablet/mobile; light Settings was inspected on desktop/mobile, with accessibility and keyboard checks. Hosted ownership and both security/performance advisors pass.
 
-Remaining configuration: enable write access for the authorized development MCP project, apply the foundation migration, generate hosted types, configure hosted token-hash email templates and allowed origins, then complete auth/browser checks. The active project URL now matches `.env.local`; the SQL connection check succeeded, and hosted tables/migration history are empty. No schema mutation occurred.
+Remaining configuration: a deliverable email inbox and appropriate email service for signup/confirmation/recovery verification. The supplied confirmed fixture uses an example-domain address. Hosted Site URL and exact callbacks are configured for localhost:3000. Custom templates remain locked by the current free-plan dashboard without SMTP; secure default-template PKCE callbacks and token-hash callbacks are both implemented. Applied migration versions are `20260930180649_foundation` and `20260930181434_categories_parent_index`; local filenames match the hosted ledger. Generated hosted types compile, and temporary SQL security fixtures were rolled back. Phase 1 closes under the user-approved email-test deferral recorded in PRODUCT. Phase 2 is not started; production release still requires the deferred email checks.
 
 ## Phase 2 — Core tracking
 
@@ -175,5 +176,6 @@ Acceptance: the complete [QA release checklist](QA.md) passes with evidence. Pen
 | Phase | Date | Evidence/handoff |
 | --- | --- | --- |
 | 0 | September 30, 2026 | Nine Markdown files, 50 local links, preserved original source, balanced fences, phase/status review, illustrative math, and staged whitespace checks passed; see QA |
+| 1 | October 1, 2026 | Foundation code/migrations/types delivered; lint/typecheck/build, 11 unit tests, 66 database checks, 16 real browser checks, hosted ownership/advisors, and responsive/accessibility review passed. Email tests explicitly deferred by the user until SMTP setup before production; see QA |
 
 Add an entry only after its gate passes. Keep later phases uncompleted until actual verification.
