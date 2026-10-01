@@ -103,7 +103,7 @@ test("authenticated account persists, profile saves, theme changes, and logout p
   await page.keyboard.press("Enter");
   await expect(page.getByRole("main")).toBeFocused();
   await page.keyboard.press("Tab");
-  await expect(page.getByRole("link", { name: "Review your profile" })).toBeFocused();
+  await expect(page.getByLabel("Dashboard challenge")).toBeFocused();
   await page.emulateMedia({ reducedMotion: "reduce" });
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
   await page.screenshot({ path: `test-results/today-${testInfo.project.name}.png`, fullPage: true });

@@ -26,9 +26,9 @@ afterEach(async () => { await database.exec("rollback; reset role;"); });
 afterAll(async () => { await database?.close(); });
 
 describe("fresh migration and user initialization", () => {
-  it("creates only the four foundation tables with RLS", async () => {
+  it("keeps the four foundation tables protected after later migrations", async () => {
     const { rows } = await database.query<{ name: string; secured: boolean }>("select relname name, relrowsecurity secured from pg_class c join pg_namespace n on c.relnamespace=n.oid where n.nspname='public' and relkind='r' order by relname");
-    expect(rows.map((row) => row.name)).toEqual([...tables].sort());
+    expect(rows.map((row) => row.name)).toEqual(expect.arrayContaining([...tables]));
     expect(rows.every((row) => row.secured)).toBe(true);
   });
   it("initializes real profile/preferences defaults without tracking records", async () => {
