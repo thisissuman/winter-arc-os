@@ -33,7 +33,7 @@ test("study totals, timer recovery, and category history stay in sync", async ({
     await expect(page.getByRole("status")).toContainText("Category saved", { timeout: 20000 });
     categoryCreated = true;
     await page.reload();
-    const date = await page.getByLabel("Review date").inputValue();
+    const date = await page.getByLabel("Review date").first().inputValue();
     await page.getByRole("spinbutton", { name: "Duration (minutes)" }).fill("90");
     await page.getByRole("article").filter({ has: page.getByRole("heading", { name: "Log a manual session" }) }).getByRole("textbox", { name: "Topic (optional)" }).fill("E2E domain review");
     await page.getByRole("button", { name: "Log study session" }).click();
@@ -49,6 +49,14 @@ test("study totals, timer recovery, and category history stay in sync", async ({
     timerStarted = true;
     await page.reload();
     await expect(page.getByRole("button", { name: "Pause" })).toBeVisible();
+    await page.context().setOffline(true);
+    try {
+      await page.getByRole("button", { name: "Finish and save" }).click();
+      await expect(page.locator("#focus-timer-heading").locator("..").getByRole("alert")).toContainText("Could not save", { timeout: 20000 });
+      await expect(page.getByRole("button", { name: "Pause" })).toBeVisible();
+    } finally {
+      await page.context().setOffline(false);
+    }
     await page.goto("/today");
     await expect(page.getByRole("status", { name: "Active focus timer" })).toContainText("Running");
     await second.goto("/career");

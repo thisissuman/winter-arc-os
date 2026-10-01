@@ -130,7 +130,7 @@ Verified: all acceptance cases pass focused domain/database tests, a hosted roll
 
 Acceptance: raw durations/totals agree; timestamped overnight sessions split correctly; manual sessions retain selected dates; timer survives refresh/navigation and two-tab races; retries finish one session only; offline finish reports unsaved state; archived categories preserve history; ownership/domain/e2e checks and lint/typecheck/build pass.
 
-Verified: the local SQL suite exercises category/session ownership, retained manual dates, archiving, one-active timers, discard, and idempotent finish; pure tests cover midnight/DST splits and score-source integration. The hosted rollback script passed with fixtures rolled back. All 24 desktop/mobile production browser regressions passed, plus two focused Career Privacy Mode checks after the final UI hardening. See [QA](QA.md) for exact outcomes and remaining release-only checks.
+Verified: the local SQL suite exercises category/session ownership, retained manual dates, archiving, one-active timers, discard, and idempotent finish; pure tests cover midnight/DST splits and score-source integration. The hosted rollback script passed with fixtures rolled back. All 24 desktop/mobile production browser regressions passed; focused Career desktop/mobile reruns then covered offline finish feedback, recovery, and Privacy Mode after the final UI hardening. See [QA](QA.md) for exact outcomes and remaining release-only checks.
 
 ## Phase 5 — Planning
 
