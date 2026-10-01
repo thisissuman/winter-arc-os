@@ -114,7 +114,7 @@ Local `config.toml` does not automatically configure hosted Auth settings. MCP m
 
 ## Vercel and recovery
 
-No Vercel deployment or Git remote is configured. For an authorized release, use separate staging/production projects and environment values, apply tested migrations, configure Auth/email URLs for the deployed origin, then run the [release checklist](docs/QA.md). Preview deployments must not share production personal data.
+The Git remote is [`origin`](https://github.com/thisissuman/winter-arc-os) and the Phase 3/4 feature branches are pushed. GitHub automatically selected `codex/phase-3-fitness` as the default branch when the empty remote received its first push; no production branch or Vercel deployment has been chosen. For an authorized release, use separate staging/production projects and environment values, apply tested migrations, configure Auth/email URLs for the deployed origin, then run the [release checklist](docs/QA.md). Preview deployments must not share production personal data.
 
 For a migration failure, stop subsequent deployment, inspect migration history, and correct the schema with an incremental repair migration. Do not rewrite an already-applied file or use remote reset. Confirm provider backup/PITR availability and rehearse restoration on a separate project before release; actual recovery identifiers belong in QA when configured.
 

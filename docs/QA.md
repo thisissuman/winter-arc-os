@@ -4,6 +4,8 @@
 
 Phases 0–4 are complete in the configured development project. Phase 4 Career migration, local and hosted database checks, domain tests, production build, and dedicated-account desktop/mobile browser checks pass; exact evidence is below. Signup/confirmation/recovery email verification remains deferred until SMTP setup before production. Full local Supabase container replay and staging/production release checks remain open.
 
+Git `origin` is the user-provided `https://github.com/thisissuman/winter-arc-os.git`. The remote was empty before this push. `codex/phase-3-fitness` and `codex/phase-4-career` were pushed and their remote refs verified. GitHub selected the Phase 3 branch as its default branch automatically; no production branch or deployment was chosen.
+
 Read [ROADMAP](ROADMAP.md) for phase gates, [SCORING](SCORING.md) for expected math, and [ARCHITECTURE](ARCHITECTURE.md) for ownership/source contracts.
 
 ## Tools and check meanings
