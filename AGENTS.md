@@ -16,7 +16,7 @@ The [original specification](docs/MASTER_SPEC.md) is an unchanged historical ref
 
 ## Current state
 
-Phases 0–4 are complete in the configured development project. Phase 3 fitness was committed as `42d6db1` on `codex/phase-3-fitness`; Phase 4 Career is on `codex/phase-4-career` after the user's explicit request. Both branches are pushed to `origin` at `https://github.com/thisissuman/winter-arc-os.git`. The active Supabase MCP URL matches `.env.local`. Applied local/hosted versions are `20260930180649_foundation`, `20260930181434_categories_parent_index`, `20261001004511_core_tracking`, `20261001004734_score_items_policy_category_index`, `20261001044053_fitness`, `20261001044323_fitness_owner_indexes`, `20261001044532_workout_edit_fix`, `20261001050228_workout_payload_guard`, and `20261001052104_career`. Hosted database types are regenerated, rollback-only hosted security fixtures pass, and the 24-case production browser suite plus focused Career offline/privacy checks pass. Read ROADMAP and QA for exact gate status and remaining release checks. Do not start Phase 5 without its own request. Phase 1 signup/confirmation/recovery email delivery remains deferred until SMTP before production.
+Phases 0–4 are complete in the configured development project. `master` and the five `feature/phase-*` checkpoint branches are on `origin` at `https://github.com/thisissuman/winter-arc-os.git`; `master` contains the complete history through Phase 4. The active Supabase MCP URL matches `.env.local`. Applied local/hosted versions are `20260930180649_foundation`, `20260930181434_categories_parent_index`, `20261001004511_core_tracking`, `20261001004734_score_items_policy_category_index`, `20261001044053_fitness`, `20261001044323_fitness_owner_indexes`, `20261001044532_workout_edit_fix`, `20261001050228_workout_payload_guard`, and `20261001052104_career`. Hosted database types are regenerated, rollback-only hosted security fixtures pass, and the 24-case production browser suite plus focused Career offline/privacy checks pass. Read ROADMAP and QA for exact gate status and remaining release checks. Do not start Phase 5 without its own request. Phase 1 signup/confirmation/recovery email delivery remains deferred until SMTP before production.
 
 ## Phase workflow
 
@@ -62,9 +62,9 @@ Supabase MCP generated the Phase 4 `src/types/database.ts` after hosted migratio
 
 ## Git and handoffs
 
-Use a feature branch; default prefix is `codex/`. Never push directly to the production branch. Use focused Conventional Commits, e.g. `docs: establish phased build documentation` or `feat(auth): add cookie-based sign-in`. Preserve unrelated work. Do not push, merge, or deploy unless authorized.
+Use a feature branch with the `feature/` prefix. `master` is the GitHub default integration branch; make future feature changes on `feature/*` and merge through a reviewed pull request. Never push routine feature work directly to `master`. Use focused Conventional Commits, e.g. `docs: establish phased build documentation` or `feat(auth): add cookie-based sign-in`. Preserve unrelated work. Do not push, merge, or deploy unless authorized.
 
-The repository began with an unborn `master` branch and no remote. `origin` is now `https://github.com/thisissuman/winter-arc-os.git`; GitHub selected `codex/phase-3-fitness` as its default branch when the empty remote received its first push. No production branch has been chosen or deployed. Do not assume an existing `main` or change the default branch as part of routine feature work. Review the diff before committing. Attach any created pull request to this chat.
+The repository began with an unborn `master` branch and no remote. `origin` is now `https://github.com/thisissuman/winter-arc-os.git`. The user's branch cleanup established `master` at the verified Phase 4 tip, made it GitHub's default branch, and published the older phase checkpoints as `feature/phase-*`. This Git organization does not mean the incomplete V1 application is released or deployed. Review the diff before committing. Attach any created pull request to this chat.
 
 <!-- BEGIN:nextjs-agent-rules -->
 

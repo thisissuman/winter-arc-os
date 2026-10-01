@@ -112,9 +112,13 @@ The browser refresh test changes only cookie `expires_at` metadata to a past val
 
 Local `config.toml` does not automatically configure hosted Auth settings. MCP migration deployment does not change email templates or redirect allowlists. Do not reset a hosted project to test migrations. Follow the [Supabase migration workflow](https://supabase.com/docs/guides/local-development/database-migrations); the historical `supabase db commit` example is superseded.
 
+## Repository branches
+
+[`master`](https://github.com/thisissuman/winter-arc-os/tree/master) is the default integration branch and contains the complete Phase 0–4 commit history. The `feature/phase-0-docs`, `feature/phase-1-foundation`, `feature/phase-2-core-tracking`, `feature/phase-3-fitness`, and `feature/phase-4-career` branches mark the verified phase checkpoints. Each later branch includes earlier commits; they are not separate copies of the app. Create future work on `feature/` branches and merge through a reviewed pull request. This branch organization is not a production release.
+
 ## Vercel and recovery
 
-The Git remote is [`origin`](https://github.com/thisissuman/winter-arc-os) and the Phase 3/4 feature branches are pushed. GitHub automatically selected `codex/phase-3-fitness` as the default branch when the empty remote received its first push; no production branch or Vercel deployment has been chosen. For an authorized release, use separate staging/production projects and environment values, apply tested migrations, configure Auth/email URLs for the deployed origin, then run the [release checklist](docs/QA.md). Preview deployments must not share production personal data.
+The Git remote is [`origin`](https://github.com/thisissuman/winter-arc-os). No Vercel deployment has been configured. For an authorized release, use separate staging/production projects and environment values, apply tested migrations, configure Auth/email URLs for the deployed origin, then run the [release checklist](docs/QA.md). Preview deployments must not share production personal data.
 
 For a migration failure, stop subsequent deployment, inspect migration history, and correct the schema with an incremental repair migration. Do not rewrite an already-applied file or use remote reset. Confirm provider backup/PITR availability and rehearse restoration on a separate project before release; actual recovery identifiers belong in QA when configured.
 
