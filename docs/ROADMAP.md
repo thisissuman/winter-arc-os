@@ -2,7 +2,7 @@
 
 ## Status
 
-**Phases 0 and 1 are complete as of October 1, 2026. The user explicitly deferred signup-confirmation/recovery email tests until SMTP setup before production.** Phases 2–9 are not started. The foundation and category-index migrations are applied to the matching hosted development project, and generated types/hosted ownership checks are verified. Dedicated-account browser checks and real refresh-token rotation pass; signup/confirmation/recovery email verification remains an unmet release gate under the user-approved deferral. Phase 2 is next, when requested.
+**Phases 0–2 are complete in the configured development project as of October 1, 2026.** The user later authorized Phase 2 validation and migration after its initial file-only pass. Core tracking migrations, generated types, local/hosted security checks, production build, and desktop/mobile browser checks pass. Phase 1's signup-confirmation/recovery email checks remain deferred until SMTP before production. Phases 3–9 have not started.
 
 The accepted plan calls for one phase at a time. Start with the earliest incomplete phase unless the user names a phase whose dependencies are already complete. Finish the phase's validation/documentation and stop with a handoff. Do not expand a phase into the entire application.
 
@@ -14,7 +14,7 @@ Read [AGENTS](../AGENTS.md), [PRODUCT](../PRODUCT.md), and the relevant [archite
 | --- | --- | --- |
 | 0 — Documentation | None | Complete; documentation checks passed |
 | 1 — Foundation | 0 | Complete; email tests deferred by user until before production |
-| 2 — Core tracking | 1 | Not started |
+| 2 — Core tracking | 1 | Complete in development project; release gates remain in QA |
 | 3 — Fitness | 2 | Not started |
 | 4 — Career | 2 | Not started |
 | 5 — Planning | 2 | Not started |
@@ -72,40 +72,42 @@ Handoff: created foundation, architectural decisions, exact checks, configuratio
 
 Current handoff evidence: lint, typecheck, 11 auth unit tests, 66 isolated SQL checks, rollback-only hosted ownership checks, four anonymous API denial checks, all 16 production browser checks, locked installation, and production build pass. Authenticated checks use actual Supabase-issued sessions, verify rotation after expiring only persisted metadata, and restore fixture name/theme even on test failure. Dark Today was inspected on desktop/tablet/mobile; light Settings was inspected on desktop/mobile, with accessibility and keyboard checks. Hosted ownership and both security/performance advisors pass.
 
-Remaining configuration: a deliverable email inbox and appropriate email service for signup/confirmation/recovery verification. The supplied confirmed fixture uses an example-domain address. Hosted Site URL and exact callbacks are configured for localhost:3000. Custom templates remain locked by the current free-plan dashboard without SMTP; secure default-template PKCE callbacks and token-hash callbacks are both implemented. Applied migration versions are `20260930180649_foundation` and `20260930181434_categories_parent_index`; local filenames match the hosted ledger. Generated hosted types compile, and temporary SQL security fixtures were rolled back. Phase 1 closes under the user-approved email-test deferral recorded in PRODUCT. Phase 2 is not started; production release still requires the deferred email checks.
+Remaining configuration: a deliverable email inbox and appropriate email service for signup/confirmation/recovery verification. The supplied confirmed fixture uses an example-domain address. Hosted Site URL and exact callbacks are configured for localhost:3000. Custom templates remain locked by the current free-plan dashboard without SMTP; secure default-template PKCE callbacks and token-hash callbacks are both implemented. Foundation migration versions are `20260930180649_foundation` and `20260930181434_categories_parent_index`; Phase 2 versions are recorded in its section. Local filenames match the hosted ledger. Generated hosted types compile, and temporary SQL security fixtures were rolled back. Phase 1 closes under the user-approved email-test deferral recorded in PRODUCT; production release still requires those email checks.
 
 ## Phase 2 — Core tracking
 
 Boundary: reusable challenges/habits/metrics/targets, numerical logging, real Today, and scoring. Do not create fitness/study source tables early.
 
+Source and validation pass, October 1, 2026: the Phase 2 SQL, Server Actions, optional starter setup, challenge/habit/metric routes, frequency/scoring settings, shared domain functions, and Today are implemented. After the user's later validation request, both Phase 2 migrations were applied to the verified development project; generated types, rollback-only hosted ownership checks, local tests, build, and browser flows passed. Exact evidence and remaining release gates are in QA.
+
 ### 2A — Challenges and optional starter setup
 
-- [ ] Add owned challenge CRUD, selection, valid statuses/dates, associations, and timing calculations.
-- [ ] Add onboarding timezone/week-start confirmation and optional idempotent starter definitions.
-- [ ] Keep starter dates editable, tracker eligibility starting on setup day, and all performance history empty.
+- [x] Add owned challenge CRUD, selection, valid statuses/dates, associations, and timing calculations.
+- [x] Add onboarding timezone/week-start confirmation and optional idempotent starter definitions.
+- [x] Keep starter dates editable, tracker eligibility starting on setup day, and all performance history empty.
 
 ### 2B — Habits and grid
 
-- [ ] Add habit CRUD/archive/permanent deletion, effective-dated recurrence, counts, and status logging.
-- [ ] Add monthly grid, month navigation, accessible status changes, scheduled-opportunity streaks, and quota progress.
+- [x] Add habit CRUD/archive/permanent deletion, effective-dated recurrence, counts, and status logging.
+- [x] Add monthly grid, month navigation, accessible status changes, scheduled-opportunity streaks, and quota progress.
 
 ### 2C — Metrics and frequency
 
-- [ ] Add manual metric definitions/raw values, effective targets, source-aware frequency rules, and source-availability states.
-- [ ] Add atomic retry-safe quick additions and stale replacement-edit handling.
+- [x] Add manual metric definitions/raw values, effective targets, source-aware frequency rules, and source-availability states.
+- [x] Add atomic retry-safe quick additions and stale replacement-edit handling.
 
 ### 2D — Today and scoring
 
-- [ ] Implement shared calculations and versioned configurable scoring categories/policies.
-- [ ] Deliver fast Today logging, private-item handling, explainable daily score, weekly progress, and separate monthly quotas.
-- [ ] Keep future workout/study/sleep sources explicitly unavailable and excluded until their phases.
+- [x] Implement shared calculations and versioned configurable scoring categories/policies.
+- [x] Deliver fast Today logging, private-item handling, explainable daily score, weekly progress, and separate monthly quotas.
+- [x] Keep future workout/study/sleep sources explicitly unavailable and excluded until their phases.
 
 ### Acceptance gate
 
-- [ ] Challenge and no-challenge tracking work; shared associations never duplicate source logs.
-- [ ] All recurrence/grid states, missing versus zero, skips, history edits, proration, streaks, and scoring examples pass tests.
-- [ ] New tables/relationships pass RLS and constraint tests; retries/concurrent writes preserve counts.
-- [ ] Lint, typecheck, tests, build, mobile/keyboard logging, and source-to-UI persistence checks pass.
+- [x] Challenge and no-challenge tracking work; shared associations never duplicate source logs.
+- [x] Recurrence/grid states, missing versus zero, skips, history versions, proration, streaks, and scoring examples pass focused tests.
+- [x] New tables/relationships pass RLS and constraint tests; atomic increments and retry receipts preserve counts.
+- [x] Lint, typecheck, tests, build, mobile/keyboard logging, accessibility, and source-to-UI persistence checks pass.
 
 Result: a useful daily habit/measurement application. Handoff identifies unavailable future sources truthfully.
 

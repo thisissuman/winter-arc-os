@@ -8,7 +8,7 @@ web
 
 ## Status and authority
 
-Accepted product contract for V1; Phase 1 foundation is delivered. Feature implementation continues one requested phase at a time. This document records the user's specification and confirmed planning decisions. The [original specification](docs/MASTER_SPEC.md) is preserved unchanged. Calculation details belong in [SCORING](docs/SCORING.md), implementation details in [ARCHITECTURE](docs/ARCHITECTURE.md), and delivery status in [ROADMAP](docs/ROADMAP.md).
+Accepted product contract for V1; foundation and core tracking are implemented in the configured development project. Feature implementation continues one requested phase at a time. This document records the user's specification and confirmed planning decisions. The [original specification](docs/MASTER_SPEC.md) is preserved unchanged. Calculation details belong in [SCORING](docs/SCORING.md), implementation details in [ARCHITECTURE](docs/ARCHITECTURE.md), and delivery status in [ROADMAP](docs/ROADMAP.md).
 
 ## Verification decision — October 1, 2026
 
@@ -116,4 +116,4 @@ Use the required stack documented in README. No AI cost or API is necessary. Def
 
 ## Evidence on hand
 
-The original written specification and accepted plan are the available evidence. There are no production records, integrations, screenshots, brand assets, or implemented features. Synthetic fixtures may be used in tests only; they must never be represented as the user's actual analytics.
+The original written specification and accepted plan define the product. Phases 1 and 2 have migrated development schemas and verified foundation/tracking checks. There are no production tracking records, integrations, or brand assets. Synthetic fixtures may be used in tests only; they must never be represented as the user's actual analytics.

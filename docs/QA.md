@@ -2,7 +2,7 @@
 
 ## Truthful status
 
-Phases 0 and 1 are complete; Phase 1 closes with the user-approved email-test deferral recorded in PRODUCT. Phase 1 includes runnable application/auth/database/browser checks. Local outcomes are recorded below; the hosted MCP connection is verified, and its migrations/ownership rules are verified; all 16 dedicated-account browser checks pass; signup/confirmation/recovery email verification is deferred until SMTP setup before production, not reported as passing. Future feature matrices remain required checks, not passing results.
+Phases 0–2 are complete in the configured development project. After the initial file-only Phase 2 pass, the user explicitly requested validation and migration. Phase 2 local/hosted SQL, domain, production build, and dedicated-account desktop/mobile tracking checks pass; exact evidence is below. Signup/confirmation/recovery email verification remains deferred until SMTP setup before production. Full local Supabase container replay and staging/production release checks remain open.
 
 Read [ROADMAP](ROADMAP.md) for phase gates, [SCORING](SCORING.md) for expected math, and [ARCHITECTURE](ARCHITECTURE.md) for ownership/source contracts.
 
@@ -154,3 +154,23 @@ Hosted dashboard verification: Site URL is localhost:3000; exact confirmation an
 
 
 Phase 1 closeout — October 1, 2026: documented the explicit user-approved email-test deferral in PRODUCT, ARCHITECTURE, ROADMAP, README, and AGENTS. All nine Markdown documents pass title/fence checks and 47 local link destinations exist. Diff whitespace checks pass. Phase 2 remains unstarted; no push, merge, or application deployment was performed.
+
+### Phase 2 validation and hosted migration — October 1, 2026
+
+The first source pass made no test or database changes, as requested at that time. The user's later request authorized validation and migration. The Supabase MCP URL matched `.env.local`; hosted inspection found only the two foundation versions and four foundation tables before deployment. `20261001004511_core_tracking` was applied after local PostgreSQL replay, then `20261001004734_score_items_policy_category_index` resolved a missing composite foreign-key covering-index advisory. Both local filenames match the hosted ledger. The 17 tracking tables have RLS enabled. Hosted types were regenerated from the matching public schema, and the temporary authored type bridge and incomplete foundation-only generator were removed.
+
+| Check | Phase 2 outcome |
+| --- | --- |
+| `npm run lint` | Passed |
+| `npm run typecheck` | Passed with hosted generated types |
+| `npm run test` | 20 passed, including calendar, recurrence, missing/zero, quota, streak, score, duplicate-source, and policy-version cases |
+| `npm run test:db` | 75 passed after fresh incremental migration replay; includes Phase 2 grants/RLS, same-owner FKs, overlap constraints, shared challenge log, stale revisions, idempotent increments, starter idempotence, and local replay of both hosted rollback scripts |
+| `npm run build` | Passed with all Phase 2 routes in the production output |
+| Hosted `hosted-tracking.sql` | Passed on the authorized project; all synthetic Auth/tracking fixtures rolled back |
+| Production browser | 16 foundation and 2 tracking checks passed across desktop and mobile, run against real hosted Auth and data; no authenticated checks skipped |
+| Accessibility and input | Today, Habits, and Metrics passed WCAG 2 A/AA and 2.1 AA axe scans in both browser projects; keyboard habit toggling and horizontal-overflow checks passed |
+| Fixture cleanup | Tracking E2E definitions deleted through owned actions; hosted query confirmed zero `E2E practice %` habits and `E2E water %` metrics afterward |
+
+The browser tracking checks create a habit and manual water metric, log them from Today, reload to verify persistence, inspect the habit grid and metric page, and remove their definitions/history. SQL checks cover two-user isolation and shared source records; the browser checks use one dedicated confirmed account. The starter is verified through transactional SQL, not an email or public signup flow.
+
+Supabase's security advisor reports 13 authenticated `security definer` RPC warnings; these are intentional because direct table writes are revoked and each function rechecks `auth.uid()`, fixes its search path, and enforces owner relationships. The hosted Auth advisor also reports leaked-password protection disabled; review and enable it before production if available in the chosen plan. The performance advisor's unindexed-FK finding was fixed; remaining unused-index notices are expected on newly empty tables. Full local Supabase Docker replay, actual concurrent multi-client increment stress, and signup/recovery email delivery are still release-level checks. No fabricated performance records or test fixtures were left in analytics.

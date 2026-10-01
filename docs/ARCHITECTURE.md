@@ -2,7 +2,7 @@
 
 ## Status and ownership
 
-Phase 1 implements the foundation described below: application shell, auth, profile/appearance settings, and four foundation tables. Later subsystems remain a blueprint. Hosted migrations, ownership checks, and dedicated-account login/session/settings/logout browser verification are complete; signup/confirmation/recovery email verification is deferred by the user until SMTP setup before production; see PRODUCT and QA. Create each subsystem in its designated [phase](ROADMAP.md); record any schema refinement here before adding its migration. Product requirements are in [PRODUCT](../PRODUCT.md), calculations in [SCORING](SCORING.md), and visual conventions in [DESIGN](../DESIGN.md).
+Phase 1 implements the verified foundation: application shell, auth, profile/appearance settings, and four foundation tables. Phase 2 implements core tracking in `supabase/migrations/20261001004511_core_tracking.sql` with a covering index in `20261001004734_score_items_policy_category_index.sql`; both are applied to the configured development project. Later subsystems remain a blueprint. Phase 1 signup/confirmation/recovery email verification is deferred until SMTP setup before production; see PRODUCT and QA. Product requirements are in [PRODUCT](../PRODUCT.md), calculations in [SCORING](SCORING.md), and visual conventions in [DESIGN](../DESIGN.md).
 
 ## Application boundaries
 
@@ -15,8 +15,8 @@ Use one Next.js App Router application deployed to Vercel, with Supabase Auth an
 | `src/components/ui` | shadcn/ui primitives and reusable accessible controls |
 | `src/components` | Shared shell, navigation, date controls, privacy presentation, feedback |
 | `src/lib/supabase` | Cookie-aware server/browser clients and session refresh |
-| `src/lib/analytics`, `src/lib/scoring` | Pure shared calculations, never presentation-dependent |
-| `src/lib` | Calendar/time utilities, shared validation, authenticated server helpers |
+| `src/features/tracking/domain.ts`, `dates.ts` | Phase 2 pure shared scheduling, adherence, score, and calendar calculations; later analytics reuse these |
+| `src/lib` | Shared validation and authenticated server helpers |
 | `src/types` | Generated database types and shared domain interfaces |
 | `supabase/migrations`, `supabase/tests` | Incremental schema/security changes and SQL tests |
 
@@ -89,9 +89,13 @@ The foundation migration is `supabase/migrations/20260930180649_foundation.sql`,
 
 The proxy refreshes cookies using `getClaims()` and private/no-store response headers. Email links verify supported token hashes via `/auth/confirm`; trusted origin and local redirect allowlist prevent external redirects. Recovery requires a verified identity, changes the password, and revokes other sessions. Dynamic protected pages and independent action authorization remain necessary even with the proxy.
 
-Testing replays this SQL against isolated PGlite PostgreSQL with minimal test-only auth roles/catalog. This verifies database behavior but is not a Supabase HTTP/auth emulator. Committed public types are generated from the hosted schema using Supabase MCP; the isolated catalog generator remains a foundation-only fallback. A rollback-only hosted script verifies actual PostgreSQL roles, RLS, ownership relationships, and initializer/cascade behavior. Authenticated browser and email verification require the dedicated test account and hosted email setup; the SQL script does not replace them.
+Testing replays migrations against isolated PGlite PostgreSQL with minimal test-only auth roles/catalog. This verifies database behavior but is not a Supabase HTTP/auth emulator. Committed public types are generated from the matching hosted schema using Supabase MCP; the incomplete foundation-only generator was removed. Rollback-only hosted scripts verify PostgreSQL roles, RLS, ownership relationships, and transactional RPC behavior. Authenticated browser and email verification require the dedicated test account and hosted email setup; SQL scripts do not replace them.
 
 ### Challenges and core tracking — Phase 2
+
+The applied migration adds selected challenge and starter-applied metadata to preferences; 17 owned tracking tables including `tracking_operations` for retry receipts; same-owner composite references, indexes, update triggers, explicit RLS policies, and authenticated transaction functions. Direct authenticated access to the new tables is read-only; Server Actions use narrowly named `security definer` functions that verify `auth.uid()` again and fix `search_path`. Business dates and original capture timezone are stored on logs. Revisions prevent stale replacement writes, and operation UUIDs make water-style increments retry-safe. The follow-up migration covers the composite score-item policy/category foreign key.
+
+`src/features/tracking/queries.ts` pages owner-filtered rows in batches rather than relying on the PostgREST default limit. `src/types/database.ts` is generated from the hosted Phase 2 public schema. Supabase widens CHECK-constrained text columns to `string`; the domain boundary narrows them to the literals enforced by the verified SQL constraints. Challenge associations share tracker definitions and logs; the optional starter is a single idempotent function guarded by `starter_applied_on`. It inserts no completion or measurement records. Study categories require Phase 4's table and are not inserted early.
 
 | Table | Specific fields and relationships |
 | --- | --- |
@@ -194,7 +198,7 @@ Desktop/mobile use identical routes. Use `(auth)` and protected route groups for
 | --- | --- | --- |
 | 1 | `/login`, `/signup`, `/forgot-password`, `/reset-password`, `/auth/confirm` | Auth forms, safe verification, recovery |
 | 1 | `/today`, `/settings` | Protected real-empty dashboard; account/profile and session controls |
-| 2 | `/onboarding`, `/habits`, `/challenges`, `/challenges/[id]`, `/track` | Optional starter setup, habit grid, challenge management; tracker editing on feature sheets/settings |
+| 2 | `/onboarding`, `/habits`, `/metrics`, `/challenges`, `/challenges/[id]`, `/track`, `/settings/tracking` | Optional starter setup, habit grid, manual metrics, challenge management, frequency/scoring/privacy settings |
 | 3 | `/fitness`, `/fitness/workouts`, `/fitness/workouts/[id]` | Measurements, trends, workout history/editor |
 | 4 | `/career`, `/career/sessions` | Targets, stopwatch, category/session management |
 | 5 | `/plan`, `/tasks`, `/goals`, `/goals/[id]` | Weekly planner, outcomes, milestones |
@@ -203,7 +207,7 @@ Desktop/mobile use identical routes. Use `(auth)` and protected route groups for
 | 8 | `/settings/[section]`, `/more` | Complete settings and mobile secondary navigation |
 | 8 | `GET /api/export`, `POST /api/account/delete` | Private versioned JSON download; recently verified account deletion |
 
-`/more` may be introduced earlier when there are actual secondary destinations. Phase 1 mobile navigation uses only working links; do not link future hubs to 404s. Date/month/week/challenge/tab selection belongs in URL parameters with validated formats. Edit/create actions primarily use dialogs/sheets. Invalid IDs return safe not-found states, never another user's data.
+`/more` may be introduced when there are actual secondary destinations. Phase 2 navigation uses desktop feature links and a mobile Track hub. Date/month/week/challenge/tab selection belongs in URL parameters with validated formats. Edit/create actions primarily use dialogs/sheets. Invalid IDs return safe not-found states, never another user's data. A setup notice remains as a safe fallback for an environment missing the migration.
 
 Export includes a format version, generated timestamp, preferences, definitions, associations, logs, sessions, planning, and reviews for the caller. Exclude credentials, auth tokens, internal retry/timer secrets, and other owners. Private records are included with a clear download notice. The account deletion endpoint accepts no arbitrary target account and returns only operational outcome.
 

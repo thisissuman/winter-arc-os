@@ -2,7 +2,7 @@
 
 ## Status
 
-Accepted calculation contract; no scoring engine exists yet. Implement and unit-test this in Phase 2, then reuse it in fitness, career, and Insights. All examples below are illustrative fixtures, not actual user performance. See [PRODUCT](../PRODUCT.md), [schema design](ARCHITECTURE.md), and [QA](QA.md).
+Accepted calculation contract implemented in `src/features/tracking/dates.ts` and `domain.ts`. Focused domain tests cover inclusive dates, recurrence, skipped/missing/zero values, proration, streaks, eligible-category redistribution, separate daily/weekly scoring, duplicate-source exclusion, and policy history. The Phase 2 migration is applied to the configured development project. All examples below are illustrative fixtures, not actual user performance. See [PRODUCT](../PRODUCT.md), [schema design](ARCHITECTURE.md), and [QA](QA.md).
 
 ## Calendar and effective rules
 
@@ -65,6 +65,8 @@ The active intersection includes tracker effective dates and, for a challenge vi
 
 A tracker created Friday with a four-session weekly quota and a Monday-start week has three eligible days: `ceil(4 × 3 / 7) = 2`. A full-week target with three of four sessions contributes 75%, even on an open Wednesday; its daily score remains unaffected.
 
+The authored `metricPeriodValue` handles a separate weekly/monthly numeric target. For additive totals (`sum`), its target is multiplied by the full active/challenge/rule date intersection divided by all calendar dates in the period, retaining numeric precision. Average and latest-value targets keep the configured amount. This scaling does not use quota rounding; the `ceil` rule above applies only to frequency counts. Removing a prospective metric target closes its rule and makes subsequent dates observational for that period.
+
 Maintain the configured counting mode and effective rule in the result. Monthly quotas do not contribute to daily/weekly scores. Show their separate month progress.
 
 ## Score inputs, categories, and formula
@@ -80,6 +82,8 @@ Initial category weights are Fitness 30, Career 30, Recovery 15, Nutrition 15, D
 If no eligible positively weighted input remains, total is null and the UI reads **“No scheduled targets.”** Do not return 0 or 100 for an empty score. Keep full precision during calculations; round the displayed total to one decimal place. All-muted category weights are invalid configuration.
 
 Return item/category contributions, effective policy, missing/unscheduled/unavailable exclusions, total, coverage, and provisional/final period state. Privacy presentation does not remove underlying score inputs.
+
+The authored engine returns `null` with a configuration reason when required effective rules are missing or overlapping, instead of silently redistributing weight around a broken rule. A truly empty account has `null` without a fabricated score. `historyFrom` bounds streak/coverage claims; archived and future dates remain separate from misses.
 
 ### Daily score
 
