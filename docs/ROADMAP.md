@@ -2,7 +2,7 @@
 
 ## Status
 
-**Phases 0–5 are complete in the configured development project as of October 1, 2026.** Phase 5 Planning migrations, generated types, local/hosted security checks, production build, and desktop/mobile browser checks pass. Phase 1's signup-confirmation/recovery email checks remain deferred until SMTP before production. Phases 6–9 have not started.
+**Phases 0–6 are complete in the configured development project as of October 1, 2026.** Phase 6 Insights reuses the owned source tables and historical calculations; domain, query-boundary, production build, and desktop/mobile browser checks pass. Phase 1's signup-confirmation/recovery email checks remain deferred until SMTP before production. Phases 7–9 have not started.
 
 The accepted plan calls for one phase at a time. Start with the earliest incomplete phase unless the user names a phase whose dependencies are already complete. Finish the phase's validation/documentation and stop with a handoff. Do not expand a phase into the entire application.
 
@@ -18,7 +18,7 @@ Read [AGENTS](../AGENTS.md), [PRODUCT](../PRODUCT.md), and the relevant [archite
 | 3 — Fitness | 2 | Complete in development project; release gates remain in QA |
 | 4 — Career | 2 | Complete in development project; release gates remain in QA |
 | 5 — Planning | 2 | Complete in development project |
-| 6 — Insights | 2, 3, 4 | Not started |
+| 6 — Insights | 2, 3, 4 | Complete in development project |
 | 7 — Reflection | 6 | Not started |
 | 8 — Settings and polish | 1–7 | Not started |
 | 9 — Final QA and release | 1–8 | Not started |
@@ -144,12 +144,14 @@ Verified: the three Planning migrations are applied to the matching development 
 
 ## Phase 6 — Insights
 
-- [ ] Reuse shared calculations for score/consistency, protein/sleep/weight/gym/study summaries, and category breakdown.
-- [ ] Add bounded date/challenge/category filters, overall/fitness/career/habit heatmaps, rankings, and comparable-period changes.
-- [ ] Show missing-data coverage, historical expectations, units, text alternatives, and in-progress status.
-- [ ] Add only justified query indexes/routines; preserve caller ownership and private caching rules.
+- [x] Reuse shared calculations for score/consistency, protein/sleep/weight/gym/study summaries, and category breakdown.
+- [x] Add bounded date/challenge/category filters, overall/fitness/career/habit heatmaps, rankings, and comparable-period changes.
+- [x] Show missing-data coverage, historical expectations, units, text alternatives, and in-progress status.
+- [x] Reuse existing owner/date indexes; preserve caller ownership and private caching rules without a new migration.
 
 Acceptance: chart totals match source fixtures; missing and zero remain distinct; open weeks use comparable elapsed coverage; historical rules survive later edits; no fake charts or future scores; RLS/query/domain tests and lint/typecheck/build pass.
+
+Verified: seven pure Insights tests cover filter bounds, source totals, no-score versus zero, historical target versions, equivalent open-week portions, historical week-start changes, and category-scoped habits. Existing RLS/migration checks pass unchanged; the route reuses existing owner/date indexes and needs no new migration. Desktop/mobile browser checks cover filters, protected IDs, four heatmaps, accessibility, and overflow. Exact command outcomes are recorded in [QA](QA.md).
 
 ## Phase 7 — Reflection
 

@@ -4,9 +4,9 @@ A personal performance application for habits, fitness, career preparation, plan
 
 ## Current delivery
 
-**Phases 1–5 are implemented in the configured development project.** Phase 5 adds seven-day tasks, keyboard ordering, retry-safe carry-forward, goals, milestones, and manual/milestone/metric progress. Earlier tracking, fitness, and Career features remain available. The Planning migrations are applied and hosted types are regenerated. See [ROADMAP](docs/ROADMAP.md) and [QA](docs/QA.md) for exact verification and release gates.
+**Phases 1–6 are implemented in the configured development project.** Phase 6 adds bounded Insights with score trends, four heatmaps, source summaries, habit rankings, and equal-coverage week comparisons. Earlier tracking, fitness, Career, and Planning features remain available. Phase 6 adds no schema migration; the existing owner/date indexes serve its reads. See [ROADMAP](docs/ROADMAP.md) and [QA](docs/QA.md) for exact verification and release gates.
 
-The MCP URL matches `.env.local`. The confirmed test account supports real login, session refresh, and browser checks. Hosted RLS scripts use rollback-only fixtures; Planning browser flows cover tasks, carry-forward, goals, and milestones on desktop and mobile. The user deferred signup/confirmation/recovery email delivery tests until custom SMTP is configured before production. The supplied confirmed test account uses an example-domain address.
+The MCP URL matches `.env.local`. The confirmed test account supports real login, session refresh, and browser checks. Hosted RLS scripts use rollback-only fixtures; Insights browser flows cover bounded filters, private access, accessibility, and mobile layout. The user deferred signup/confirmation/recovery email delivery tests until custom SMTP is configured before production. The supplied confirmed test account uses an example-domain address.
 
 ## Documentation
 
@@ -52,7 +52,7 @@ Keep `.env.local` out of Git. Never paste credentials into documentation or chat
 | `npm run dev` | Start Next.js development on port 3000 |
 | `npm run lint` | Check code with ESLint |
 | `npm run typecheck` | Generate route declarations and check TypeScript |
-| `npm run test` | Run auth, tracking, fitness, study, and planning-domain unit tests |
+| `npm run test` | Run auth, tracking, fitness, study, planning, and Insights domain unit tests |
 | `npm run test:db` | Replay migrations in isolated PostgreSQL and verify RLS/constraints; no Docker or remote changes |
 | `npm run test:e2e` | Build production, start port 3100, and run desktop/mobile browser tests |
 | `npm run build` | Compile a production application |

@@ -4,6 +4,10 @@
 
 Accepted calculation contract implemented in `src/features/tracking/dates.ts` and `domain.ts`, with recorded-day fitness summaries in `src/features/fitness/domain.ts` and split-day study summaries in `src/features/career/domain.ts`. Focused tests cover historical scoring, sleep/gym, and study across midnight and daylight-saving transitions. Phase 5 migrations are applied to the configured development project. Tasks and goals are planning records and do not contribute to daily or weekly scores. All examples below are illustrative fixtures, not actual user performance. See [PRODUCT](../PRODUCT.md), [schema design](ARCHITECTURE.md), and [QA](QA.md).
 
+## Insights comparison semantics
+
+Insights calls the same date-specific score evaluator as Today. A bounded `through` date may stop a weekly evaluation before its end to compare equal elapsed portions of two weeks; each week still selects its own effective historical policy, quota rule, and week-start context. If a week-start change makes the period containing the preceding day overlap the selected week, comparison steps back to the latest non-overlapping historical week. A partial historical week in such a comparison is labelled in progress for the selected portion, not presented as a full-week final score. Missing eligible logs remain zero contributions with lower recorded coverage; no eligible score stays null. The tracker-category filter narrows source and habit analysis only, because organizational categories do not replace score policy categories or their weights.
+
 ## Calendar and effective rules
 
 Use business calendar dates in the user's capture timezone, initially Asia/Kolkata. ISO weekdays are Monday=1 through Sunday=7; initial week starts Monday. A month is a calendar month, not a rolling 30 days. Calendar arithmetic must not assume every day has 24 elapsed hours.

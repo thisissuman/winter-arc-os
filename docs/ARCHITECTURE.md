@@ -2,7 +2,7 @@
 
 ## Status and ownership
 
-Phases 1–5 implement foundation, core tracking, fitness, Career, and Planning in the configured development project. Planning lives in `supabase/migrations/20261001104654_planning.sql` plus two follow-up migrations for a foreign-key index and copy reset semantics. Insights and later subsystems remain a blueprint. Phase 1 signup/confirmation/recovery email verification is deferred until SMTP setup before production; see PRODUCT and QA. Product requirements are in [PRODUCT](../PRODUCT.md), calculations in [SCORING](SCORING.md), and visual conventions in [DESIGN](../DESIGN.md).
+Phases 1–6 implement foundation, core tracking, fitness, Career, Planning, and Insights in the configured development project. Planning lives in `supabase/migrations/20261001104654_planning.sql` plus two follow-up migrations. Insights uses those existing owned tables and indexes without a new migration; Reflection and later subsystems remain a blueprint. Phase 1 signup/confirmation/recovery email verification is deferred until SMTP setup before production; see PRODUCT and QA. Product requirements are in [PRODUCT](../PRODUCT.md), calculations in [SCORING](SCORING.md), and visual conventions in [DESIGN](../DESIGN.md).
 
 ## Application boundaries
 
@@ -18,6 +18,7 @@ Use one Next.js App Router application deployed to Vercel, with Supabase Auth an
 | `src/features/tracking/domain.ts`, `dates.ts` | Shared scheduling, source evaluation, score, and calendar calculations |
 | `src/features/fitness` | Fitness-domain summaries, server actions, and focused UI; trend charts load only on fitness routes |
 | `src/features/planning` | Owned task and goal reads, checked actions, forms, and pure goal-progress calculations |
+| `src/features/insights` | Bounded filter validation, historical report calculations, accessible heatmaps, and route-local score chart |
 | `src/lib` | Shared validation and authenticated server helpers |
 | `src/types` | Generated database types and shared domain interfaces |
 | `supabase/migrations`, `supabase/tests` | Incremental schema/security changes and SQL tests |
@@ -171,6 +172,12 @@ Reordering has keyboard/button controls. Carry-forward actions select unfinished
 `/tasks` shows a seven-day board anchored to the user’s week-start preference and selected-day editor; `/plan` is the mobile planning entry. Task records retain separate estimated and actual integer seconds, completion time, position, and optimistic revision. `save_planning_task`, `set_planning_task_status`, and `move_planning_task` validate ownership and revisions. A per-user advisory transaction lock serializes task ordering and carry operations. `carry_planning_tasks` writes an owner-scoped receipt in the same transaction as its changes. A copy starts as `todo`, keeps its estimate, and clears recorded actual time; a move retains status and work. Completed tasks are excluded from both operations.
 
 `/goals` and `/goals/[id]` expose creation, editing, milestones, and all three progress modes. `save_planning_goal` and `save_goal_milestone` validate revision and owned category/challenge/metric relationships. Goal calculations use raw metric logs, study sessions, or sleep logs over the configured interval, distinguish missing from a measured zero, and support latest/sum/count aggregation and downward targets. Milestones remain attached when the progress mode changes. Private goal/task text is masked before passing it to interactive client components in Privacy Mode. The four tables have owner RLS and authenticated direct writes revoked; only checked RPCs mutate them. The hosted index follow-up covers the milestone owner FK. The copy-reset follow-up preserves earlier applied SQL and ensures copied work starts fresh.
+
+### Insights — Phase 6 (implemented)
+
+`/insights` accepts an inclusive range of 1–180 past or current business dates plus an owned challenge and an owned organizational tracker category. Invalid/future ranges and unknown filter IDs display an error without an analytics report. The server verifies the caller and uses the existing owner-scoped, paginated tracking query. In compact mode it bounds log, sleep, workout, and study-session reads by business date, includes a short preceding comparison window, and skips exercise/set/timer detail unrelated to Insights. Sessions may finish after a displayed day; the reader includes seven later completion dates so split-day study time is not lost. Existing `(user_id, business_date)` indexes cover the source reads. No schema migration or new RLS surface is required.
+
+The report calls the same effective-dated `scoreForPeriod`, `evaluateHabit`, and `metricDailyValue` functions used by Today. The `through` option evaluates a selected part of a weekly period without changing the historical policy; the latest non-overlapping prior week is cut to the same elapsed number of calendar days, including across week-start changes. Daily score trends and overall/Fitness/Career heatmaps retain null for no eligible score, zero for an eligible zero, coverage counts, and an in-progress label. Habit heatmaps/rankings use due daily opportunities, exclude today's pending opportunity, and count skipped dates as zero. Source summaries retain raw units and recorded-day denominators; drafts do not count as completed workouts. Study time uses retained session timezones and splits at local midnight. The organizational category filter narrows habits, metrics, and study summaries; score policy categories remain independent and whole-context, clearly labelled in the UI. Chart data loads only on the Insights route and has adjacent text, numeric heatmap cells, and accessible date/value labels. Private tracker and study-category labels are masked in Privacy Mode.
 
 ### Reflection — Phase 7
 

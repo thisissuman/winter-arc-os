@@ -413,14 +413,15 @@ export function metricPeriodValue(snapshot: TrackingSnapshot, metric: MetricDefi
   };
 }
 
-export function scoreForPeriod(snapshot: TrackingSnapshot, options: { date: string; period: Period; challengeId?: string | null }): ScoreResult {
+export function scoreForPeriod(snapshot: TrackingSnapshot, options: { date: string; period: Period; challengeId?: string | null; through?: string }): ScoreResult {
   const { date, period, challengeId } = options;
   const selectedPolicy = uniqueRule(snapshot.scorePolicies.filter((policy) => policy.period === period), date);
   const policy = selectedPolicy.rule;
   const range = periodRange(period, date, policy?.week_starts_on ?? snapshot.weekStartsOn);
-  const evaluatedThrough = period !== "daily" && range.end < snapshot.today ? range.end : date < snapshot.today ? date : snapshot.today;
+  const defaultThrough = period !== "daily" && range.end < snapshot.today ? range.end : date < snapshot.today ? date : snapshot.today;
+  const evaluatedThrough = options.through && options.through < defaultThrough ? options.through : defaultThrough;
   const base: ScoreResult = {
-    total: null, status: range.start > snapshot.today ? "future" : range.end >= snapshot.today ? "in_progress" : "final",
+    total: null, status: range.start > snapshot.today ? "future" : range.end >= snapshot.today || (options.through !== undefined && evaluatedThrough < range.end) ? "in_progress" : "final",
     period, ...range, evaluatedThrough, policy, categories: [], items: [], exclusions: [],
     coverage: { recorded: 0, expected: 0, ratio: null, historyComplete: range.start >= snapshot.historyFrom },
   };

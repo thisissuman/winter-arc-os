@@ -57,9 +57,19 @@ export function studyDay(sessions: StudySession[], date: string): StudyDay {
 }
 
 export function studyCoverage(sessions: StudySession[], dates: string[]): StudyCoverage {
-  const days = dates.map((date) => studyDay(sessions, date));
-  const seconds = days.reduce((sum, day) => sum + day.seconds, 0);
-  return { seconds, minutes: seconds / 60, recordedDays: days.filter((day) => day.seconds > 0).length, sessionsCompleted: days.reduce((sum, day) => sum + day.sessionsCompleted, 0) };
+  const selected = new Set(dates);
+  const recorded = new Set<string>();
+  let seconds = 0;
+  let sessionsCompleted = 0;
+  for (const session of sessions) {
+    if (selected.has(session.business_date)) sessionsCompleted++;
+    for (const [date, amount] of studySessionDays(session)) {
+      if (!selected.has(date)) continue;
+      seconds += amount;
+      if (amount > 0) recorded.add(date);
+    }
+  }
+  return { seconds, minutes: seconds / 60, recordedDays: recorded.size, sessionsCompleted };
 }
 
 export function studyCategorySeconds(sessions: StudySession[], from: string, to: string): Map<string, number> {

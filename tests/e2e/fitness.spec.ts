@@ -38,9 +38,9 @@ test("sleep source and workout copying agree across Fitness and Today", async ({
     sleepCreated = true;
     await page.goto("/today");
     await page.getByLabel("Dashboard challenge").selectOption("");
-    await expect(page.getByText("8.00 hours recorded")).toBeVisible();
+    await expect(page.locator("#workspace-content").getByText("8.00 hours recorded")).toBeVisible();
     await page.goto(`/metrics?date=${date}`);
-    await expect(page.getByText("8.00 hours recorded")).toBeVisible();
+    await expect(page.locator("#workspace-content").getByText("8.00 hours recorded")).toBeVisible();
     await page.goto(`/fitness?date=${date}`);
     const previousDate = new Date(Date.parse(`${date}T12:00:00Z`) - 86400_000).toISOString().slice(0, 10);
     await page.getByRole("radio", { name: "Sleep and wake times" }).check();

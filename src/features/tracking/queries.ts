@@ -1,6 +1,7 @@
 import "server-only";
 import { requireAccount } from "@/lib/auth/session";
 import { businessDateSchema } from "./validation";
+import { addDays } from "./dates";
 import type { TrackingSnapshot } from "./types";
 import type { Database } from "@/types/database";
 
@@ -24,14 +25,14 @@ function captureDate(timezone: string): string {
 }
 
 /** Request-scoped, owner-filtered reads; pagination follows exact counts, never a server row cap. */
-export async function loadTrackingSnapshot({ from, to }: { from?: string; to?: string } = {}): Promise<TrackingSnapshot> {
+export async function loadTrackingSnapshot({ from, to, compact = false }: { from?: string; to?: string; compact?: boolean } = {}): Promise<TrackingSnapshot> {
   if (from != null) businessDateSchema.parse(from);
   if (to != null) businessDateSchema.parse(to);
   if (from && to && from > to) throw new Error("Choose a date range whose end follows its start.");
   const { supabase, userId, preferences } = await requireAccount();
   const today = captureDate(preferences.timezone);
   const through = to ?? today;
-  const read = async <T extends TrackingTable>(table: T, dateColumn?: "business_date"): Promise<Tables[T]["Row"][]> => {
+  const read = async <T extends TrackingTable>(table: T, dateColumn?: "business_date", endOverride?: string): Promise<Tables[T]["Row"][]> => {
     const rows: Tables[T]["Row"][] = [];
     let offset = 0;
     for (;;) {
@@ -39,7 +40,7 @@ export async function loadTrackingSnapshot({ from, to }: { from?: string; to?: s
       // All tables in this reader have the same owned user_id and id columns.
       let query = supabase.from(table as "habits").select("*", { count: "exact" }).eq("user_id", userId).order("id").range(offset, offset + 499);
       if (dateColumn) {
-        query = query.lte(dateColumn, through);
+        query = query.lte(dateColumn, endOverride ?? through);
         if (from) query = query.gte(dateColumn, from);
       }
       const { data, error, count } = await query;
@@ -57,8 +58,9 @@ export async function loadTrackingSnapshot({ from, to }: { from?: string; to?: s
     read("habits"), read("habit_schedules"), read("habit_logs", "business_date"),
     read("metric_definitions"), read("metric_targets"), read("metric_logs", "business_date"),
     read("frequency_targets"), read("frequency_target_rules"), read("score_categories"), read("score_policies"), read("score_category_weights"), read("score_items"), read("categories"), read("life_areas"),
-    read("sleep_logs", "business_date"), read("exercises"), read("workouts", "business_date"), read("workout_exercises"), read("workout_sets"),
-    read("study_categories"), read("study_sessions"), read("focus_timers"),
+    read("sleep_logs", "business_date"), compact ? Promise.resolve([]) : read("exercises"), read("workouts", "business_date"),
+    compact ? Promise.resolve([]) : read("workout_exercises"), compact ? Promise.resolve([]) : read("workout_sets"),
+    read("study_categories"), read("study_sessions", "business_date", to ? addDays(to, 7) : undefined), compact ? Promise.resolve([]) : read("focus_timers"),
   ]);
   const beginnings = [...habits, ...metrics, ...frequencyTargets].map((tracker) => tracker.active_from).sort();
   // PostgreSQL CHECK-constrained text is generated as `string`; the migrated
