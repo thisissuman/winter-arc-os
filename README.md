@@ -4,9 +4,9 @@ A personal performance application for habits, fitness, career preparation, plan
 
 ## Current delivery
 
-**Phases 1 and 2 are implemented in the configured development project.** Phase 2 adds challenges, habits, manual metrics, frequency rules, optional starter setup, Today logging, separate daily/weekly scores, and tracking settings. The migration is applied, hosted types are regenerated, and local/hosted database checks pass. See [ROADMAP](docs/ROADMAP.md) and [QA](docs/QA.md) for the exact browser and release gates.
+**Phases 1–3 are implemented in the configured development project.** Phase 3 adds an opt-in fitness setup, sleep logs, workout/exercise/set logging and copying, recorded-day trends, and workout-driven gym quotas. Earlier challenges, habits, manual metrics, and separate scores remain available. The fitness migrations are applied and hosted types are regenerated. See [ROADMAP](docs/ROADMAP.md) and [QA](docs/QA.md) for exact verification and release gates.
 
-The MCP URL matches `.env.local`. The configured confirmed test account passes real login, session refresh, settings, and logout flows. Phase 2 hosted RLS checks use rollback-only fixtures; the production browser suite checks daily habit and metric logging on desktop/mobile. The user deferred signup/confirmation/recovery email delivery tests until custom SMTP is configured before production. The supplied confirmed test account uses an example-domain address.
+The MCP URL matches `.env.local`. The confirmed test account supports real login, session refresh, and browser checks. Hosted RLS scripts use rollback-only fixtures; fitness browser flows cover sleep, workouts, and concurrent water additions. The user deferred signup/confirmation/recovery email delivery tests until custom SMTP is configured before production. The supplied confirmed test account uses an example-domain address.
 
 ## Documentation
 
@@ -33,7 +33,7 @@ npm run dev
 
 Before starting, replace the example Supabase URL/public key and set `APP_ORIGIN` to `http://localhost:3000`. Open that address after starting the server. Apply the foundation migration to the same project first; auth alone cannot supply the missing application tables. Missing credentials disable submission with a setup notice.
 
-Apply all migrations in `supabase/migrations` to the same project before using tracking pages. The hosted development project already has versions `20261001004511_core_tracking` and `20261001004734_score_items_policy_category_index`; local filenames match its ledger. An empty account can use personal tracking immediately or opt into starter definitions during onboarding.
+Apply all migrations in `supabase/migrations` to the same project before using tracking pages. The hosted development project has the Phase 2 and Phase 3 versions listed below; local filenames match its ledger. An empty account can use personal tracking immediately, opt into full starters during onboarding, or set up only fitness definitions from `/fitness`.
 
 | Environment variable | Purpose |
 | --- | --- |
@@ -52,7 +52,7 @@ Keep `.env.local` out of Git. Never paste credentials into documentation or chat
 | `npm run dev` | Start Next.js development on port 3000 |
 | `npm run lint` | Check code with ESLint |
 | `npm run typecheck` | Generate route declarations and check TypeScript |
-| `npm run test` | Run auth and tracking-domain unit tests |
+| `npm run test` | Run auth, tracking, and fitness-domain unit tests |
 | `npm run test:db` | Replay migrations in isolated PostgreSQL and verify RLS/constraints; no Docker or remote changes |
 | `npm run test:e2e` | Build production, start port 3100, and run desktop/mobile browser tests |
 | `npm run build` | Compile a production application |
@@ -62,7 +62,7 @@ Keep `.env.local` out of Git. Never paste credentials into documentation or chat
 
 Install Playwright's browser once with `npx playwright install chromium`. Browser tests skip authenticated flows unless dedicated test credentials are supplied. They do not mock Supabase or manufacture successful authentication.
 
-The scaffold uses Next.js 16.3.8, React 19.2.8, Tailwind 4, shadcn/ui, Lucide, Geist, Zod, and Supabase SSR. Recharts and React Hook Form will be added where their feature work needs them. Fonts ship locally, so builds do not fetch Google Fonts.
+The application uses Next.js 16.3.8, React 19.2.8, Tailwind 4, shadcn/ui, Lucide, Geist, Zod, Supabase SSR, and Recharts 3.10.1 for bounded fitness charts. React Hook Form remains optional for later complex forms. Fonts ship locally, so builds do not fetch Google Fonts.
 
 Webpack is selected explicitly for development/build because the available environment rejected Turbopack's process/port initialization. ESLint 10 uses the official `@eslint/compat` adapter for bundled Next.js plugins. npm reports their older peer ranges; the locked installation and actual lint checks succeed without legacy-peer installation flags. Re-evaluate this compatibility bridge when updating Next.js/plugins.
 
@@ -82,7 +82,7 @@ The isolated `test:db` runner executes real PostgreSQL through PGlite and suppli
 
 ## Migrations and generated types
 
-Add incremental SQL under `supabase/migrations`, using `npx supabase migration new <name>`. Never edit a migration after deploying it. The foundation creates profiles, preferences, life areas, categories, and the transactional new-user initializer. Phase 2 adds core tracking and its score-item covering index. Applied versions are `20260930180649_foundation`, `20260930181434_categories_parent_index`, `20261001004511_core_tracking`, and `20261001004734_score_items_policy_category_index`; local filenames match the hosted ledger.
+Add incremental SQL under `supabase/migrations`, using `npx supabase migration new <name>`. Never edit a migration after deploying it. The foundation creates account/organization tables; Phase 2 adds core tracking. Phase 3 adds sleep/workout tables and transactional fitness routines. Applied versions are `20260930180649_foundation`, `20260930181434_categories_parent_index`, `20261001004511_core_tracking`, `20261001004734_score_items_policy_category_index`, `20261001044053_fitness`, `20261001044323_fitness_owner_indexes`, `20261001044532_workout_edit_fix`, and `20261001050228_workout_payload_guard`. Phase 3 follow-ups add FK covering indexes, fix workout editing, and guard malformed direct RPC payloads; local filenames match the hosted ledger.
 
 Regenerate complete public database types after schema changes with Supabase's generator. With a full local stack:
 
@@ -90,7 +90,7 @@ Regenerate complete public database types after schema changes with Supabase's g
 npx supabase gen types typescript --local --schema public > src/types/database.ts
 ```
 
-The committed `src/types/database.ts` was regenerated through the matching hosted MCP after Phase 2 deployment. The old isolated generator was removed because it could overwrite complete types with an incomplete schema. Review generated types with every migration. Hosted MCP regeneration is the verified path when a local Docker-compatible runtime is unavailable.
+`src/types/database.ts` was regenerated through the matching hosted MCP after Phase 3 deployment. The old isolated generator was removed because it could overwrite complete types with an incomplete schema. Review generated types with every migration. Hosted MCP regeneration is the verified path when a local Docker-compatible runtime is unavailable.
 
 ## Hosted configuration
 
@@ -102,7 +102,7 @@ The committed `src/types/database.ts` was regenerated through the matching hoste
 6. Create a dedicated account in Supabase Auth → Users and confirm its email. Add `E2E_AUTH_EMAIL` and `E2E_AUTH_PASSWORD` to ignored `.env.local`, then run `npm run test:e2e`. This exercises real login, reload persistence, refresh-token rotation, settings, theme changes, keyboard access, and logout. Use a test account because these checks temporarily change its name/theme; ordinary owner-scoped API cleanup restores both in `finally` even on assertion failure. Traces can contain test credentials and remain ignored; never publish them.
 7. Separately exercise signup and confirmation/recovery emails against a real inbox. The default email service sends only to pre-authorized organization team addresses and has restrictive limits; configure [custom SMTP](https://supabase.com/docs/guides/auth/auth-smtp) for other recipients. A manually confirmed example-domain test account establishes login, not email delivery. After resetting a dedicated fixture password, update its ignored E2E password locally before rerunning tests. Never send passwords or email links in chat.
 
-Hosted PostgreSQL isolation is verified by `supabase/tests/hosted-foundation.sql` and `supabase/tests/hosted-tracking.sql`. Validate them locally with `npm run test:db` before executing through the authorized development-project MCP. Both use temporary fixtures in rollback-only transactions. They do not create a usable Auth API test account or send email.
+Hosted PostgreSQL isolation is verified by `supabase/tests/hosted-foundation.sql`, `supabase/tests/hosted-tracking.sql`, and `supabase/tests/hosted-fitness.sql`. Validate them locally with `npm run test:db` before executing through the authorized development-project MCP. All use temporary fixtures in rollback-only transactions. They do not create a usable Auth API test account or send email.
 
 The current hosted Site URL is `http://localhost:3000`. Exact allowed callbacks are `http://localhost:3000/auth/confirm` and `http://localhost:3000/auth/confirm?next=/reset-password`; no wildcard was added. Hosted templates remain the provider defaults. These are development settings, not a deployed release.
 

@@ -2,7 +2,7 @@
 
 ## Status
 
-Accepted calculation contract implemented in `src/features/tracking/dates.ts` and `domain.ts`. Focused domain tests cover inclusive dates, recurrence, skipped/missing/zero values, proration, streaks, eligible-category redistribution, separate daily/weekly scoring, duplicate-source exclusion, and policy history. The Phase 2 migration is applied to the configured development project. All examples below are illustrative fixtures, not actual user performance. See [PRODUCT](../PRODUCT.md), [schema design](ARCHITECTURE.md), and [QA](QA.md).
+Accepted calculation contract implemented in `src/features/tracking/dates.ts` and `domain.ts`, with recorded-day fitness summaries in `src/features/fitness/domain.ts`. Focused tests cover calendar/scoring history plus sleep derivation, gym completion, and missing-day averages. Phase 3 migrations are applied to the configured development project. All examples below are illustrative fixtures, not actual user performance. See [PRODUCT](../PRODUCT.md), [schema design](ARCHITECTURE.md), and [QA](QA.md).
 
 ## Calendar and effective rules
 
@@ -47,7 +47,7 @@ Retain the full numeric input in canonical units. Display conversions never over
 
 Minimum/maximum ratio targets must be positive; reject zero/negative targets. A logged zero is valid and meets a maximum target. Body weight is observational unless explicitly configured otherwise. No score bonus for exceeding targets in V1.
 
-Derived study/sleep metrics read their source records; prohibit duplicate manual logs for the same definition. A source not yet delivered by the application is unavailable and excluded with a reason. Its activation date is persisted when feature setup becomes available; pre-activation expectations stay excluded from historical scores. Once active, an absent required value contributes zero. Deliberate backdating is a separate user correction, not an automatic consequence of a release.
+Derived sleep metrics now read `sleep_logs` by wake business date and convert stored seconds to hours. They never create a parallel `metric_logs` row. Study remains unavailable until Phase 4. A source not yet activated is excluded with a reason. Fitness setup persists prospective sleep/gym activation dates; pre-activation expectations stay excluded from historical scores. Once active, an absent required value contributes zero. Deliberate backdating is a separate user correction, not an automatic consequence of a release.
 
 Example: protein 126 g with a 130 g minimum gives `126 / 130 = 0.969230...`, displayed as **96.9%**. Protein 160 g stays 160 g in history but contributes 100%.
 
@@ -56,6 +56,8 @@ Example: a 60-minute maximum with 90 minutes logged gives `60 / 90 = 66.7%`. An 
 ## Frequency and partial periods
 
 Count completed source records only. Session mode counts sessions; distinct-day mode counts qualifying business dates once, regardless of multiple records that day. Gym counts completed workouts. Starter career quota counts completed study sessions. Walking counts days meeting the configured metric threshold.
+
+Gym counts `workouts.status = completed` within eligible dates; drafts and copied drafts contribute zero until completed. A copy does not copy score results. Weight's seven-day and week-to-date averages divide by recorded values only and display `recorded days / window days`; a missing day is never zero-filled. Sleep charts use the same derived value returned to Today and Metrics.
 
 For weekly/monthly quota Q, full period length L calendar days, and active intersection A calendar days:
 

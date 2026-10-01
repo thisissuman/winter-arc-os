@@ -167,13 +167,16 @@ export function metricAdherence(actual: number | null, target: number, direction
 }
 
 function metricAvailable(metric: MetricDefinition, date: string): boolean {
-  // Study and sleep records arrive in their own phases; a configured definition alone cannot activate them.
-  return metric.source === "manual" && (!metric.source_available_from || date >= metric.source_available_from);
+  return metric.source === "manual"
+    ? !metric.source_available_from || date >= metric.source_available_from
+    : metric.source === "sleep" && metric.source_available_from !== null && date >= metric.source_available_from;
 }
 
 export function metricDailyValue(snapshot: TrackingSnapshot, metric: MetricDefinition, date: string, challengeId?: string | null): MetricEvaluation {
   const log = metric.source === "manual" ? snapshot.metricLogs.find((item) => item.metric_id === metric.id && item.business_date === date) ?? null : null;
-  const base: MetricEvaluation = { date, rawValue: log?.value ?? null, target: null, direction: "observation", unit: metric.unit, adherence: null, eligible: false, state: "inactive", reason: null, rule: null, log };
+  const sleep = metric.source === "sleep" ? snapshot.sleepLogs.find((item) => item.business_date === date) ?? null : null;
+  const rawValue = metric.source === "sleep" ? sleep ? sleep.duration_seconds / 3600 : null : log?.value ?? null;
+  const base: MetricEvaluation = { date, rawValue, target: null, direction: "observation", unit: metric.unit, adherence: null, eligible: false, state: "inactive", reason: null, rule: null, log };
   const association = associationReason(snapshot, "metric", metric.id, challengeId);
   if (association) return { ...base, reason: association };
   if (!activeOn(metric, date) || !challengeOn(snapshot, date, challengeId)) return { ...base, reason: "Outside this tracker's active dates or challenge dates." };
@@ -190,9 +193,9 @@ export function metricDailyValue(snapshot: TrackingSnapshot, metric: MetricDefin
   const rule = selected.rule;
   if (!Number.isFinite(rule.target) || rule.target <= 0) return { ...base, rule, state: "configuration", reason: "Ratio-based targets must be positive." };
   return {
-    ...base, state: log ? "logged" : "missing", target: rule.target,
-    direction: rule.direction, adherence: metricAdherence(log?.value ?? null, rule.target, rule.direction),
-    eligible: true, rule, reason: log ? null : "Required measurement not logged.",
+    ...base, state: rawValue !== null ? "logged" : "missing", target: rule.target,
+    direction: rule.direction, adherence: metricAdherence(rawValue, rule.target, rule.direction),
+    eligible: true, rule, reason: rawValue !== null ? null : "Required measurement not logged.",
   };
 }
 
@@ -246,9 +249,10 @@ export function frequencyProgress(snapshot: TrackingSnapshot, source: Habit | Fr
   if (!rule) return { ...base, reason: selected.reason };
   if (!quota || !Number.isFinite(quota) || quota <= 0) return { ...base, reason: "Period quota must be positive." };
   if (range.start > snapshot.today) return { ...base, state: "future", reason: "Future periods do not count as misses." };
-  if (isTarget && source.source !== "metric_threshold") return { ...base, state: "unavailable", reason: "The source is not available in this phase." };
+  if (isTarget && source.source === "study_sessions") return { ...base, state: "unavailable", reason: "The source is not available in this phase." };
+  if (isTarget && source.source === "workouts" && source.source_available_from === null) return { ...base, state: "unavailable", reason: "Workout tracking has not been activated." };
   const metric = isTarget && source.metric_id ? snapshot.metrics.find((item) => item.id === source.metric_id) ?? null : null;
-  if (isTarget && (!metric || !("threshold" in rule) || rule.threshold === null || rule.threshold <= 0)) return { ...base, reason: "This frequency target needs an available metric and positive threshold." };
+  if (isTarget && source.source === "metric_threshold" && (!metric || !("threshold" in rule) || rule.threshold === null || rule.threshold <= 0)) return { ...base, reason: "This frequency target needs an available metric and positive threshold." };
   if (metric && metric.source !== "manual") return { ...base, state: "unavailable", reason: "The metric source is not available in this phase." };
   const eligibleDates = datesBetween(range.start, range.end).filter((day) => activeOn(source, day) && effectiveOn(rule, day) && challengeOn(snapshot, day, challengeId)
     && (!isTarget || !source.source_available_from || day >= source.source_available_from)
@@ -267,6 +271,10 @@ export function frequencyProgress(snapshot: TrackingSnapshot, source: Habit | Fr
     const logs = snapshot.metricLogs.filter((log) => log.metric_id === metric.id && evaluatedDates.has(log.business_date));
     observedDays = logs.length;
     actualCount = new Set(logs.filter((log) => log.value >= threshold).map((log) => log.business_date)).size;
+  } else if (isTarget && source.source === "workouts") {
+    const sessions = snapshot.workouts.filter((workout) => workout.status === "completed" && evaluatedDates.has(workout.business_date));
+    observedDays = new Set(sessions.map((workout) => workout.business_date)).size;
+    actualCount = source.count_mode === "distinct_days" ? observedDays : sessions.length;
   }
   const requiredCount = Math.ceil(quota * eligibleDates.length / totalDays);
   return {
@@ -344,11 +352,14 @@ function metricPeriod(snapshot: TrackingSnapshot, metric: MetricDefinition, rang
     if (!activeDates.length) return { ...base, reason: metric.source === "manual" ? "No active dates in this period." : "The source is not available in this phase." };
     const due = new Set(activeDates.filter((day) => day <= date && day <= snapshot.today));
     if ([...due].some((day) => day < snapshot.historyFrom)) return { ...base, reason: "The full evaluated period is outside loaded history.", configuration: true };
-    const logs = snapshot.metricLogs.filter((log) => log.metric_id === metric.id && due.has(log.business_date)).sort((a, b) => a.business_date.localeCompare(b.business_date));
-    const actual = aggregate(logs.map((log) => log.value), metric.aggregation);
+    const values = [...due].sort().flatMap((day) => {
+      const value = metricDailyValue(snapshot, metric, day, challengeId);
+      return value.rawValue === null ? [] : [value.rawValue];
+    });
+    const actual = aggregate(values, metric.aggregation);
     // Additive totals scale to the active intersection; averages/latest keep their original unit target.
     const target = metric.aggregation === "sum" ? periodRule.target * activeDates.length / allDates.length : periodRule.target;
-    return { contribution: metricAdherence(actual, target, periodRule.direction), actual, target, expected: due.size, recorded: logs.length, reason: actual === null ? "Required period measurement not logged." : null, configuration: false };
+    return { contribution: metricAdherence(actual, target, periodRule.direction), actual, target, expected: due.size, recorded: values.length, reason: actual === null ? "Required period measurement not logged." : null, configuration: false };
   }
   const due = datesBetween(range.start, range.end).filter((day) => day <= date && day <= snapshot.today);
   const evaluations = due.map((day) => metricDailyValue(snapshot, metric, day, challengeId));
@@ -360,7 +371,7 @@ function metricPeriod(snapshot: TrackingSnapshot, metric: MetricDefinition, rang
   return {
     contribution, actual: aggregate(eligible.flatMap((value) => value.rawValue === null ? [] : [value.rawValue]), metric.aggregation),
     target: period === "daily" ? eligible[0].target : null,
-    expected: eligible.length, recorded: eligible.filter((value) => value.log !== null).length,
+    expected: eligible.length, recorded: eligible.filter((value) => value.rawValue !== null).length,
     reason: null, configuration: false,
   };
 }
@@ -380,7 +391,7 @@ export function metricPeriodValue(snapshot: TrackingSnapshot, metric: MetricDefi
   const association = associationReason(snapshot, "metric", metric.id, challengeId);
   if (association) return { ...base, reason: association };
   if (range.start > snapshot.today) return { ...base, state: "future", reason: "Future periods do not count as misses." };
-  if (metric.source !== "manual") return { ...base, state: "unavailable", reason: "The source is not available in this phase." };
+  if (metric.source === "study" || metric.source === "sleep" && metric.source_available_from === null) return { ...base, state: "unavailable", reason: "The source is not available for this period." };
   if (!rule) return {
     ...base, state: selected.reason?.startsWith("Overlapping") ? "configuration" : "inactive",
     reason: selected.reason?.startsWith("Overlapping") ? selected.reason : `No ${period} metric target is configured.`,

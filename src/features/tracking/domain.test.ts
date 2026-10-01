@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { addDays, inclusiveChallengeProgress, isBusinessDate, monthRange, weekRange } from "./dates";
 import { evaluateHabit, frequencyProgress, habitStreak, metricAdherence, metricDailyValue, scoreForPeriod } from "./domain";
+import { averageRecorded } from "@/features/fitness/domain";
 import type { Habit, HabitLog, HabitSchedule, MetricDefinition, MetricLog, MetricTarget, ScoreCategory, ScoreItem, ScorePolicy, TrackingSnapshot } from "./types";
 
 const id = (suffix: string) => `00000000-0000-4000-8000-${suffix.padStart(12, "0")}`;
@@ -30,6 +31,7 @@ function snapshot(changes: Partial<TrackingSnapshot> = {}): TrackingSnapshot {
     ],
     scoreItems: [habitItem, metricItem, { ...habitItem, id: id("52"), policy_id: weeklyPolicy.id }, { ...metricItem, id: id("53"), policy_id: weeklyPolicy.id }],
     categories: [], lifeAreas: [], timezone: "Asia/Kolkata", weekStartsOn: 1, today: "2026-10-01", selectedChallengeId: null,
+    sleepLogs: [], exercises: [], workouts: [], workoutExercises: [], workoutSets: [],
     onboardingComplete: true, historyFrom: "2026-09-28", privacyMode: false, hidePrivateToday: false,
     ...changes,
   };
@@ -69,6 +71,25 @@ describe("calendar and effective tracking rules", () => {
 });
 
 describe("adherence and separate score periods", () => {
+  it("derives sleep hours from the wake-date log without a duplicate metric log", () => {
+    const sleep = { ...metric, id: id("81"), source: "sleep" as const, unit: "hours", aggregation: "latest" as const, source_available_from: "2026-10-01" };
+    const recorded = snapshot({ metrics: [sleep], metricLogs: [], metricTargets: [{ ...target, metric_id: sleep.id, target: 8 }], sleepLogs: [{ ...owned, id: id("82"), business_date: "2026-10-01", timezone: "Asia/Kolkata", sleep_start_at: "2026-09-30T18:00:00Z", wake_at: "2026-10-01T02:00:00Z", duration_seconds: 28800, quality: 4, notes: "", revision: 1 }] });
+    expect(metricDailyValue(recorded, sleep, "2026-10-01")).toMatchObject({ state: "logged", rawValue: 8, adherence: 1, log: null });
+    expect(metricDailyValue(recorded, sleep, "2026-09-30").state).toBe("unavailable");
+  });
+  it("counts only completed workouts toward a gym session quota", () => {
+    const gym = { ...metric, id: id("83"), name: "Gym", source: "workouts" as const, metric_id: null, count_mode: "sessions" as const, source_available_from: "2026-09-28", active_from: "2026-09-28" };
+    const rule = { ...target, id: id("84"), frequency_target_id: gym.id, period: "weekly" as const, quota: 4, threshold: null };
+    const workouts = [
+      { ...owned, id: id("85"), business_date: "2026-09-29", timezone: "Asia/Kolkata", name: "A", duration_seconds: 3600, notes: "", status: "completed" as const, challenge_id: null, revision: 1 },
+      { ...owned, id: id("86"), business_date: "2026-10-01", timezone: "Asia/Kolkata", name: "B", duration_seconds: 3600, notes: "", status: "draft" as const, challenge_id: null, revision: 1 },
+    ];
+    const tracked = snapshot({ frequencyTargets: [gym], frequencyRules: [rule], workouts });
+    expect(frequencyProgress(tracked, gym, "2026-10-01", "weekly")).toMatchObject({ actualCount: 1, requiredCount: 4, contribution: 0.25 });
+  });
+  it("averages recorded weight days while reporting missing coverage", () => {
+    expect(averageRecorded([{ date: "2026-09-29", value: 70 }, { date: "2026-09-30", value: null }, { date: "2026-10-01", value: 72 }])).toMatchObject({ value: 71, recordedDays: 2, windowDays: 3 });
+  });
   it("distinguishes missing measurements from a logged zero and caps overachievement", () => {
     expect(metricDailyValue(snapshot(), metric, "2026-10-01")).toMatchObject({ state: "missing", rawValue: null, adherence: 0 });
     expect(metricDailyValue(snapshot({ metricLogs: [metricLog("2026-10-01", 0)] }), metric, "2026-10-01")).toMatchObject({ state: "logged", rawValue: 0, adherence: 0 });

@@ -11,7 +11,7 @@ export class TrackingSetupError extends Error {
   }
 }
 type Tables = Database["public"]["Tables"];
-type TrackingTable = Exclude<keyof Tables, "profiles" | "user_preferences" | "tracking_operations">;
+type TrackingTable = Exclude<keyof Tables, "profiles" | "user_preferences" | "tracking_operations" | "workout_operations">;
 type ReadError = { code?: string; message?: string };
 function readError(error: ReadError): never {
   if (error.code === "42P01" || error.code === "PGRST205") throw new TrackingSetupError();
@@ -52,11 +52,12 @@ export async function loadTrackingSnapshot({ from, to }: { from?: string; to?: s
     }
     return rows;
   };
-  const [challenges, challengeHabits, challengeMetrics, challengeTargets, habits, schedules, habitLogs, metrics, metricTargets, metricLogs, frequencyTargets, frequencyRules, scoreCategories, scorePolicies, scoreWeights, scoreItems, categories, lifeAreas] = await Promise.all([
+  const [challenges, challengeHabits, challengeMetrics, challengeTargets, habits, schedules, habitLogs, metrics, metricTargets, metricLogs, frequencyTargets, frequencyRules, scoreCategories, scorePolicies, scoreWeights, scoreItems, categories, lifeAreas, sleepLogs, exercises, workouts, workoutExercises, workoutSets] = await Promise.all([
     read("challenges"), read("challenge_habits"), read("challenge_metrics"), read("challenge_targets"),
     read("habits"), read("habit_schedules"), read("habit_logs", "business_date"),
     read("metric_definitions"), read("metric_targets"), read("metric_logs", "business_date"),
     read("frequency_targets"), read("frequency_target_rules"), read("score_categories"), read("score_policies"), read("score_category_weights"), read("score_items"), read("categories"), read("life_areas"),
+    read("sleep_logs", "business_date"), read("exercises"), read("workouts", "business_date"), read("workout_exercises"), read("workout_sets"),
   ]);
   const beginnings = [...habits, ...metrics, ...frequencyTargets].map((tracker) => tracker.active_from).sort();
   // PostgreSQL CHECK-constrained text is generated as `string`; the migrated
@@ -69,6 +70,7 @@ export async function loadTrackingSnapshot({ from, to }: { from?: string; to?: s
     frequencyTargets: frequencyTargets as TrackingSnapshot["frequencyTargets"],
     frequencyRules: frequencyRules as TrackingSnapshot["frequencyRules"], scoreCategories,
     scorePolicies: scorePolicies as TrackingSnapshot["scorePolicies"], scoreWeights, scoreItems, categories, lifeAreas,
+    sleepLogs, exercises, workouts: workouts as TrackingSnapshot["workouts"], workoutExercises, workoutSets,
     timezone: preferences.timezone, weekStartsOn: preferences.week_starts_on, today,
     selectedChallengeId: preferences.selected_challenge_id ?? null, onboardingComplete: preferences.onboarding_completed,
     historyFrom: from ?? beginnings[0] ?? today, privacyMode: preferences.privacy_mode, hidePrivateToday: preferences.hide_private_today,

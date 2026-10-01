@@ -23,6 +23,11 @@ export type ScoreItem = OwnedRecord & { policy_id: string; score_category_id: st
 export type ChallengeHabit = OwnedRecord & { challenge_id: string; habit_id: string };
 export type ChallengeMetric = OwnedRecord & { challenge_id: string; metric_id: string };
 export type ChallengeTarget = OwnedRecord & { challenge_id: string; frequency_target_id: string };
+export type SleepLog = OwnedRecord & { business_date: BusinessDate; timezone: string; sleep_start_at: string | null; wake_at: string | null; duration_seconds: number; quality: number | null; notes: string; revision: number };
+export type Exercise = OwnedRecord & { name: string; muscle_group: string; archived_at: string | null };
+export type Workout = OwnedRecord & { business_date: BusinessDate; timezone: string; name: string; duration_seconds: number | null; notes: string; status: "draft" | "completed"; challenge_id: string | null; revision: number };
+export type WorkoutExercise = OwnedRecord & { workout_id: string; exercise_id: string; position: number; notes: string };
+export type WorkoutSet = OwnedRecord & { workout_exercise_id: string; set_number: number; weight_kg: number; reps: number; rpe: number | null };
 export type TrackingCategory = OwnedRecord & { name: string; life_area_id: string | null; position: number; archived_at: string | null };
 export type TrackingLifeArea = OwnedRecord & { name: string; icon: string | null; color: string | null; position: number; archived_at: string | null };
 export type TrackingSnapshot = {
@@ -32,6 +37,7 @@ export type TrackingSnapshot = {
   frequencyTargets: FrequencyTarget[]; frequencyRules: FrequencyRule[];
   scoreCategories: ScoreCategory[]; scorePolicies: ScorePolicy[]; scoreWeights: ScoreCategoryWeight[]; scoreItems: ScoreItem[];
   categories: TrackingCategory[]; lifeAreas: TrackingLifeArea[];
+  sleepLogs: SleepLog[]; exercises: Exercise[]; workouts: Workout[]; workoutExercises: WorkoutExercise[]; workoutSets: WorkoutSet[];
   timezone: string; weekStartsOn: number; today: BusinessDate; selectedChallengeId: string | null;
   onboardingComplete: boolean; historyFrom: BusinessDate; privacyMode: boolean; hidePrivateToday: boolean;
 };

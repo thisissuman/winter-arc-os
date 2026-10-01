@@ -2,7 +2,7 @@
 
 ## Status and ownership
 
-Phase 1 implements the verified foundation: application shell, auth, profile/appearance settings, and four foundation tables. Phase 2 implements core tracking in `supabase/migrations/20261001004511_core_tracking.sql` with a covering index in `20261001004734_score_items_policy_category_index.sql`; both are applied to the configured development project. Later subsystems remain a blueprint. Phase 1 signup/confirmation/recovery email verification is deferred until SMTP setup before production; see PRODUCT and QA. Product requirements are in [PRODUCT](../PRODUCT.md), calculations in [SCORING](SCORING.md), and visual conventions in [DESIGN](../DESIGN.md).
+Phases 1–3 implement foundation, core tracking, and fitness in the configured development project. Phase 3 lives in `supabase/migrations/20261001044053_fitness.sql`, followed by three narrow index/workout-payload migrations; all four are applied. Career and later subsystems remain a blueprint. Phase 1 signup/confirmation/recovery email verification is deferred until SMTP setup before production; see PRODUCT and QA. Product requirements are in [PRODUCT](../PRODUCT.md), calculations in [SCORING](SCORING.md), and visual conventions in [DESIGN](../DESIGN.md).
 
 ## Application boundaries
 
@@ -15,7 +15,8 @@ Use one Next.js App Router application deployed to Vercel, with Supabase Auth an
 | `src/components/ui` | shadcn/ui primitives and reusable accessible controls |
 | `src/components` | Shared shell, navigation, date controls, privacy presentation, feedback |
 | `src/lib/supabase` | Cookie-aware server/browser clients and session refresh |
-| `src/features/tracking/domain.ts`, `dates.ts` | Phase 2 pure shared scheduling, adherence, score, and calendar calculations; later analytics reuse these |
+| `src/features/tracking/domain.ts`, `dates.ts` | Shared scheduling, source evaluation, score, and calendar calculations |
+| `src/features/fitness` | Fitness-domain summaries, server actions, and focused UI; trend charts load only on fitness routes |
 | `src/lib` | Shared validation and authenticated server helpers |
 | `src/types` | Generated database types and shared domain interfaces |
 | `supabase/migrations`, `supabase/tests` | Incremental schema/security changes and SQL tests |
@@ -95,7 +96,7 @@ Testing replays migrations against isolated PGlite PostgreSQL with minimal test-
 
 The applied migration adds selected challenge and starter-applied metadata to preferences; 17 owned tracking tables including `tracking_operations` for retry receipts; same-owner composite references, indexes, update triggers, explicit RLS policies, and authenticated transaction functions. Direct authenticated access to the new tables is read-only; Server Actions use narrowly named `security definer` functions that verify `auth.uid()` again and fix `search_path`. Business dates and original capture timezone are stored on logs. Revisions prevent stale replacement writes, and operation UUIDs make water-style increments retry-safe. The follow-up migration covers the composite score-item policy/category foreign key.
 
-`src/features/tracking/queries.ts` pages owner-filtered rows in batches rather than relying on the PostgREST default limit. `src/types/database.ts` is generated from the hosted Phase 2 public schema. Supabase widens CHECK-constrained text columns to `string`; the domain boundary narrows them to the literals enforced by the verified SQL constraints. Challenge associations share tracker definitions and logs; the optional starter is a single idempotent function guarded by `starter_applied_on`. It inserts no completion or measurement records. Study categories require Phase 4's table and are not inserted early.
+`src/features/tracking/queries.ts` pages owner-filtered rows in batches rather than relying on the PostgREST default limit. `src/types/database.ts` is generated from the hosted Phase 3 public schema. Supabase widens CHECK-constrained text columns to `string`; the domain boundary narrows them to the literals enforced by verified SQL constraints. Challenge associations share tracker definitions and logs; the optional starter is a single idempotent function guarded by `starter_applied_on`. It inserts no completion or measurement records. Study categories require Phase 4's table and are not inserted early.
 
 | Table | Specific fields and relationships |
 | --- | --- |
@@ -120,7 +121,7 @@ Habit schedule frequency is `DAILY`, `WEEKDAYS`, `SPECIFIC_DAYS`, `TIMES_PER_WEE
 
 Source filters are narrowly typed and Zod-validated. Real entity references, such as a habit, metric, or study category, use FKs with ownership rather than arbitrary JSON IDs. Small metadata/configuration may use validated JSONB; primary relationships and measurements do not.
 
-Initial supported manual sources operate in Phase 2. Workout/study/sleep sources are declared for later phases and explicitly unavailable until implemented; they are excluded rather than shown as zero performance. Record a previously unavailable source's activation date when its feature setup is completed and start its expectations then, preserving prior exclusions. Migrations add source-specific FKs as parent tables arrive. The UI only offers editable source types that are available.
+Manual sources operate from Phase 2. Phase 3 activates sleep and workout sources when the user explicitly runs fitness setup; study remains unavailable until Phase 4. Source activation dates prevent prior unavailable periods from turning into historical misses. First saved sleep/completed workout can also activate an existing source definition on that business date. The UI offers only editable source types currently supported.
 
 ### Fitness — Phase 3
 
@@ -131,12 +132,15 @@ Initial supported manual sources operate in Phase 2. Workout/study/sleep sources
 | `workout_exercises` | Workout/exercise references, position; stable exercise identity enables comparison across sessions |
 | `workout_sets` | Workout-exercise reference, set number, numeric load, positive repetitions, optional bounded RPE |
 | `sleep_logs` | Wake business date, timezone at capture, optional sleep/wake timestamps, duration seconds, optional quality 1–5; unique date |
+| `workout_operations` | Owned operation UUID, source/date/result receipt for retry-safe copying |
 
 Weight/protein/water/steps remain metric logs. Creatine remains a habit with editable dose metadata. Water stores millilitres canonically and displays litres. Weight uses kilograms; protein grams; steps integers. Unit conversion belongs at input/display boundaries.
 
 Sleep accepts either duration-only or valid timestamp pairs. When timestamps exist, derive elapsed duration from them instead of storing contradictory user-entered totals. Weight averages use available observations within calendar windows and show coverage; no zero filling.
 
 Gym frequency counts completed workouts, not unfinished drafts. Copying creates a new workout with its own child records and date; the old session is unchanged. Progression charts compare stable exercise IDs, sets, repetitions, and load, without claiming a medical outcome.
+
+`setup_fitness` adds only missing canonical definitions and activates existing starter sleep/gym sources prospectively; repeating it cannot add duplicate definitions, logs, or scores. `save_fitness_sleep` uses a revision check and stores an elapsed duration consistent with timestamp pairs. `save_fitness_workout` replaces one workout's ordered children in a single transaction after ownership and revision checks. `copy_fitness_workout` takes a stable operation UUID and returns its prior result on retry; the copy starts as a draft. Direct authenticated table writes are revoked, while every new table has owner RLS policies and same-owner composite relationships. Read queries load the five source tables through the same authenticated snapshot used by Today, Metrics, and Fitness. Fitness's gym quota uses the selected Today challenge context; historical measurement charts show shared personal source history.
 
 ### Career — Phase 4
 

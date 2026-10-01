@@ -2,7 +2,7 @@
 
 ## Truthful status
 
-Phases 0–2 are complete in the configured development project. After the initial file-only Phase 2 pass, the user explicitly requested validation and migration. Phase 2 local/hosted SQL, domain, production build, and dedicated-account desktop/mobile tracking checks pass; exact evidence is below. Signup/confirmation/recovery email verification remains deferred until SMTP setup before production. Full local Supabase container replay and staging/production release checks remain open.
+Phases 0–3 are complete in the configured development project. Phase 3 fitness migrations, local and hosted database checks, domain tests, production build, and dedicated-account desktop/mobile browser checks pass; exact evidence is below. Signup/confirmation/recovery email verification remains deferred until SMTP setup before production. Full local Supabase container replay and staging/production release checks remain open.
 
 Read [ROADMAP](ROADMAP.md) for phase gates, [SCORING](SCORING.md) for expected math, and [ARCHITECTURE](ARCHITECTURE.md) for ownership/source contracts.
 
@@ -174,3 +174,22 @@ The first source pass made no test or database changes, as requested at that tim
 The browser tracking checks create a habit and manual water metric, log them from Today, reload to verify persistence, inspect the habit grid and metric page, and remove their definitions/history. SQL checks cover two-user isolation and shared source records; the browser checks use one dedicated confirmed account. The starter is verified through transactional SQL, not an email or public signup flow.
 
 Supabase's security advisor reports 13 authenticated `security definer` RPC warnings; these are intentional because direct table writes are revoked and each function rechecks `auth.uid()`, fixes its search path, and enforces owner relationships. The hosted Auth advisor also reports leaked-password protection disabled; review and enable it before production if available in the chosen plan. The performance advisor's unindexed-FK finding was fixed; remaining unused-index notices are expected on newly empty tables. Full local Supabase Docker replay, actual concurrent multi-client increment stress, and signup/recovery email delivery are still release-level checks. No fabricated performance records or test fixtures were left in analytics.
+
+### Phase 3 fitness validation and hosted migration — October 1, 2026
+
+The Supabase MCP URL matched `.env.local`, and inspection confirmed the four expected prior migrations and no fitness tables before deployment. The reviewed fitness SQL was replayed locally, applied to the same development project as `20261001044053_fitness`, and followed by `20261001044323_fitness_owner_indexes` after the advisor found two uncovered auth-user FKs. A focused edit test found an ambiguous workout identifier; `20261001044532_workout_edit_fix` corrected it without editing the deployed migration. `20261001050228_workout_payload_guard` rejects absent child arrays from direct authenticated RPC calls. Local filenames match all hosted versions. Full public TypeScript types were regenerated from the matching project. All six fitness tables have RLS enabled; the advisor reports no unindexed foreign keys after the follow-up migration.
+
+| Check | Phase 3 outcome |
+| --- | --- |
+| `npm run lint` and `npm run typecheck` | Passed with generated Phase 3 types |
+| `npm run test` | 23 passed, including derived sleep hours, completed-only gym quotas, and missing-day weight averages |
+| `npm run test:db` | 82 passed after fresh incremental replay; includes fitness grants/RLS, overnight sleep, setup idempotence, revision conflicts, malformed payload rejection, independent/retry-safe workout copies and edits, and rollback-script replay |
+| `npm run build` | Passed with `/fitness` and workout routes in production output |
+| Hosted `hosted-fitness.sql` | Passed against the authorized development project; synthetic users and rows rolled back |
+| `npm run test:e2e` | 22 passed across desktop/mobile, including earlier auth/tracking regressions and four fitness browser checks |
+| Fitness browser checks | Sleep value matched Today/Metrics, completed workout counted while copy remained draft, two-tab +250 ml additions both persisted, and Fitness passed WCAG 2 A/AA + 2.1 AA axe and horizontal-overflow checks |
+| Fixture cleanup | E2E workouts and sleep entries removed through owned UI actions; remaining archived E2E exercise definitions removed by a narrowly targeted development-project cleanup query. Zero E2E workout/exercise rows remained. |
+
+The fitness source is opt-in and creates definitions only. Sleep stores one wake-date record; workout sets remain children of one reusable exercise identity. Missing dates are excluded from averages and shown as coverage. Concurrent water additions were exercised with two authenticated browser tabs; stale manual replacement was verified at the SQL routine boundary. A failed exploratory browser check initially timed out during fixture cleanup and left one copied draft; it was identified by its synthetic E2E name and removed with a targeted cleanup query before the passing full run. No fabricated fitness analytics remain in the test account.
+
+The hosted security advisor now reports 19 authenticated `security definer` RPC warnings, including the six new fitness routines. Their exposure is intentional: direct table mutations are revoked, each routine checks `auth.uid()`, fixes `search_path`, and validates owned references. Unused-index notices reflect mostly empty development tables. The browser server occasionally logs Next.js “destination stream closed early” while navigation aborts an in-flight response; the 22 browser assertions pass, but investigate if this appears during ordinary user navigation in Phase 9. Full local Docker-stack replay and signup/recovery email delivery remain unverified release checks. SMTP setup is still required before production.

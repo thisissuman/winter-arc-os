@@ -2,7 +2,7 @@
 
 ## Status
 
-**Phases 0–2 are complete in the configured development project as of October 1, 2026.** The user later authorized Phase 2 validation and migration after its initial file-only pass. Core tracking migrations, generated types, local/hosted security checks, production build, and desktop/mobile browser checks pass. Phase 1's signup-confirmation/recovery email checks remain deferred until SMTP before production. Phases 3–9 have not started.
+**Phases 0–3 are complete in the configured development project as of October 1, 2026.** Phase 3 fitness migrations, generated types, local/hosted security checks, production build, and desktop/mobile browser checks pass. Phase 1's signup-confirmation/recovery email checks remain deferred until SMTP before production. Phases 4–9 have not started.
 
 The accepted plan calls for one phase at a time. Start with the earliest incomplete phase unless the user names a phase whose dependencies are already complete. Finish the phase's validation/documentation and stop with a handoff. Do not expand a phase into the entire application.
 
@@ -15,7 +15,7 @@ Read [AGENTS](../AGENTS.md), [PRODUCT](../PRODUCT.md), and the relevant [archite
 | 0 — Documentation | None | Complete; documentation checks passed |
 | 1 — Foundation | 0 | Complete; email tests deferred by user until before production |
 | 2 — Core tracking | 1 | Complete in development project; release gates remain in QA |
-| 3 — Fitness | 2 | Not started |
+| 3 — Fitness | 2 | Complete in development project; release gates remain in QA |
 | 4 — Career | 2 | Not started |
 | 5 — Planning | 2 | Not started |
 | 6 — Insights | 2, 3, 4 | Not started |
@@ -113,12 +113,14 @@ Result: a useful daily habit/measurement application. Handoff identifies unavail
 
 ## Phase 3 — Fitness
 
-- [ ] First deliver weight/protein/water/creatine/sleep/steps setup and logging, using existing raw metric/habit sources.
-- [ ] Add sleep storage/derivation, seven-day and weekly weight averages, protein adherence, and bounded charts with text summaries.
-- [ ] Add workouts, reusable exercise IDs, ordered sets, optional RPE, transactional copying, and progression history.
-- [ ] Activate workout/sleep metric and quota sources without copying measurements into duplicate logs.
+- [x] Deliver opt-in weight/protein/water/creatine/sleep/steps setup and logging, using existing raw metric/habit sources.
+- [x] Add sleep storage/derivation, seven-day and weekly weight averages, protein adherence, and bounded charts with text summaries.
+- [x] Add workouts, reusable exercise IDs, ordered sets, optional RPE, transactional copying, and progression history.
+- [x] Activate workout/sleep metric and quota sources without copying measurements into duplicate logs.
 
 Acceptance: Today/Fitness totals agree; concurrent water additions and stale manual edits behave correctly; sleep timestamps/durations and missing-date averages are accurate; copied workouts are independent/retry-safe; gym quotas count completed sessions; ownership/domain/UI checks and lint/typecheck/build pass.
+
+Verified: all acceptance cases pass focused domain/database tests, a hosted rollback-only security check, and production desktop/mobile browser flows. Two-tab browser additions preserve both water increments; a database revision test rejects stale replacement. The complete 22-case browser regression suite passes. See [QA](QA.md) for outcomes, limits, and release-only checks.
 
 ## Phase 4 — Career
 
