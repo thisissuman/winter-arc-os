@@ -3,9 +3,13 @@ import { Brand } from "@/components/brand";
 import { Navigation } from "@/components/shell/navigation";
 import { LogoutButton } from "@/components/shell/logout-button";
 import { requireAccount } from "@/lib/auth/session";
+import { PersistentTimerBar } from "@/features/career/focus-timer";
+import type { FocusTimer } from "@/features/tracking/types";
 
 export default async function WorkspaceLayout({ children }: { children: React.ReactNode }) {
-  const { profile } = await requireAccount();
+  const { profile, supabase, userId } = await requireAccount();
+  const { data: activeTimer, error: timerError } = await supabase.from("focus_timers").select("*").eq("user_id", userId).in("status", ["running", "paused"]).limit(1).maybeSingle();
+  if (timerError) throw new Error("Could not load the active focus timer.");
   const name = profile.display_name || "Your account";
   return <div className="min-h-dvh">
     <a href="#workspace-content" className="sr-only z-50 rounded-md bg-card p-3 focus:not-sr-only focus:fixed focus:left-4 focus:top-4">Skip to content</a>
@@ -20,6 +24,7 @@ export default async function WorkspaceLayout({ children }: { children: React.Re
     </aside>
     <header className="border-b bg-sidebar px-6 py-5 md:hidden"><Link href="/today" aria-label="Winter Arc OS Today"><Brand /></Link></header>
     <div className="md:pl-60"><main id="workspace-content" tabIndex={-1} className="mx-auto max-w-[1200px] px-6 pt-8 pb-28 sm:px-10 md:py-12 lg:px-14">{children}</main></div>
+    <PersistentTimerBar initialTimer={activeTimer ? { ...activeTimer, topic: "", notes: "", segments: [] } as FocusTimer : null} />
     <div className="fixed inset-x-0 bottom-0 z-20 border-t bg-sidebar md:hidden"><Navigation mobile /></div>
   </div>;
 }

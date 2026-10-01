@@ -31,7 +31,7 @@ function snapshot(changes: Partial<TrackingSnapshot> = {}): TrackingSnapshot {
     ],
     scoreItems: [habitItem, metricItem, { ...habitItem, id: id("52"), policy_id: weeklyPolicy.id }, { ...metricItem, id: id("53"), policy_id: weeklyPolicy.id }],
     categories: [], lifeAreas: [], timezone: "Asia/Kolkata", weekStartsOn: 1, today: "2026-10-01", selectedChallengeId: null,
-    sleepLogs: [], exercises: [], workouts: [], workoutExercises: [], workoutSets: [],
+    sleepLogs: [], exercises: [], workouts: [], workoutExercises: [], workoutSets: [], studyCategories: [], studySessions: [], focusTimers: [],
     onboardingComplete: true, historyFrom: "2026-09-28", privacyMode: false, hidePrivateToday: false,
     ...changes,
   };
@@ -86,6 +86,17 @@ describe("adherence and separate score periods", () => {
     ];
     const tracked = snapshot({ frequencyTargets: [gym], frequencyRules: [rule], workouts });
     expect(frequencyProgress(tracked, gym, "2026-10-01", "weekly")).toMatchObject({ actualCount: 1, requiredCount: 4, contribution: 0.25 });
+  });
+  it("derives study minutes from source sessions and counts one completion date for frequency", () => {
+    const study = { ...metric, id: id("87"), source: "study" as const, unit: "minutes", aggregation: "sum" as const, source_available_from: "2026-09-28" };
+    const frequency = { ...metric, id: id("88"), name: "Study sessions", source: "study_sessions" as const, metric_id: null, count_mode: "sessions" as const, source_available_from: "2026-09-28" };
+    const rule = { ...target, id: id("89"), frequency_target_id: frequency.id, period: "weekly" as const, quota: 5, threshold: null };
+    const session = { ...owned, id: id("90"), study_category_id: id("91"), challenge_id: null, timer_id: null, topic: "", notes: "", business_date: "2026-10-01", timezone: "Asia/Kolkata", duration_seconds: 7200,
+      start_at: "2026-09-30T18:00:00Z", end_at: "2026-09-30T20:00:00Z", segments: [{ start: "2026-09-30T18:00:00Z", end: "2026-09-30T20:00:00Z" }], source: "manual" as const, revision: 1 };
+    const tracked = snapshot({ metrics: [study], metricTargets: [{ ...target, metric_id: study.id, target: 90 }], frequencyTargets: [frequency], frequencyRules: [rule], studySessions: [session] });
+    expect(metricDailyValue(tracked, study, "2026-09-30")).toMatchObject({ rawValue: 30, state: "logged" });
+    expect(metricDailyValue(tracked, study, "2026-10-01")).toMatchObject({ rawValue: 90, state: "logged" });
+    expect(frequencyProgress(tracked, frequency, "2026-10-01", "weekly")).toMatchObject({ actualCount: 1, observedDays: 1, requiredCount: 5 });
   });
   it("averages recorded weight days while reporting missing coverage", () => {
     expect(averageRecorded([{ date: "2026-09-29", value: 70 }, { date: "2026-09-30", value: null }, { date: "2026-10-01", value: 72 }])).toMatchObject({ value: 71, recordedDays: 2, windowDays: 3 });

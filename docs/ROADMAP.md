@@ -2,7 +2,7 @@
 
 ## Status
 
-**Phases 0–3 are complete in the configured development project as of October 1, 2026.** Phase 3 fitness migrations, generated types, local/hosted security checks, production build, and desktop/mobile browser checks pass. Phase 1's signup-confirmation/recovery email checks remain deferred until SMTP before production. Phases 4–9 have not started.
+**Phases 0–4 are complete in the configured development project as of October 1, 2026.** Phase 4 Career migration, generated types, local/hosted security checks, production build, and desktop/mobile browser checks pass. Phase 1's signup-confirmation/recovery email checks remain deferred until SMTP before production. Phases 5–9 have not started.
 
 The accepted plan calls for one phase at a time. Start with the earliest incomplete phase unless the user names a phase whose dependencies are already complete. Finish the phase's validation/documentation and stop with a handoff. Do not expand a phase into the entire application.
 
@@ -16,7 +16,7 @@ Read [AGENTS](../AGENTS.md), [PRODUCT](../PRODUCT.md), and the relevant [archite
 | 1 — Foundation | 0 | Complete; email tests deferred by user until before production |
 | 2 — Core tracking | 1 | Complete in development project; release gates remain in QA |
 | 3 — Fitness | 2 | Complete in development project; release gates remain in QA |
-| 4 — Career | 2 | Not started |
+| 4 — Career | 2 | Complete in development project; release gates remain in QA |
 | 5 — Planning | 2 | Not started |
 | 6 — Insights | 2, 3, 4 | Not started |
 | 7 — Reflection | 6 | Not started |
@@ -124,11 +124,13 @@ Verified: all acceptance cases pass focused domain/database tests, a hosted roll
 
 ## Phase 4 — Career
 
-- [ ] Deliver editable study categories, manual sessions, topics/notes, optional challenge, and daily/weekly targets.
-- [ ] Add persisted stopwatch, one-active-timer constraint, navigation/refresh recovery, tab reconciliation, discard, and idempotent finish.
-- [ ] Add split-day duration aggregation, category distribution, daily/weekly/30-day summaries, and source activation.
+- [x] Deliver editable study categories, manual sessions, topics/notes, optional challenge, and daily/weekly targets.
+- [x] Add persisted stopwatch, one-active-timer constraint, navigation/refresh recovery, tab reconciliation, discard, and idempotent finish.
+- [x] Add split-day duration aggregation, category distribution, daily/weekly/30-day summaries, and source activation.
 
 Acceptance: raw durations/totals agree; timestamped overnight sessions split correctly; manual sessions retain selected dates; timer survives refresh/navigation and two-tab races; retries finish one session only; offline finish reports unsaved state; archived categories preserve history; ownership/domain/e2e checks and lint/typecheck/build pass.
+
+Verified: the local SQL suite exercises category/session ownership, retained manual dates, archiving, one-active timers, discard, and idempotent finish; pure tests cover midnight/DST splits and score-source integration. The hosted rollback script passed with fixtures rolled back. All 24 desktop/mobile production browser regressions passed, plus two focused Career Privacy Mode checks after the final UI hardening. See [QA](QA.md) for exact outcomes and remaining release-only checks.
 
 ## Phase 5 — Planning
 

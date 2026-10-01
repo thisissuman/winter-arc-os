@@ -2,7 +2,7 @@
 
 ## Status and ownership
 
-Phases 1–3 implement foundation, core tracking, and fitness in the configured development project. Phase 3 lives in `supabase/migrations/20261001044053_fitness.sql`, followed by three narrow index/workout-payload migrations; all four are applied. Career and later subsystems remain a blueprint. Phase 1 signup/confirmation/recovery email verification is deferred until SMTP setup before production; see PRODUCT and QA. Product requirements are in [PRODUCT](../PRODUCT.md), calculations in [SCORING](SCORING.md), and visual conventions in [DESIGN](../DESIGN.md).
+Phases 1–4 implement foundation, core tracking, fitness, and Career in the configured development project. Phase 4 lives in `supabase/migrations/20261001052104_career.sql`; it is applied after all Phase 3 migrations. Planning and later subsystems remain a blueprint. Phase 1 signup/confirmation/recovery email verification is deferred until SMTP setup before production; see PRODUCT and QA. Product requirements are in [PRODUCT](../PRODUCT.md), calculations in [SCORING](SCORING.md), and visual conventions in [DESIGN](../DESIGN.md).
 
 ## Application boundaries
 
@@ -96,7 +96,7 @@ Testing replays migrations against isolated PGlite PostgreSQL with minimal test-
 
 The applied migration adds selected challenge and starter-applied metadata to preferences; 17 owned tracking tables including `tracking_operations` for retry receipts; same-owner composite references, indexes, update triggers, explicit RLS policies, and authenticated transaction functions. Direct authenticated access to the new tables is read-only; Server Actions use narrowly named `security definer` functions that verify `auth.uid()` again and fix `search_path`. Business dates and original capture timezone are stored on logs. Revisions prevent stale replacement writes, and operation UUIDs make water-style increments retry-safe. The follow-up migration covers the composite score-item policy/category foreign key.
 
-`src/features/tracking/queries.ts` pages owner-filtered rows in batches rather than relying on the PostgREST default limit. `src/types/database.ts` is generated from the hosted Phase 3 public schema. Supabase widens CHECK-constrained text columns to `string`; the domain boundary narrows them to the literals enforced by verified SQL constraints. Challenge associations share tracker definitions and logs; the optional starter is a single idempotent function guarded by `starter_applied_on`. It inserts no completion or measurement records. Study categories require Phase 4's table and are not inserted early.
+`src/features/tracking/queries.ts` pages owner-filtered rows in batches rather than relying on the PostgREST default limit. `src/types/database.ts` is generated from the hosted Phase 4 public schema. Supabase widens CHECK-constrained text columns to `string`; the domain boundary narrows them to the literals enforced by verified SQL constraints. Challenge associations share tracker definitions and logs; the optional starter is a single idempotent function guarded by `starter_applied_on`. It inserts no completion, measurement, or study-session records.
 
 | Table | Specific fields and relationships |
 | --- | --- |
@@ -121,7 +121,7 @@ Habit schedule frequency is `DAILY`, `WEEKDAYS`, `SPECIFIC_DAYS`, `TIMES_PER_WEE
 
 Source filters are narrowly typed and Zod-validated. Real entity references, such as a habit, metric, or study category, use FKs with ownership rather than arbitrary JSON IDs. Small metadata/configuration may use validated JSONB; primary relationships and measurements do not.
 
-Manual sources operate from Phase 2. Phase 3 activates sleep and workout sources when the user explicitly runs fitness setup; study remains unavailable until Phase 4. Source activation dates prevent prior unavailable periods from turning into historical misses. First saved sleep/completed workout can also activate an existing source definition on that business date. The UI offers only editable source types currently supported.
+Manual sources operate from Phase 2. Phase 3 activates sleep/workouts; Phase 4 activates study duration/session-count sources when the user explicitly runs Career setup. Source activation dates prevent prior unavailable periods from turning into historical misses. First saved source records can also activate an existing definition on their business date. The UI offers only editable source types currently supported.
 
 ### Fitness — Phase 3
 
@@ -142,17 +142,17 @@ Gym frequency counts completed workouts, not unfinished drafts. Copying creates 
 
 `setup_fitness` adds only missing canonical definitions and activates existing starter sleep/gym sources prospectively; repeating it cannot add duplicate definitions, logs, or scores. `save_fitness_sleep` uses a revision check and stores an elapsed duration consistent with timestamp pairs. `save_fitness_workout` replaces one workout's ordered children in a single transaction after ownership and revision checks. `copy_fitness_workout` takes a stable operation UUID and returns its prior result on retry; the copy starts as a draft. Direct authenticated table writes are revoked, while every new table has owner RLS policies and same-owner composite relationships. Read queries load the five source tables through the same authenticated snapshot used by Today, Metrics, and Fitness. Fitness's gym quota uses the selected Today challenge context; historical measurement charts show shared personal source history.
 
-### Career — Phase 4
+### Career — Phase 4 (implemented)
 
 | Table | Specific fields and relationships |
 | --- | --- |
-| `study_categories` | Editable name, optional general category, order, archive state |
-| `study_sessions` | Study-category reference, optional challenge/topic, notes, business date/timezone, duration seconds, optional start/end timestamps, source (`manual`, `timer`) |
-| `focus_timers` | Category/challenge, start timestamp, timezone, elapsed/paused state, revision, terminal session reference; partial uniqueness for one active timer per user |
+| `study_categories` | Editable name, optional owned general category, order, archive state; old sessions retain the category ID |
+| `study_sessions` | Owned study category/challenge/timer references, topic/notes, completion business date and retained timezone, duration seconds, optional start/end timestamps, running segments, source (`manual`, `timer`), optimistic revision |
+| `focus_timers` | Owned category/challenge, retained timezone, running timestamp, accumulated seconds and segments, status/revision; partial uniqueness for one running or paused timer per user |
 
 Manual duration-only sessions are attributed to the chosen date. Timestamped sessions split duration across local-day boundaries for analytics. Count a completed session once on its completion business date for frequency targets. A category archive prevents new selection without deleting its prior study history.
 
-Start a timer only after the server creates its record. Render elapsed time from timestamps plus saved accumulated duration, not tick counts. Navigation/refresh resumes from server state. Reconcile tabs on focus and revisions. Finish locks the timer, creates one session, and marks the timer terminal in one transaction; repeated finish returns that session. Discard is an explicit terminal action. Review unusually long elapsed sessions before saving, without silently truncating raw time. No second-by-second database writes or background worker is needed.
+Start a timer only after the server creates its record. Render elapsed time from timestamps plus saved accumulated duration, not tick counts. Navigation/refresh resumes from server state through the workspace timer bar. Focus/visibility changes, a periodic read, and BroadcastChannel reconcile tabs; SQL revisions and the one-active partial index settle races. Finish locks the timer, creates one session, and marks the timer terminal in one transaction; repeated finish returns that session. Discard is an explicit terminal action. A browser confirmation reviews elapsed time above four hours before finishing; the database retains the complete value up to seven days. Running segments preserve pause gaps for split-day analytics. No second-by-second database writes or background worker is needed.
 
 ### Planning — Phase 5
 

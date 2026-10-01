@@ -2,7 +2,7 @@
 
 ## Truthful status
 
-Phases 0–3 are complete in the configured development project. Phase 3 fitness migrations, local and hosted database checks, domain tests, production build, and dedicated-account desktop/mobile browser checks pass; exact evidence is below. Signup/confirmation/recovery email verification remains deferred until SMTP setup before production. Full local Supabase container replay and staging/production release checks remain open.
+Phases 0–4 are complete in the configured development project. Phase 4 Career migration, local and hosted database checks, domain tests, production build, and dedicated-account desktop/mobile browser checks pass; exact evidence is below. Signup/confirmation/recovery email verification remains deferred until SMTP setup before production. Full local Supabase container replay and staging/production release checks remain open.
 
 Read [ROADMAP](ROADMAP.md) for phase gates, [SCORING](SCORING.md) for expected math, and [ARCHITECTURE](ARCHITECTURE.md) for ownership/source contracts.
 
@@ -193,3 +193,22 @@ The Supabase MCP URL matched `.env.local`, and inspection confirmed the four exp
 The fitness source is opt-in and creates definitions only. Sleep stores one wake-date record; workout sets remain children of one reusable exercise identity. Missing dates are excluded from averages and shown as coverage. Concurrent water additions were exercised with two authenticated browser tabs; stale manual replacement was verified at the SQL routine boundary. A failed exploratory browser check initially timed out during fixture cleanup and left one copied draft; it was identified by its synthetic E2E name and removed with a targeted cleanup query before the passing full run. No fabricated fitness analytics remain in the test account.
 
 The hosted security advisor now reports 19 authenticated `security definer` RPC warnings, including the six new fitness routines. Their exposure is intentional: direct table mutations are revoked, each routine checks `auth.uid()`, fixes `search_path`, and validates owned references. Unused-index notices reflect mostly empty development tables. The browser server occasionally logs Next.js “destination stream closed early” while navigation aborts an in-flight response; the 22 browser assertions pass, but investigate if this appears during ordinary user navigation in Phase 9. Full local Docker-stack replay and signup/recovery email delivery remain unverified release checks. SMTP setup is still required before production.
+
+### Phase 4 Career validation and hosted migration — October 1, 2026
+
+The Supabase MCP URL matched `.env.local`; inspection found all eight expected prior migrations and no Career tables. The locally replayed `20261001052104_career` migration was applied to that same development project. Hosted public types were regenerated from the matching schema. The three new tables have RLS, read-only direct grants for authenticated users, same-owner foreign keys, a one-active-timer partial index, and checked transactional RPCs. The hosted performance advisor reports no unindexed foreign keys.
+
+| Check | Phase 4 outcome |
+| --- | --- |
+| `npm run lint` and `npm run typecheck` | Passed after the final Career/privacy changes |
+| `npm run test` | 28 passed, including local-midnight/DST splits, pause-gap exclusion, and derived study source/quota evaluation |
+| `npm run test:db` | 90 passed after fresh incremental replay; includes three new tables' grants/RLS, owned relationships, archive history, manual timestamp validation, one-active constraint, discard, and finish retry returning one session |
+| `npm run build` | Passed with `/career` and `/career/sessions` in the production output after final UI changes |
+| Hosted `hosted-career.sql` | Passed against the authorized development project; synthetic Auth/study rows rolled back |
+| `npm run test:e2e` | Full 24-case desktop/mobile regression suite passed, including two Career flows; no authenticated checks skipped |
+| Focused privacy browser check | Two additional desktop/mobile cases passed after final privacy hardening; category names/editor controls stayed masked |
+| Fixture cleanup | Manual E2E sessions deleted and categories archived through owner-scoped UI; only narrowly matched, archived synthetic categories and discarded timers were removed from the development project. Zero `E2E career %` rows remained. |
+
+Career setup creates definitions and optional targets, never time records. Daily/weekly/30-day totals and Today/Metrics derive minutes from saved sessions; timestamped intervals split using the retained timezone, while session frequency counts the completion date once. The browser flow verifies manual totals, persistent timer after refresh/navigation, and a second tab observing pause/resume; SQL tests verify finish idempotence. A browser finish lasting at least one minute and an actual offline finish were not run; the UI preserves the last confirmed timer and reports an unsaved connection failure, while local transaction checks cover save behavior.
+
+The hosted security advisor reports 24 authenticated `security definer` routine warnings (the previous 19 plus five Career RPCs). These routines revoke direct writes, check `auth.uid()` through the private owner helper, fix `search_path`, and validate owned references. The Auth advisor still reports leaked-password protection disabled; review it before production. Performance shows unused-index information on a mostly empty development schema. The full local Docker stack and deliverable signup/recovery email remain release checks. During verification, running typecheck and build simultaneously caused a transient missing `.next/types` file report; each passed when run sequentially, and this command-order rule is now in AGENTS/README. Browser navigation still occasionally logs Next.js “destination stream closed early”; the passing browser checks did not see a failed user flow.

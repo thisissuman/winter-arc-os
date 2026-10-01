@@ -6,7 +6,7 @@ import type { Database } from "@/types/database";
 
 export class TrackingSetupError extends Error {
   constructor() {
-    super("Core tracking needs its Phase 2 database migration. Apply the reviewed migration to the configured development project, regenerate database types, and retry.");
+    super("Tracking needs the versioned database migrations. Apply them to the configured development project, regenerate database types, and retry.");
     this.name = "TrackingSetupError";
   }
 }
@@ -52,12 +52,13 @@ export async function loadTrackingSnapshot({ from, to }: { from?: string; to?: s
     }
     return rows;
   };
-  const [challenges, challengeHabits, challengeMetrics, challengeTargets, habits, schedules, habitLogs, metrics, metricTargets, metricLogs, frequencyTargets, frequencyRules, scoreCategories, scorePolicies, scoreWeights, scoreItems, categories, lifeAreas, sleepLogs, exercises, workouts, workoutExercises, workoutSets] = await Promise.all([
+  const [challenges, challengeHabits, challengeMetrics, challengeTargets, habits, schedules, habitLogs, metrics, metricTargets, metricLogs, frequencyTargets, frequencyRules, scoreCategories, scorePolicies, scoreWeights, scoreItems, categories, lifeAreas, sleepLogs, exercises, workouts, workoutExercises, workoutSets, studyCategories, studySessions, focusTimers] = await Promise.all([
     read("challenges"), read("challenge_habits"), read("challenge_metrics"), read("challenge_targets"),
     read("habits"), read("habit_schedules"), read("habit_logs", "business_date"),
     read("metric_definitions"), read("metric_targets"), read("metric_logs", "business_date"),
     read("frequency_targets"), read("frequency_target_rules"), read("score_categories"), read("score_policies"), read("score_category_weights"), read("score_items"), read("categories"), read("life_areas"),
     read("sleep_logs", "business_date"), read("exercises"), read("workouts", "business_date"), read("workout_exercises"), read("workout_sets"),
+    read("study_categories"), read("study_sessions"), read("focus_timers"),
   ]);
   const beginnings = [...habits, ...metrics, ...frequencyTargets].map((tracker) => tracker.active_from).sort();
   // PostgreSQL CHECK-constrained text is generated as `string`; the migrated
@@ -71,6 +72,7 @@ export async function loadTrackingSnapshot({ from, to }: { from?: string; to?: s
     frequencyRules: frequencyRules as TrackingSnapshot["frequencyRules"], scoreCategories,
     scorePolicies: scorePolicies as TrackingSnapshot["scorePolicies"], scoreWeights, scoreItems, categories, lifeAreas,
     sleepLogs, exercises, workouts: workouts as TrackingSnapshot["workouts"], workoutExercises, workoutSets,
+    studyCategories, studySessions: studySessions as TrackingSnapshot["studySessions"], focusTimers: focusTimers as TrackingSnapshot["focusTimers"],
     timezone: preferences.timezone, weekStartsOn: preferences.week_starts_on, today,
     selectedChallengeId: preferences.selected_challenge_id ?? null, onboardingComplete: preferences.onboarding_completed,
     historyFrom: from ?? beginnings[0] ?? today, privacyMode: preferences.privacy_mode, hidePrivateToday: preferences.hide_private_today,

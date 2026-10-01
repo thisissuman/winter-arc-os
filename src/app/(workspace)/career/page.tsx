@@ -1,0 +1,43 @@
+import Link from "next/link";
+import { PageHeader } from "@/components/tracking/page-header";
+import { TrackingUnavailable } from "@/components/tracking/tracking-unavailable";
+import { CareerSetupForm, StudyCategoryForm, StudySessionForm } from "@/features/career/career-forms";
+import { studyCategorySeconds, studyCoverage } from "@/features/career/domain";
+import { FocusTimerPanel } from "@/features/career/focus-timer";
+import { frequencyProgress, metricDailyValue, metricPeriodValue } from "@/features/tracking/domain";
+import { addDays, datesBetween, parseDateQuery, weekRange } from "@/features/tracking/dates";
+import { loadTrackingSnapshot, TrackingSetupError } from "@/features/tracking/queries";
+
+export const metadata = { title: "Career" };
+export default async function CareerPage({ searchParams }: { searchParams: Promise<{ date?: string }> }) {
+  const { date: dateQuery } = await searchParams;
+  let snapshot;
+  try { snapshot = await loadTrackingSnapshot(); } catch (error) { if (error instanceof TrackingSetupError) return <TrackingUnavailable />; throw error; }
+  const requested = parseDateQuery(dateQuery, snapshot.today);
+  const date = requested > snapshot.today ? snapshot.today : requested;
+  const activeCategories = snapshot.studyCategories.filter((category) => !category.archived_at);
+  const studyMetric = snapshot.metrics.find((metric) => metric.starter_key === "study-duration" && !metric.archived_on) ?? null;
+  const studyQuota = snapshot.frequencyTargets.find((target) => target.starter_key === "study-sessions" && !target.archived_on) ?? null;
+  const needsSetup = !studyMetric || !studyQuota || studyMetric.source_available_from === null || studyQuota.source_available_from === null;
+  const week = weekRange(date, snapshot.weekStartsOn);
+  const weekThrough = week.end > date ? date : week.end;
+  const daily = studyCoverage(snapshot.studySessions, [date]);
+  const weekly = studyCoverage(snapshot.studySessions, datesBetween(week.start, weekThrough));
+  const monthStart = addDays(date, -29);
+  const month = studyCoverage(snapshot.studySessions, datesBetween(monthStart, date));
+  const distribution = [...studyCategorySeconds(snapshot.studySessions, monthStart, date)].sort((a, b) => b[1] - a[1]);
+  const dailyMetric = studyMetric ? metricDailyValue(snapshot, studyMetric, date, snapshot.selectedChallengeId) : null;
+  const weeklyMetric = studyMetric ? metricPeriodValue(snapshot, studyMetric, date, "weekly", snapshot.selectedChallengeId) : null;
+  const quota = studyQuota ? frequencyProgress(snapshot, studyQuota, date, "weekly", snapshot.selectedChallengeId) : null;
+  const activeTimer = snapshot.focusTimers.find((timer) => timer.status === "running" || timer.status === "paused") ?? null;
+  return <>
+    <PageHeader title="Career" description="Log study work and keep one focus timer across pages and tabs." actions={<Link href="/career/sessions" className="inline-flex min-h-11 items-center rounded-lg bg-primary px-4 text-sm font-medium text-primary-foreground">Session history</Link>} />
+    <form action="/career" className="mt-6 flex flex-wrap items-end gap-3"><label className="space-y-2 text-sm"><span className="block">Review date</span><input name="date" type="date" max={snapshot.today} defaultValue={date} className="min-h-11 rounded-lg border border-input bg-background px-3 py-2" /></label><button className="min-h-11 rounded-lg border px-4 text-sm">View day</button></form>
+    {needsSetup && <section className="mt-6 rounded-xl border bg-card p-5"><h2 className="text-lg font-medium">Set up career tracking</h2><p className="mt-2 text-sm text-muted-foreground">Activate shared study time and the five-session weekly quota. Optional duration targets are your choice, and no study history is created.</p><CareerSetupForm /></section>}
+    <section className="mt-7 grid gap-4 sm:grid-cols-3" aria-label="Study totals"><article className="rounded-xl border bg-card p-5"><h2 className="text-sm text-muted-foreground">On {date}</h2><p className="mt-2 text-3xl font-semibold tabular-nums">{Math.round(daily.minutes)} min</p><p className="mt-1 text-xs text-muted-foreground">{daily.sessionsCompleted} completed sessions{dailyMetric?.target != null ? ` · target ${dailyMetric.target} min` : ""}</p></article><article className="rounded-xl border bg-card p-5"><h2 className="text-sm text-muted-foreground">This week</h2><p className="mt-2 text-3xl font-semibold tabular-nums">{Math.round(weekly.minutes)} min</p><p className="mt-1 text-xs text-muted-foreground">{weekly.recordedDays}/{datesBetween(week.start, weekThrough).length} recorded days{weeklyMetric?.target != null ? ` · target ${weeklyMetric.target} min` : ""}</p></article><article className="rounded-xl border bg-card p-5"><h2 className="text-sm text-muted-foreground">Past 30 days</h2><p className="mt-2 text-3xl font-semibold tabular-nums">{Math.round(month.minutes)} min</p><p className="mt-1 text-xs text-muted-foreground">{month.recordedDays}/30 recorded days · {month.sessionsCompleted} completed sessions</p></article></section>
+    <section className="mt-6 grid gap-4 lg:grid-cols-2"><FocusTimerPanel initialTimer={activeTimer && snapshot.privacyMode ? { ...activeTimer, topic: "", notes: "", segments: [] } : activeTimer} categories={snapshot.privacyMode ? [] : snapshot.studyCategories} challenges={snapshot.privacyMode ? [] : snapshot.challenges} privacyMode={snapshot.privacyMode} /><article className="rounded-xl border bg-card p-5"><h2 className="text-lg font-medium">Weekly study sessions</h2><p className="mt-3 text-3xl font-semibold tabular-nums">{quota?.state === "unavailable" ? "—" : `${quota?.actualCount ?? 0} / ${quota?.requiredCount ?? "—"}`}</p><p className="mt-2 text-sm text-muted-foreground">{quota?.reason ?? "A finished timer or manual entry counts once on its completion date."}</p><p className="mt-3 text-xs text-muted-foreground">Study minutes and completed-session counts are separate targets. Timestamped minutes split at local midnight.</p></article></section>
+    <section className="mt-7 grid gap-4 lg:grid-cols-2"><article className="rounded-xl border bg-card p-5"><h2 className="text-lg font-medium">Log a manual session</h2><p className="mt-1 text-sm text-muted-foreground">Choose a date and duration, or add timestamps for overnight study. Create a category first.</p><div className="mt-4">{snapshot.privacyMode ? <p className="text-sm text-muted-foreground">Session editing is hidden in Privacy Mode.</p> : <StudySessionForm categories={snapshot.studyCategories} challenges={snapshot.challenges} today={snapshot.today} privacyMode={false} />}</div></article><article className="rounded-xl border bg-card p-5"><h2 className="text-lg font-medium">Study categories</h2><p className="mt-1 text-sm text-muted-foreground">Categories stay attached to their historical sessions if archived.</p>{snapshot.privacyMode ? <p className="mt-4 text-sm text-muted-foreground">Category names and editing are hidden in Privacy Mode.</p> : <div className="mt-4"><StudyCategoryForm generalCategories={snapshot.categories} /></div>}<ul className="mt-4 space-y-2">{activeCategories.map((category) => <li key={category.id} className="rounded-lg border px-3 py-2 text-sm">{snapshot.privacyMode ? "Private study category" : category.name}</li>)}</ul>{activeCategories.length === 0 && <p className="mt-3 text-sm text-muted-foreground">No study categories yet.</p>}</article></section>
+    <section className="mt-7 rounded-xl border bg-card p-5"><h2 className="text-lg font-medium">Past 30 days by category</h2>{distribution.length === 0 ? <p className="mt-3 text-sm text-muted-foreground">No recorded study time in this range.</p> : <ul className="mt-4 space-y-3">{distribution.map(([categoryId, seconds]) => { const category = snapshot.studyCategories.find((item) => item.id === categoryId); const share = month.seconds > 0 ? seconds / month.seconds : 0; return <li key={categoryId}><div className="flex justify-between gap-3 text-sm"><span>{snapshot.privacyMode ? "Private study category" : category?.name ?? "Archived category"}</span><span className="tabular-nums">{Math.round(seconds / 60)} min · {Math.round(share * 100)}%</span></div><div className="mt-1 h-2 rounded-full bg-secondary"><div className="h-2 rounded-full bg-primary" style={{ width: `${Math.round(share * 100)}%` }} /></div></li>; })}</ul>}</section>
+    <p className="mt-5 text-xs text-muted-foreground">Study dates use {snapshot.timezone}. The selected Today challenge affects target progress; raw study history remains shared.</p>
+  </>;
+}

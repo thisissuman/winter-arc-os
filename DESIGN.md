@@ -2,7 +2,7 @@
 
 ## Status
 
-**Foundation, core tracking, and fitness interfaces are implemented.** Phase 1 auth and shell retain their recorded visual and accessibility results. Phase 2 Today and tracking pages passed desktop/mobile browser and automated accessibility checks. Phase 3 adds Fitness measurement/sleep cards, recorded-day charts with text summaries, an exercise library, and responsive workout/set forms. See QA for exact checks.
+**Foundation, core tracking, fitness, and Career interfaces are implemented.** Phase 1 auth and shell retain their recorded visual and accessibility results. Phase 2 Today and tracking pages passed desktop/mobile browser and automated accessibility checks. Phase 3 adds Fitness measurement/sleep cards, recorded-day charts with text summaries, an exercise library, and responsive workout/set forms. Phase 4 adds study summaries, category distribution, session forms, and a persistent timer bar. See QA for exact checks.
 
 Product truth lives in [PRODUCT](PRODUCT.md), route/component responsibilities in [ARCHITECTURE](docs/ARCHITECTURE.md), and validation in [QA](docs/QA.md).
 
@@ -46,7 +46,7 @@ Shared shadcn primitives are Button, Input, Label, Badge, Separator, and Skeleto
 
 ## Navigation and responsive behavior
 
-Implemented in source: desktop uses a 240 px sidebar from 768 px upward; mobile uses a header and fixed three-link bottom navigation with safe-area spacing. The sidebar includes Fitness and the mobile Track hub links to it. Auth uses a split introduction/form layout from 1024 px upward and a single form column below it. Both presentations use the same URLs. Plan, Insights, Reflection, and More remain later work.
+Implemented in source: desktop uses a 240 px sidebar from 768 px upward; mobile uses a header and fixed three-link bottom navigation with safe-area spacing. The sidebar includes Fitness and Career; the mobile Track hub links to both. An active focus timer appears above the mobile navigation or at the desktop bottom edge. Auth uses a split introduction/form layout from 1024 px upward and a single form column below it. Both presentations use the same URLs. Plan, Insights, Reflection, and More remain later work.
 
 At small widths, prioritize a single reading column, sheets for short editing flows, reachable quick-add controls, and clear sticky actions when useful. Weekly planners can show one selected day with a week switcher. The habit grid may scroll horizontally but keeps habit identity readable and supports keyboard cell interaction.
 
@@ -80,3 +80,5 @@ Missing measurements do not display as measured zero. Empty scores read “No sc
 Phase 1 auth/empty-Today screenshots were inspected at 1440 px desktop and 390 px mobile, plus Today at 768 px tablet; light account Settings was inspected on desktop/mobile. Phase 2 tracking browser checks pass at desktop/mobile sizes: Today, Habits, and Metrics pass automated WCAG 2 A/AA and 2.1 AA scans; keyboard toggling and horizontal-overflow assertions pass. Phase 2 masks private labels before passing them to interactive components, uses text/symbol habit-grid states, and has optimistic logging with rollback. A complete cross-application privacy review remains a Phase 8 gate. Generated browser artifacts remain ignored under `test-results/`; QA records outcomes.
 
 Phase 3 browser checks cover Fitness at desktop/mobile widths, its WCAG 2 A/AA and 2.1 AA axe scan, and horizontal overflow. Recharts appears only on fitness routes and has adjacent numeric summaries with missing-day coverage; sparse history shows an explicit empty state. Workout names, exercise names, and sleep notes are hidden or uneditable in Privacy Mode. Exercise/set controls use labelled fields and keyboard-operable move buttons. The full cross-application privacy review remains a Phase 8 gate.
+
+Phase 4 keeps Career summaries as text and proportional category bars with numeric alternatives. The timer shows a saved running/paused state and elapsed clock; action feedback distinguishes a confirmed save from a connectivity failure. Desktop/mobile browser checks cover navigation, refresh, two-tab reconciliation, automated accessibility, and horizontal overflow. Study topics, notes, and category names are masked in Privacy Mode. The full cross-application privacy review remains a Phase 8 gate.

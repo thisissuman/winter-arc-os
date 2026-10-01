@@ -256,6 +256,72 @@ export type Database = {
         }
         Relationships: []
       }
+      focus_timers: {
+        Row: {
+          accumulated_seconds: number
+          challenge_id: string | null
+          created_at: string
+          id: string
+          notes: string
+          revision: number
+          running_since: string | null
+          segments: Json
+          status: string
+          study_category_id: string
+          timezone: string
+          topic: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          accumulated_seconds?: number
+          challenge_id?: string | null
+          created_at?: string
+          id?: string
+          notes?: string
+          revision?: number
+          running_since?: string | null
+          segments?: Json
+          status: string
+          study_category_id: string
+          timezone: string
+          topic?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          accumulated_seconds?: number
+          challenge_id?: string | null
+          created_at?: string
+          id?: string
+          notes?: string
+          revision?: number
+          running_since?: string | null
+          segments?: Json
+          status?: string
+          study_category_id?: string
+          timezone?: string
+          topic?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "focus_timers_challenge_id_user_id_fkey"
+            columns: ["challenge_id", "user_id"]
+            isOneToOne: false
+            referencedRelation: "challenges"
+            referencedColumns: ["id", "user_id"]
+          },
+          {
+            foreignKeyName: "focus_timers_study_category_id_user_id_fkey"
+            columns: ["study_category_id", "user_id"]
+            isOneToOne: false
+            referencedRelation: "study_categories"
+            referencedColumns: ["id", "user_id"]
+          },
+        ]
+      }
       frequency_target_rules: {
         Row: {
           created_at: string
@@ -1033,6 +1099,129 @@ export type Database = {
         }
         Relationships: []
       }
+      study_categories: {
+        Row: {
+          archived_at: string | null
+          category_id: string | null
+          created_at: string
+          id: string
+          name: string
+          position: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          archived_at?: string | null
+          category_id?: string | null
+          created_at?: string
+          id?: string
+          name: string
+          position?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          archived_at?: string | null
+          category_id?: string | null
+          created_at?: string
+          id?: string
+          name?: string
+          position?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "study_categories_category_id_user_id_fkey"
+            columns: ["category_id", "user_id"]
+            isOneToOne: false
+            referencedRelation: "categories"
+            referencedColumns: ["id", "user_id"]
+          },
+        ]
+      }
+      study_sessions: {
+        Row: {
+          business_date: string
+          challenge_id: string | null
+          created_at: string
+          duration_seconds: number
+          end_at: string | null
+          id: string
+          notes: string
+          revision: number
+          segments: Json
+          source: string
+          start_at: string | null
+          study_category_id: string
+          timer_id: string | null
+          timezone: string
+          topic: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          business_date: string
+          challenge_id?: string | null
+          created_at?: string
+          duration_seconds: number
+          end_at?: string | null
+          id?: string
+          notes?: string
+          revision?: number
+          segments?: Json
+          source: string
+          start_at?: string | null
+          study_category_id: string
+          timer_id?: string | null
+          timezone: string
+          topic?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          business_date?: string
+          challenge_id?: string | null
+          created_at?: string
+          duration_seconds?: number
+          end_at?: string | null
+          id?: string
+          notes?: string
+          revision?: number
+          segments?: Json
+          source?: string
+          start_at?: string | null
+          study_category_id?: string
+          timer_id?: string | null
+          timezone?: string
+          topic?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "study_sessions_challenge_id_user_id_fkey"
+            columns: ["challenge_id", "user_id"]
+            isOneToOne: false
+            referencedRelation: "challenges"
+            referencedColumns: ["id", "user_id"]
+          },
+          {
+            foreignKeyName: "study_sessions_study_category_id_user_id_fkey"
+            columns: ["study_category_id", "user_id"]
+            isOneToOne: false
+            referencedRelation: "study_categories"
+            referencedColumns: ["id", "user_id"]
+          },
+          {
+            foreignKeyName: "study_sessions_timer_id_user_id_fkey"
+            columns: ["timer_id", "user_id"]
+            isOneToOne: false
+            referencedRelation: "focus_timers"
+            referencedColumns: ["id", "user_id"]
+          },
+        ]
+      }
       tracking_operations: {
         Row: {
           created_at: string
@@ -1331,6 +1520,10 @@ export type Database = {
         Args: { p_input: Json }
         Returns: undefined
       }
+      control_focus_timer: {
+        Args: { p_action: string; p_expected_revision: number; p_id: string }
+        Returns: Json
+      }
       copy_fitness_workout: {
         Args: { p_date: string; p_operation_id: string; p_source_id: string }
         Returns: string
@@ -1347,13 +1540,17 @@ export type Database = {
       save_fitness_exercise: { Args: { p_input: Json }; Returns: Json }
       save_fitness_sleep: { Args: { p_input: Json }; Returns: Json }
       save_fitness_workout: { Args: { p_input: Json }; Returns: Json }
+      save_study_category: { Args: { p_input: Json }; Returns: Json }
+      save_study_session: { Args: { p_input: Json }; Returns: Json }
       save_tracking_challenge: { Args: { p_input: Json }; Returns: string }
       save_tracking_frequency: { Args: { p_input: Json }; Returns: string }
       save_tracking_habit: { Args: { p_input: Json }; Returns: string }
       save_tracking_metric: { Args: { p_input: Json }; Returns: string }
       save_tracking_score_category: { Args: { p_input: Json }; Returns: string }
       save_tracking_score_policy: { Args: { p_input: Json }; Returns: string }
+      setup_career: { Args: { p_input: Json }; Returns: undefined }
       setup_fitness: { Args: { p_input: Json }; Returns: undefined }
+      start_focus_timer: { Args: { p_input: Json }; Returns: Json }
       write_tracking_habit_log: { Args: { p_input: Json }; Returns: Json }
       write_tracking_metric_log: { Args: { p_input: Json }; Returns: Json }
     }

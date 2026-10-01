@@ -2,7 +2,7 @@
 
 ## Status
 
-Accepted calculation contract implemented in `src/features/tracking/dates.ts` and `domain.ts`, with recorded-day fitness summaries in `src/features/fitness/domain.ts`. Focused tests cover calendar/scoring history plus sleep derivation, gym completion, and missing-day averages. Phase 3 migrations are applied to the configured development project. All examples below are illustrative fixtures, not actual user performance. See [PRODUCT](../PRODUCT.md), [schema design](ARCHITECTURE.md), and [QA](QA.md).
+Accepted calculation contract implemented in `src/features/tracking/dates.ts` and `domain.ts`, with recorded-day fitness summaries in `src/features/fitness/domain.ts` and split-day study summaries in `src/features/career/domain.ts`. Focused tests cover historical scoring, sleep/gym, and study across midnight and daylight-saving transitions. Phase 4 migrations are applied to the configured development project. All examples below are illustrative fixtures, not actual user performance. See [PRODUCT](../PRODUCT.md), [schema design](ARCHITECTURE.md), and [QA](QA.md).
 
 ## Calendar and effective rules
 
@@ -47,7 +47,7 @@ Retain the full numeric input in canonical units. Display conversions never over
 
 Minimum/maximum ratio targets must be positive; reject zero/negative targets. A logged zero is valid and meets a maximum target. Body weight is observational unless explicitly configured otherwise. No score bonus for exceeding targets in V1.
 
-Derived sleep metrics now read `sleep_logs` by wake business date and convert stored seconds to hours. They never create a parallel `metric_logs` row. Study remains unavailable until Phase 4. A source not yet activated is excluded with a reason. Fitness setup persists prospective sleep/gym activation dates; pre-activation expectations stay excluded from historical scores. Once active, an absent required value contributes zero. Deliberate backdating is a separate user correction, not an automatic consequence of a release.
+Derived sleep metrics read `sleep_logs` by wake business date and convert stored seconds to hours. Derived study metrics read `study_sessions` and convert split-day seconds to minutes. Neither creates a parallel `metric_logs` row. A source not yet activated is excluded with a reason. Fitness and Career setup persist prospective source activation dates; pre-activation expectations stay excluded from historical scores. Once active, an absent required value contributes zero. Deliberate backdating is a separate user correction, not an automatic consequence of a release.
 
 Example: protein 126 g with a 130 g minimum gives `126 / 130 = 0.969230...`, displayed as **96.9%**. Protein 160 g stays 160 g in history but contributes 100%.
 
@@ -58,6 +58,8 @@ Example: a 60-minute maximum with 90 minutes logged gives `60 / 90 = 66.7%`. An 
 Count completed source records only. Session mode counts sessions; distinct-day mode counts qualifying business dates once, regardless of multiple records that day. Gym counts completed workouts. Starter career quota counts completed study sessions. Walking counts days meeting the configured metric threshold.
 
 Gym counts `workouts.status = completed` within eligible dates; drafts and copied drafts contribute zero until completed. A copy does not copy score results. Weight's seven-day and week-to-date averages divide by recorded values only and display `recorded days / window days`; a missing day is never zero-filled. Sleep charts use the same derived value returned to Today and Metrics.
+
+Study session frequency counts one saved session on its completion business date, including timer sessions; paused time does not create extra sessions. Manual duration-only time belongs to its chosen date. Timestamped manual and timer sessions divide their running intervals at local midnight using the retained session timezone. Actual UTC instants locate each boundary, so a daylight-saving day need not be 24 hours. Segment shares are scaled to the stored duration seconds, preserving the session's raw total despite subsecond timer boundaries. The Career daily, weekly, 30-day, category, Today, Metrics, and score views consume the same split-day values. Missing study dates remain absent rather than recorded zero.
 
 For weekly/monthly quota Q, full period length L calendar days, and active intersection A calendar days:
 

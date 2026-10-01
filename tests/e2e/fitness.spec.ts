@@ -26,7 +26,7 @@ test("sleep source and workout copying agree across Fitness and Today", async ({
       await expect(page.getByRole("heading", { name: "Set up fitness tracking" })).toHaveCount(0, { timeout: 20000 });
       await page.reload();
     }
-    const date = await page.getByLabel("Tracking date").inputValue();
+    const date = await page.getByLabel("Tracking date").first().inputValue();
     if (await page.getByRole("button", { name: "Remove entry" }).isVisible()) {
       await page.getByRole("button", { name: "Remove entry" }).click();
       await expect(page.getByRole("status")).toContainText("Sleep entry removed");
