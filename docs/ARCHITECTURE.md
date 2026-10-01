@@ -2,7 +2,7 @@
 
 ## Status and ownership
 
-Phases 1–4 implement foundation, core tracking, fitness, and Career in the configured development project. Phase 4 lives in `supabase/migrations/20261001052104_career.sql`; it is applied after all Phase 3 migrations. Planning and later subsystems remain a blueprint. Phase 1 signup/confirmation/recovery email verification is deferred until SMTP setup before production; see PRODUCT and QA. Product requirements are in [PRODUCT](../PRODUCT.md), calculations in [SCORING](SCORING.md), and visual conventions in [DESIGN](../DESIGN.md).
+Phases 1–5 implement foundation, core tracking, fitness, Career, and Planning in the configured development project. Planning lives in `supabase/migrations/20261001104654_planning.sql` plus two follow-up migrations for a foreign-key index and copy reset semantics. Insights and later subsystems remain a blueprint. Phase 1 signup/confirmation/recovery email verification is deferred until SMTP setup before production; see PRODUCT and QA. Product requirements are in [PRODUCT](../PRODUCT.md), calculations in [SCORING](SCORING.md), and visual conventions in [DESIGN](../DESIGN.md).
 
 ## Application boundaries
 
@@ -17,6 +17,7 @@ Use one Next.js App Router application deployed to Vercel, with Supabase Auth an
 | `src/lib/supabase` | Cookie-aware server/browser clients and session refresh |
 | `src/features/tracking/domain.ts`, `dates.ts` | Shared scheduling, source evaluation, score, and calendar calculations |
 | `src/features/fitness` | Fitness-domain summaries, server actions, and focused UI; trend charts load only on fitness routes |
+| `src/features/planning` | Owned task and goal reads, checked actions, forms, and pure goal-progress calculations |
 | `src/lib` | Shared validation and authenticated server helpers |
 | `src/types` | Generated database types and shared domain interfaces |
 | `supabase/migrations`, `supabase/tests` | Incremental schema/security changes and SQL tests |
@@ -96,7 +97,7 @@ Testing replays migrations against isolated PGlite PostgreSQL with minimal test-
 
 The applied migration adds selected challenge and starter-applied metadata to preferences; 17 owned tracking tables including `tracking_operations` for retry receipts; same-owner composite references, indexes, update triggers, explicit RLS policies, and authenticated transaction functions. Direct authenticated access to the new tables is read-only; Server Actions use narrowly named `security definer` functions that verify `auth.uid()` again and fix `search_path`. Business dates and original capture timezone are stored on logs. Revisions prevent stale replacement writes, and operation UUIDs make water-style increments retry-safe. The follow-up migration covers the composite score-item policy/category foreign key.
 
-`src/features/tracking/queries.ts` pages owner-filtered rows in batches rather than relying on the PostgREST default limit. `src/types/database.ts` is generated from the hosted Phase 4 public schema. Supabase widens CHECK-constrained text columns to `string`; the domain boundary narrows them to the literals enforced by verified SQL constraints. Challenge associations share tracker definitions and logs; the optional starter is a single idempotent function guarded by `starter_applied_on`. It inserts no completion, measurement, or study-session records.
+`src/features/tracking/queries.ts` pages owner-filtered rows in batches rather than relying on the PostgREST default limit. `src/types/database.ts` is generated from the hosted Phase 5 public schema. Supabase widens CHECK-constrained text columns to `string`; the domain boundary narrows them to the literals enforced by verified SQL constraints. Challenge associations share tracker definitions and logs; the optional starter is a single idempotent function guarded by `starter_applied_on`. It inserts no completion, measurement, or study-session records.
 
 | Table | Specific fields and relationships |
 | --- | --- |
@@ -154,17 +155,22 @@ Manual duration-only sessions are attributed to the chosen date. Timestamped ses
 
 Start a timer only after the server creates its record. Render elapsed time from timestamps plus saved accumulated duration, not tick counts. Navigation/refresh resumes from server state through the workspace timer bar. Focus/visibility changes, a periodic read, and BroadcastChannel reconcile tabs; SQL revisions and the one-active partial index settle races. Finish locks the timer, creates one session, and marks the timer terminal in one transaction; repeated finish returns that session. Discard is an explicit terminal action. A browser confirmation reviews elapsed time above four hours before finishing; the database retains the complete value up to seven days. Running segments preserve pause gaps for split-day analytics. No second-by-second database writes or background worker is needed.
 
-### Planning — Phase 5
+### Planning — Phase 5 (implemented)
 
 | Table | Specific fields and relationships |
 | --- | --- |
 | `tasks` | Title, notes, date, status (`todo`, `in_progress`, `completed`), priority, category, position, estimated/actual seconds, optional goal/challenge |
 | `goals` | Title, description, category, target date, optional challenge, status, progress kind, manual percentage or metric reference/aggregation/baseline/target |
 | `goal_milestones` | Goal reference, title, position, completion timestamp |
+| `task_carry_operations` | Owner, operation UUID, source/target date, move/copy kind, result IDs; transactional result for retries |
 
 Manual progress is 0–100. Milestone progress is completed/total; no milestones means unconfigured, not 100%. Metric progress is clamped advancement from baseline toward target; reject equal baseline/target and support downward goals. Latest/sum/count aggregations are explicit and use the goal's configured interval. Milestones may exist on any goal, but only milestone mode derives its percentage from them.
 
 Reordering has keyboard/button controls. Carry-forward actions select unfinished tasks only; a move changes the existing date, a copy makes new IDs. Batch retries cannot duplicate copies. Tasks are not score inputs by default.
+
+`/tasks` shows a seven-day board anchored to the user’s week-start preference and selected-day editor; `/plan` is the mobile planning entry. Task records retain separate estimated and actual integer seconds, completion time, position, and optimistic revision. `save_planning_task`, `set_planning_task_status`, and `move_planning_task` validate ownership and revisions. A per-user advisory transaction lock serializes task ordering and carry operations. `carry_planning_tasks` writes an owner-scoped receipt in the same transaction as its changes. A copy starts as `todo`, keeps its estimate, and clears recorded actual time; a move retains status and work. Completed tasks are excluded from both operations.
+
+`/goals` and `/goals/[id]` expose creation, editing, milestones, and all three progress modes. `save_planning_goal` and `save_goal_milestone` validate revision and owned category/challenge/metric relationships. Goal calculations use raw metric logs, study sessions, or sleep logs over the configured interval, distinguish missing from a measured zero, and support latest/sum/count aggregation and downward targets. Milestones remain attached when the progress mode changes. Private goal/task text is masked before passing it to interactive client components in Privacy Mode. The four tables have owner RLS and authenticated direct writes revoked; only checked RPCs mutate them. The hosted index follow-up covers the milestone owner FK. The copy-reset follow-up preserves earlier applied SQL and ensures copied work starts fresh.
 
 ### Reflection — Phase 7
 

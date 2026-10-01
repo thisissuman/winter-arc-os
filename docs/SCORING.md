@@ -2,7 +2,7 @@
 
 ## Status
 
-Accepted calculation contract implemented in `src/features/tracking/dates.ts` and `domain.ts`, with recorded-day fitness summaries in `src/features/fitness/domain.ts` and split-day study summaries in `src/features/career/domain.ts`. Focused tests cover historical scoring, sleep/gym, and study across midnight and daylight-saving transitions. Phase 4 migrations are applied to the configured development project. All examples below are illustrative fixtures, not actual user performance. See [PRODUCT](../PRODUCT.md), [schema design](ARCHITECTURE.md), and [QA](QA.md).
+Accepted calculation contract implemented in `src/features/tracking/dates.ts` and `domain.ts`, with recorded-day fitness summaries in `src/features/fitness/domain.ts` and split-day study summaries in `src/features/career/domain.ts`. Focused tests cover historical scoring, sleep/gym, and study across midnight and daylight-saving transitions. Phase 5 migrations are applied to the configured development project. Tasks and goals are planning records and do not contribute to daily or weekly scores. All examples below are illustrative fixtures, not actual user performance. See [PRODUCT](../PRODUCT.md), [schema design](ARCHITECTURE.md), and [QA](QA.md).
 
 ## Calendar and effective rules
 

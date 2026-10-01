@@ -2,7 +2,7 @@
 
 ## Status
 
-**Phases 0–4 are complete in the configured development project as of October 1, 2026.** Phase 4 Career migration, generated types, local/hosted security checks, production build, and desktop/mobile browser checks pass. Phase 1's signup-confirmation/recovery email checks remain deferred until SMTP before production. Phases 5–9 have not started.
+**Phases 0–5 are complete in the configured development project as of October 1, 2026.** Phase 5 Planning migrations, generated types, local/hosted security checks, production build, and desktop/mobile browser checks pass. Phase 1's signup-confirmation/recovery email checks remain deferred until SMTP before production. Phases 6–9 have not started.
 
 The accepted plan calls for one phase at a time. Start with the earliest incomplete phase unless the user names a phase whose dependencies are already complete. Finish the phase's validation/documentation and stop with a handoff. Do not expand a phase into the entire application.
 
@@ -17,7 +17,7 @@ Read [AGENTS](../AGENTS.md), [PRODUCT](../PRODUCT.md), and the relevant [archite
 | 2 — Core tracking | 1 | Complete in development project; release gates remain in QA |
 | 3 — Fitness | 2 | Complete in development project; release gates remain in QA |
 | 4 — Career | 2 | Complete in development project; release gates remain in QA |
-| 5 — Planning | 2 | Not started |
+| 5 — Planning | 2 | Complete in development project |
 | 6 — Insights | 2, 3, 4 | Not started |
 | 7 — Reflection | 6 | Not started |
 | 8 — Settings and polish | 1–7 | Not started |
@@ -134,11 +134,13 @@ Verified: the local SQL suite exercises category/session ownership, retained man
 
 ## Phase 5 — Planning
 
-- [ ] Deliver seven-day tasks, CRUD, priority/category/duration, keyboard reorder, and date selection.
-- [ ] Add atomic/retry-safe move/copy unfinished actions with explicit distinction between move and copy.
-- [ ] Add goals, all three progress modes, metric intervals/baselines/targets, milestones, and owned challenge relationships.
+- [x] Deliver seven-day tasks, CRUD, priority/category/duration, keyboard reorder, and date selection.
+- [x] Add atomic/retry-safe move/copy unfinished actions with explicit distinction between move and copy.
+- [x] Add goals, all three progress modes, metric intervals/baselines/targets, milestones, and owned challenge relationships.
 
 Acceptance: completed tasks are not carried forward; copied retries do not duplicate tasks; estimates and actual duration remain separate; manual/milestone/metric progress and empty milestones work; tasks do not inflate scores; ownership, keyboard/mobile flows, domain tests, and lint/typecheck/build pass.
+
+Verified: the three Planning migrations are applied to the matching development project, full public types regenerated, and hosted rollback-only ownership checks passed. Local SQL checks cover RLS, relationships, revisions, carry retries and completed exclusions. Domain checks cover all three progress modes and missing/zero behavior. Desktop/mobile browser flows cover task creation, reorder/copy/move, all goal modes, accessibility, and horizontal overflow. The complete check counts are recorded in [QA](QA.md); SMTP and full-container replay remain release gates.
 
 ## Phase 6 — Insights
 

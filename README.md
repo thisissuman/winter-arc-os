@@ -4,9 +4,9 @@ A personal performance application for habits, fitness, career preparation, plan
 
 ## Current delivery
 
-**Phases 1–4 are implemented in the configured development project.** Phase 4 adds study categories, manual sessions, a recoverable single-active focus timer, split-day study totals, and career summaries. Earlier challenges, habits, metrics, scores, and fitness remain available. The Career migration is applied and hosted types are regenerated. See [ROADMAP](docs/ROADMAP.md) and [QA](docs/QA.md) for exact verification and release gates.
+**Phases 1–5 are implemented in the configured development project.** Phase 5 adds seven-day tasks, keyboard ordering, retry-safe carry-forward, goals, milestones, and manual/milestone/metric progress. Earlier tracking, fitness, and Career features remain available. The Planning migrations are applied and hosted types are regenerated. See [ROADMAP](docs/ROADMAP.md) and [QA](docs/QA.md) for exact verification and release gates.
 
-The MCP URL matches `.env.local`. The confirmed test account supports real login, session refresh, and browser checks. Hosted RLS scripts use rollback-only fixtures; Career browser flows cover manual sessions and timer recovery across pages/tabs. The user deferred signup/confirmation/recovery email delivery tests until custom SMTP is configured before production. The supplied confirmed test account uses an example-domain address.
+The MCP URL matches `.env.local`. The confirmed test account supports real login, session refresh, and browser checks. Hosted RLS scripts use rollback-only fixtures; Planning browser flows cover tasks, carry-forward, goals, and milestones on desktop and mobile. The user deferred signup/confirmation/recovery email delivery tests until custom SMTP is configured before production. The supplied confirmed test account uses an example-domain address.
 
 ## Documentation
 
@@ -33,7 +33,7 @@ npm run dev
 
 Before starting, replace the example Supabase URL/public key and set `APP_ORIGIN` to `http://localhost:3000`. Open that address after starting the server. Apply the foundation migration to the same project first; auth alone cannot supply the missing application tables. Missing credentials disable submission with a setup notice.
 
-Apply all migrations in `supabase/migrations` to the same project before using tracking pages. The hosted development project has the Phase 2–4 versions listed below; local filenames match its ledger. An empty account can use personal tracking immediately, opt into full starters during onboarding, or set up fitness/Career definitions from their pages.
+Apply all migrations in `supabase/migrations` to the same project before using tracking pages. The hosted development project has the Phase 2–5 versions listed below; local filenames match its ledger. An empty account can use personal tracking immediately, opt into full starters during onboarding, or set up fitness/Career definitions from their pages.
 
 | Environment variable | Purpose |
 | --- | --- |
@@ -52,7 +52,7 @@ Keep `.env.local` out of Git. Never paste credentials into documentation or chat
 | `npm run dev` | Start Next.js development on port 3000 |
 | `npm run lint` | Check code with ESLint |
 | `npm run typecheck` | Generate route declarations and check TypeScript |
-| `npm run test` | Run auth, tracking, fitness, and study-domain unit tests |
+| `npm run test` | Run auth, tracking, fitness, study, and planning-domain unit tests |
 | `npm run test:db` | Replay migrations in isolated PostgreSQL and verify RLS/constraints; no Docker or remote changes |
 | `npm run test:e2e` | Build production, start port 3100, and run desktop/mobile browser tests |
 | `npm run build` | Compile a production application |
@@ -84,7 +84,7 @@ The isolated `test:db` runner executes real PostgreSQL through PGlite and suppli
 
 ## Migrations and generated types
 
-Add incremental SQL under `supabase/migrations`, using `npx supabase migration new <name>`. Never edit a migration after deploying it. The foundation creates account/organization tables; Phase 2 adds core tracking; Phase 3 adds fitness; Phase 4 adds study sessions and the persisted timer. Applied versions are `20260930180649_foundation`, `20260930181434_categories_parent_index`, `20261001004511_core_tracking`, `20261001004734_score_items_policy_category_index`, `20261001044053_fitness`, `20261001044323_fitness_owner_indexes`, `20261001044532_workout_edit_fix`, `20261001050228_workout_payload_guard`, and `20261001052104_career`. Local filenames match the hosted ledger.
+Add incremental SQL under `supabase/migrations`, using `npx supabase migration new <name>`. Never edit a migration after deploying it. The foundation creates account/organization tables; Phase 2 adds core tracking; Phase 3 adds fitness; Phase 4 adds study sessions and the persisted timer; Phase 5 adds tasks, goals, milestones, and retry-safe carry operations. Applied versions are `20260930180649_foundation`, `20260930181434_categories_parent_index`, `20261001004511_core_tracking`, `20261001004734_score_items_policy_category_index`, `20261001044053_fitness`, `20261001044323_fitness_owner_indexes`, `20261001044532_workout_edit_fix`, `20261001050228_workout_payload_guard`, `20261001052104_career`, `20261001104654_planning`, `20261001104905_planning_goal_owner_index`, and `20261001105141_planning_copy_reset`. Local filenames match the hosted ledger.
 
 Regenerate complete public database types after schema changes with Supabase's generator. With a full local stack:
 
@@ -92,7 +92,7 @@ Regenerate complete public database types after schema changes with Supabase's g
 npx supabase gen types typescript --local --schema public > src/types/database.ts
 ```
 
-`src/types/database.ts` was regenerated through the matching hosted MCP after Phase 4 deployment. The old isolated generator was removed because it could overwrite complete types with an incomplete schema. Review generated types with every migration. Hosted MCP regeneration is the verified path when a local Docker-compatible runtime is unavailable.
+`src/types/database.ts` was regenerated through the matching hosted MCP after Phase 5 deployment. The old isolated generator was removed because it could overwrite complete types with an incomplete schema. Review generated types with every migration. Hosted MCP regeneration is the verified path when a local Docker-compatible runtime is unavailable.
 
 ## Hosted configuration
 

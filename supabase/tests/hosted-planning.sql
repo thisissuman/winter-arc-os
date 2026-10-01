@@ -1,0 +1,60 @@
+-- Phase 5 hosted development-project security check. Synthetic rows always roll back.
+begin;
+set local plpgsql.check_asserts = on;
+set constraints all immediate;
+do $$
+declare
+  owner_a uuid:=gen_random_uuid(); owner_b uuid:=gen_random_uuid();
+  source_day date:=(now() at time zone 'Asia/Kolkata')::date;
+  goal_a uuid; task_a uuid; operation_id uuid:=gen_random_uuid(); copied jsonb; repeated jsonb; saved jsonb;
+  table_name text; seen integer; blocked boolean;
+begin
+  insert into auth.users(id,raw_user_meta_data) values(owner_a,'{"display_name":"Planning fixture A"}'),(owner_b,'{"display_name":"Planning fixture B"}');
+  foreach table_name in array array['tasks','goals','goal_milestones','task_carry_operations'] loop
+    assert (select relrowsecurity from pg_class where oid=('public.'||table_name)::regclass), 'RLS disabled: '||table_name;
+    assert has_table_privilege('authenticated','public.'||table_name,'select'), 'Authenticated read denied: '||table_name;
+    assert not has_table_privilege('authenticated','public.'||table_name,'insert'), 'Direct insert permitted: '||table_name;
+    assert not has_table_privilege('authenticated','public.'||table_name,'update'), 'Direct update permitted: '||table_name;
+    assert not has_table_privilege('authenticated','public.'||table_name,'delete'), 'Direct delete permitted: '||table_name;
+    execute 'set local role anon';
+    blocked:=false;
+    begin execute format('select count(*) from public.%I',table_name) into seen;
+    exception when insufficient_privilege then blocked:=true; end;
+    assert blocked, 'Anonymous read permitted: '||table_name;
+    execute 'reset role';
+    execute 'set local role authenticated';
+    perform set_config('request.jwt.claim.sub',owner_a::text,true);
+    execute format('select count(*) from public.%I where user_id=$1',table_name) into seen using owner_b;
+    assert seen=0, 'Cross-owner read permitted: '||table_name;
+    execute 'reset role';
+  end loop;
+  execute 'set local role authenticated';
+  perform set_config('request.jwt.claim.sub',owner_a::text,true);
+  saved:=public.save_planning_goal('{"title":"Fixture outcome","status":"active","progressMode":"milestone","manualPercent":0}'::jsonb);
+  goal_a:=(saved->>'id')::uuid;
+  perform public.save_goal_milestone(jsonb_build_object('goalId',goal_a,'title','Fixture step'));
+  saved:=public.save_planning_task(jsonb_build_object('title','Fixture task','date',source_day,'status','todo','priority','normal','goalId',goal_a));
+  task_a:=(saved->>'id')::uuid;
+  perform public.save_planning_task(jsonb_build_object('title','Completed fixture','date',source_day,'status','completed','priority','normal'));
+  copied:=public.carry_planning_tasks(operation_id,source_day,source_day+1,'copy');
+  repeated:=public.carry_planning_tasks(operation_id,source_day,source_day+1,'copy');
+  assert copied->'result_ids'=repeated->'result_ids', 'Copy retry returned different tasks';
+  assert jsonb_array_length(copied->'result_ids')=1, 'Completed task was copied';
+  assert (select count(*) from public.tasks where user_id=owner_a and business_date=source_day+1)=1, 'Copy created a duplicate';
+  execute 'reset role';
+  execute 'set local role authenticated';
+  perform set_config('request.jwt.claim.sub',owner_b::text,true);
+  assert (select count(*) from public.tasks where id=task_a)=0, 'Cross-owner task read permitted';
+  blocked:=false;
+  begin perform public.save_goal_milestone(jsonb_build_object('goalId',goal_a,'title','Cross owner'));
+  exception when insufficient_privilege then blocked:=true; end;
+  assert blocked, 'Cross-owner milestone accepted';
+  blocked:=false;
+  begin perform public.set_planning_task_status(task_a,'completed',1);
+  exception when insufficient_privilege then blocked:=true; end;
+  assert blocked, 'Cross-owner task mutation accepted';
+  execute 'reset role';
+end;
+$$;
+rollback;
+select 'Phase 5 planning security checks passed; all fixtures rolled back' as result;

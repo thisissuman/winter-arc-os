@@ -2,7 +2,7 @@
 
 ## Status
 
-**Foundation, core tracking, fitness, and Career interfaces are implemented.** Phase 1 auth and shell retain their recorded visual and accessibility results. Phase 2 Today and tracking pages passed desktop/mobile browser and automated accessibility checks. Phase 3 adds Fitness measurement/sleep cards, recorded-day charts with text summaries, an exercise library, and responsive workout/set forms. Phase 4 adds study summaries, category distribution, session forms, and a persistent timer bar. See QA for exact checks.
+**Foundation, core tracking, fitness, Career, and Planning interfaces are implemented.** Phase 1 auth and shell retain their recorded visual and accessibility results. Phase 2 Today and tracking pages passed desktop/mobile browser and automated accessibility checks. Phase 3 adds Fitness measurement/sleep cards, recorded-day charts with text summaries, an exercise library, and responsive workout/set forms. Phase 4 adds study summaries, category distribution, session forms, and a persistent timer bar. Phase 5 adds a seven-day task board, selected-day forms, accessible order controls, carry-forward actions, and goal progress cards. See QA for exact checks.
 
 Product truth lives in [PRODUCT](PRODUCT.md), route/component responsibilities in [ARCHITECTURE](docs/ARCHITECTURE.md), and validation in [QA](docs/QA.md).
 
@@ -46,7 +46,7 @@ Shared shadcn primitives are Button, Input, Label, Badge, Separator, and Skeleto
 
 ## Navigation and responsive behavior
 
-Implemented in source: desktop uses a 240 px sidebar from 768 px upward; mobile uses a header and fixed three-link bottom navigation with safe-area spacing. The sidebar includes Fitness and Career; the mobile Track hub links to both. An active focus timer appears above the mobile navigation or at the desktop bottom edge. Auth uses a split introduction/form layout from 1024 px upward and a single form column below it. Both presentations use the same URLs. Plan, Insights, Reflection, and More remain later work.
+Implemented in source: desktop uses a 240 px sidebar from 768 px upward; mobile uses a header and fixed four-link bottom navigation with safe-area spacing. The sidebar includes Fitness and Career; the mobile Track hub links to both. An active focus timer appears above the mobile navigation or at the desktop bottom edge. Auth uses a split introduction/form layout from 1024 px upward and a single form column below it. Both presentations use the same URLs. Insights, Reflection, and More remain later work.
 
 At small widths, prioritize a single reading column, sheets for short editing flows, reachable quick-add controls, and clear sticky actions when useful. Weekly planners can show one selected day with a week switcher. The habit grid may scroll horizontally but keeps habit identity readable and supports keyboard cell interaction.
 
@@ -82,3 +82,5 @@ Phase 1 auth/empty-Today screenshots were inspected at 1440 px desktop and 390 p
 Phase 3 browser checks cover Fitness at desktop/mobile widths, its WCAG 2 A/AA and 2.1 AA axe scan, and horizontal overflow. Recharts appears only on fitness routes and has adjacent numeric summaries with missing-day coverage; sparse history shows an explicit empty state. Workout names, exercise names, and sleep notes are hidden or uneditable in Privacy Mode. Exercise/set controls use labelled fields and keyboard-operable move buttons. The full cross-application privacy review remains a Phase 8 gate.
 
 Phase 4 keeps Career summaries as text and proportional category bars with numeric alternatives. The timer shows a saved running/paused state and elapsed clock; action feedback distinguishes a confirmed save from a connectivity failure. Desktop/mobile browser checks cover offline finish feedback and recovery, navigation, refresh, two-tab reconciliation, automated accessibility, and horizontal overflow. Study topics, notes, and category names are masked in Privacy Mode. The full cross-application privacy review remains a Phase 8 gate.
+
+Phase 5 shows seven dates as reachable controls and the chosen day as a single-column task list on phones. Every task has labelled status, priority, estimate, and actual-duration fields; order buttons give a keyboard alternative to dragging. Carry-forward spells out move versus copy and reports the saved count. Goal cards distinguish 0% from an unconfigured milestone or missing metric value. The Planning browser flows passed desktop/mobile accessibility and horizontal-overflow checks. Private task and goal text is masked in Privacy Mode; the complete cross-application privacy audit remains a Phase 8 gate.
