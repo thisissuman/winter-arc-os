@@ -4,6 +4,7 @@ import { businessDateSchema } from "./validation";
 import { addDays } from "./dates";
 import type { TrackingSnapshot } from "./types";
 import type { Database } from "@/types/database";
+import { presentTrackingSnapshot } from "./privacy";
 
 export class TrackingSetupError extends Error {
   constructor() {
@@ -65,7 +66,7 @@ export async function loadTrackingSnapshot({ from, to, compact = false }: { from
   const beginnings = [...habits, ...metrics, ...frequencyTargets].map((tracker) => tracker.active_from).sort();
   // PostgreSQL CHECK-constrained text is generated as `string`; the migrated
   // constraints enforce the narrower domain literals used by the evaluator.
-  return {
+  return presentTrackingSnapshot({
     challenges: challenges as TrackingSnapshot["challenges"], challengeHabits, challengeMetrics, challengeTargets,
     habits: habits as TrackingSnapshot["habits"], schedules: schedules as TrackingSnapshot["schedules"],
     habitLogs: habitLogs as TrackingSnapshot["habitLogs"], metrics: metrics as TrackingSnapshot["metrics"],
@@ -78,5 +79,5 @@ export async function loadTrackingSnapshot({ from, to, compact = false }: { from
     timezone: preferences.timezone, weekStartsOn: preferences.week_starts_on, today,
     selectedChallengeId: preferences.selected_challenge_id ?? null, onboardingComplete: preferences.onboarding_completed,
     historyFrom: from ?? beginnings[0] ?? today, privacyMode: preferences.privacy_mode, hidePrivateToday: preferences.hide_private_today,
-  };
+  });
 }

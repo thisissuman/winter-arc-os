@@ -21,6 +21,10 @@ function failure(error: RpcError): string {
   return "Could not save. Check your connection and retry.";
 }
 function saved(message: string, id?: string, count?: number): PlanningState { revalidatePath("/", "layout"); return { status: "success", message, id, count }; }
+async function presentTask(task: PlanningTask): Promise<PlanningTask> {
+  const { preferences } = await requireAccount();
+  return preferences.privacy_mode && task.is_private ? { ...task, title: "Private task", notes: "" } : task;
+}
 
 export async function savePlanningTask(_previous: PlanningState, form: FormData): Promise<PlanningState> {
   const minutesToSeconds = (value: FormDataEntryValue | null) => value === null || value === "" ? null : Number(value) * 60;
@@ -39,7 +43,7 @@ export async function setPlanningTaskStatus(input: unknown): Promise<MutationRes
   const { data, error } = await call<PlanningTask>("set_planning_task_status", { p_id: parsed.data.id, p_status: parsed.data.status, p_expected_revision: parsed.data.expectedRevision });
   if (error || !data) return { ok: false, code: error?.code === "40001" ? "conflict" : "storage", message: failure(error ?? {}) };
   revalidatePath("/", "layout");
-  return { ok: true, data };
+  return { ok: true, data: await presentTask(data) };
 }
 
 export async function movePlanningTask(input: unknown): Promise<MutationResult<PlanningTask>> {
@@ -48,7 +52,7 @@ export async function movePlanningTask(input: unknown): Promise<MutationResult<P
   const { data, error } = await call<PlanningTask>("move_planning_task", { p_id: parsed.data.id, p_direction: parsed.data.direction, p_expected_revision: parsed.data.expectedRevision });
   if (error || !data) return { ok: false, code: error?.code === "40001" ? "conflict" : "storage", message: failure(error ?? {}) };
   revalidatePath("/", "layout");
-  return { ok: true, data };
+  return { ok: true, data: await presentTask(data) };
 }
 
 export async function carryPlanningTasks(_previous: PlanningState, form: FormData): Promise<PlanningState> {

@@ -31,8 +31,14 @@ export async function loadPlanningSnapshot(): Promise<PlanningSnapshot> {
     read("tasks"), read("goals"), read("goal_milestones"), read("categories"), read("challenges"),
     read("metric_definitions"), read("metric_logs"), read("sleep_logs"), read("study_sessions"),
   ]);
-  return { tasks: tasks as PlanningSnapshot["tasks"], goals: goals as PlanningSnapshot["goals"], milestones: milestones as PlanningSnapshot["milestones"],
-    categories, challenges: challenges as PlanningSnapshot["challenges"], metrics: metrics as PlanningSnapshot["metrics"],
-    metricLogs, sleepLogs, studySessions: studySessions as PlanningSnapshot["studySessions"],
+  const maskedGoals = new Set(goals.filter(item => item.is_private).map(item => item.id));
+  return { tasks: (preferences.privacy_mode ? tasks.map(item => item.is_private ? { ...item, title: "Private task", notes: "" } : item) : tasks) as PlanningSnapshot["tasks"],
+    goals: (preferences.privacy_mode ? goals.map(item => item.is_private ? { ...item, title: "Private goal", description: "" } : item) : goals) as PlanningSnapshot["goals"],
+    milestones: preferences.privacy_mode ? milestones.map(item => maskedGoals.has(item.goal_id) ? { ...item, title: "Private milestone" } : item) : milestones,
+    categories, challenges: challenges as PlanningSnapshot["challenges"],
+    metrics: (preferences.privacy_mode ? metrics.map(item => item.is_private ? { ...item, name: "Private tracker", description: "" } : item) : metrics) as PlanningSnapshot["metrics"],
+    metricLogs: preferences.privacy_mode ? metricLogs.map(item => metrics.some(metric => metric.id === item.metric_id && metric.is_private) ? { ...item, notes: "" } : item) : metricLogs,
+    sleepLogs: preferences.privacy_mode ? sleepLogs.map(item => ({ ...item, notes: "" })) : sleepLogs,
+    studySessions: (preferences.privacy_mode ? studySessions.map(item => ({ ...item, topic: "", notes: "" })) : studySessions) as PlanningSnapshot["studySessions"],
     today: businessDate(preferences.timezone), timezone: preferences.timezone, weekStartsOn: preferences.week_starts_on, privacyMode: preferences.privacy_mode };
 }

@@ -1918,6 +1918,11 @@ export type Database = {
         Args: { p_expected_at: string; p_id: string; p_kind: string }
         Returns: undefined
       }
+      delete_workspace_data: {
+        Args: { p_confirmation: string }
+        Returns: undefined
+      }
+      export_workspace_data: { Args: never; Returns: Json }
       increment_tracking_metric: { Args: { p_input: Json }; Returns: Json }
       move_planning_task: {
         Args: { p_direction: string; p_expected_revision: number; p_id: string }

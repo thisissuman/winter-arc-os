@@ -193,6 +193,18 @@ The weekly row stores its week-start ISO weekday and timezone at creation. A new
 
 `/reflection` lists the current periods and saved history. `/reflection/weekly/[weekStart]` and `/reflection/monthly/[month]` validate URL anchors, show saved forms, and truncate current-period statistics at today. Their context panel calls `buildInsightReport` with the same source query and historical scoring rules as Insights. It stores no calculated snapshots. Privacy Mode omits written responses and the editor from the rendered page while leaving aggregate numbers visible. Mobile's More hub exposes Reflection, Challenges, and Settings.
 
+### Settings and data controls — Phase 8
+
+Organization settings manage owned life areas/categories with archive/restore, parent ownership checks, and stale-edit protection. Calendar preferences use the existing onboarding routine without applying starters. Target/tracker settings link to their delivered editors.
+
+The private export returns format version 1 from a single PostgreSQL statement snapshot. A fixed allowlist includes all owned product records, archived/private records, and active timer timestamps, excluding the three internal retry-receipt tables. No REST row cap truncates the arrays; the attachment is private/no-store.
+
+Delete workspace data removes tracking definitions, organization, challenges, logs, workout/study history, timers, planning, reviews, and operation receipts. It retains Auth, profile, calendar, theme, and privacy preferences; selected challenge and setup flags reset. Typed confirmation and a password check precede the authenticated transaction. Account deletion verifies the caller's password in the same request, requires typed account confirmation and same-origin POST, then calls Auth admin deletion using an isolated server-only secret client. A private before-delete Auth trigger clears children in dependency order inside the account deletion transaction, protecting restrictive relationships. No browser admin client or arbitrary target-user parameter is exposed.
+
+The PWA uses Next's manifest, local PNG icons, and a standalone public offline document. Its worker caches only `/offline.html` and the three local PNG icons in `winter-arc-public-v1`. Private navigations remain network-only, with a generic offline fallback on failure. API, Auth, RSC, and mutations are never cached or queued. Connection feedback explains unavailable writes; settings action wrappers catch network failures and preserve entered form text. Installation requires HTTPS or localhost and browser support; full offline synchronization and push remain excluded.
+
+The migration is `20261002004151_data_controls`. `export_workspace_data()` is stable and owner-scoped; `delete_workspace_data()` is owner-scoped and transactional. Both revoke anonymous execution and fix their search path. `private.clear_workspace()` and `private.before_account_delete()` are inaccessible to anonymous/authenticated callers. Fixed table allowlists are verified against the catalog; update them whenever product tables are added. Privacy presentation is applied at tracking/planning query boundaries before client serialization; mutation results use the same masking rules.
+
 ### Migration sequence
 
 Phase 1: account/organization and auth initializer. Phase 2: challenges, habits, metrics, frequency targets, scoring, associations, and preference FK. Phase 3: fitness/sleep and source relationships. Phase 4: study/timer and source relationships. Phase 5: planning. Phase 6: query indexes/routines only when needed. Phase 7: reflection. Phase 8: data-control routines and any justified operational metadata.
@@ -226,12 +238,13 @@ Desktop/mobile use identical routes. Use `(auth)` and protected route groups for
 | 5 | `/plan`, `/tasks`, `/goals`, `/goals/[id]` | Weekly planner, outcomes, milestones |
 | 6 | `/insights` | Bounded analytics, heatmaps, comparisons |
 | 7 | `/reflection`, `/reflection/weekly/[weekStart]`, `/reflection/monthly/[month]` | Period history, review editors, statistics |
-| 8 | `/settings/[section]`, `/more` | Complete settings and mobile secondary navigation |
+| 7 | `/more` | Delivered mobile secondary navigation |
+| 8 | `/settings/organization`, `/settings/data` | Organization editors, private export, and deletion controls |
 | 8 | `GET /api/export`, `POST /api/account/delete` | Private versioned JSON download; recently verified account deletion |
 
 `/more` may be introduced when there are actual secondary destinations. Phase 2 navigation uses desktop feature links and a mobile Track hub. Date/month/week/challenge/tab selection belongs in URL parameters with validated formats. Edit/create actions primarily use dialogs/sheets. Invalid IDs return safe not-found states, never another user's data. A setup notice remains as a safe fallback for an environment missing the migration.
 
-Export includes a format version, generated timestamp, preferences, definitions, associations, logs, sessions, planning, and reviews for the caller. Exclude credentials, auth tokens, internal retry/timer secrets, and other owners. Private records are included with a clear download notice. The account deletion endpoint accepts no arbitrary target account and returns only operational outcome.
+Export includes a format version, generated timestamp, preferences, definitions, associations, logs, sessions, planning, and reviews for the caller. Exclude credentials, auth tokens, internal retry receipts, and other owners. Private records and active timer timestamps are included with a clear download notice. The account deletion endpoint accepts no arbitrary target account and returns only operational outcome.
 
 ## Component responsibilities
 

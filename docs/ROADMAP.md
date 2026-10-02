@@ -2,7 +2,7 @@
 
 ## Status
 
-**Phases 0–7 are complete in the configured development project as of October 2, 2026.** Phase 7 adds owned period-anchored reviews and Insights-derived adjacent statistics; its migration, security checks, and browser flows are recorded in QA. Phase 1's signup-confirmation/recovery email checks remain deferred until SMTP before production. Phases 8–9 have not started.
+**Phases 0–8 are complete in the configured development project as of October 2, 2026.** Phase 7 adds owned period-anchored reviews and Insights-derived adjacent statistics; its migration, security checks, and browser flows are recorded in QA. Phase 1's signup-confirmation/recovery email checks remain deferred until SMTP before production. Phase 8 adds verified private data controls, organization/calendar settings, and public offline behavior. Phase 9 has not started.
 
 The accepted plan calls for one phase at a time. Start with the earliest incomplete phase unless the user names a phase whose dependencies are already complete. Finish the phase's validation/documentation and stop with a handoff. Do not expand a phase into the entire application.
 
@@ -20,7 +20,7 @@ Read [AGENTS](../AGENTS.md), [PRODUCT](../PRODUCT.md), and the relevant [archite
 | 5 — Planning | 2 | Complete in development project |
 | 6 — Insights | 2, 3, 4 | Complete in development project |
 | 7 — Reflection | 6 | Complete in development project |
-| 8 — Settings and polish | 1–7 | Not started |
+| 8 — Settings and polish | 1–7 | Complete in development project |
 | 9 — Final QA and release | 1–8 | Not started |
 
 Default delivery order is 0 → 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 → 9. Dependencies allow an explicitly requested alternate order for fitness/career/planning; they do not authorize parallel agents or unchecked skipping.
@@ -165,13 +165,15 @@ Verified: the Phase 7 migration and rollback-only hosted script pass on the matc
 
 ## Phase 8 — Settings and polish
 
-- [ ] Complete profile/appearance/timezone/week-start/target/organization/challenge/habit settings.
-- [ ] Finish Privacy Mode across notes/labels/tooltips/search/accessibility and the separate hide-private-Today preference.
-- [ ] Add private versioned JSON export, tracking-data deletion, recently verified account deletion, and isolated administrative client.
-- [ ] Add installable manifest/icons/theme metadata and public offline shell; explicitly exclude personal/auth/API responses from service-worker caches.
-- [ ] Finish light-theme, mobile, keyboard, contrast, reduced-motion, empty/error, chart-loading, and performance review.
+- [x] Complete profile/appearance/timezone/week-start/target/organization/challenge/habit settings.
+- [x] Finish Privacy Mode across notes/labels/tooltips/search/accessibility and the separate hide-private-Today preference.
+- [x] Add private versioned JSON export, tracking-data deletion, recently verified account deletion, and isolated administrative client.
+- [x] Add installable manifest/icons/theme metadata and public offline shell; explicitly exclude personal/auth/API responses from service-worker caches.
+- [x] Finish light-theme, mobile, keyboard, contrast, reduced-motion, empty/error, chart-loading, and performance review.
 
 Acceptance: export is complete and owner-scoped; account/data deletion matches its stated scope; administrative credentials are absent from browser assets; privacy has no secondary-label leaks; PWA installs and offline shell works without private caching; feature/security/e2e checks and lint/typecheck/build pass.
+
+Verified: all 48 desktop/mobile production browser checks pass. Phase 8 covers 24 protected routes per browser for private client payloads, light-theme accessibility, and horizontal overflow; data controls pass keyboard and tablet checks. Export/deletion SQL and hosted fixtures pass, the private credential scan finds no leaks, and Chromium installation eligibility/offline caches are verified. Real operating-system installation and staging/email checks remain Phase 9 gates. See [QA](QA.md).
 
 ## Phase 9 — Final QA and release
 
@@ -189,5 +191,12 @@ Acceptance: the complete [QA release checklist](QA.md) passes with evidence. Pen
 | --- | --- | --- |
 | 0 | September 30, 2026 | Nine Markdown files, 50 local links, preserved original source, balanced fences, phase/status review, illustrative math, and staged whitespace checks passed; see QA |
 | 1 | October 1, 2026 | Foundation code/migrations/types delivered; lint/typecheck/build, 11 unit tests, 66 database checks, 16 real browser checks, hosted ownership/advisors, and responsive/accessibility review passed. Email tests explicitly deferred by the user until SMTP setup before production; see QA |
+| 2 | October 1, 2026 | Shared trackers, historical scheduling/scoring, migrations/types, hosted security, and production tracking gates verified; see QA |
+| 3 | October 1, 2026 | Fitness source/workout migrations, concurrent water, ownership, and 22 production browser checks verified; see QA |
+| 4 | October 1, 2026 | Career source/timer migration, recovery/retry security, and 24 production browser regressions verified; see QA |
+| 5 | October 1, 2026 | Planning migrations, all goal modes, carry/reorder ownership, and 30 production browser checks verified; see QA |
+| 6 | October 1, 2026 | Shared bounded analytics, 40 domain/96 SQL cases and 34 production browser checks verified; see QA |
+| 7 | October 2, 2026 | Owned reviews, shared period statistics, hosted migration/security checks, and focused browser gates verified; all regressions subsequently pass in Phase 8 |
+| 8 | October 2, 2026 | 41 domain, 106 database, 48 real browser checks; hosted data controls, types, lint/typecheck/build, privacy, exports/deletion, and public offline shell verified; see QA |
 
 Add an entry only after its gate passes. Keep later phases uncompleted until actual verification.
