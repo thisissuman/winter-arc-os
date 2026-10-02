@@ -8,7 +8,7 @@ web
 
 ## Status and authority
 
-Accepted product contract for V1; foundation, core tracking, fitness, Career, Planning, and Insights are implemented in the configured development project. Feature implementation continues one requested phase at a time. This document records the user's specification and confirmed planning decisions. The [original specification](docs/MASTER_SPEC.md) is preserved unchanged. Calculation details belong in [SCORING](docs/SCORING.md), implementation details in [ARCHITECTURE](docs/ARCHITECTURE.md), and delivery status in [ROADMAP](docs/ROADMAP.md).
+Accepted product contract for V1; foundation, core tracking, fitness, Career, Planning, Insights, and Reflection are implemented in the configured development project. Feature implementation continues one requested phase at a time. This document records the user's specification and confirmed planning decisions. The [original specification](docs/MASTER_SPEC.md) is preserved unchanged. Calculation details belong in [SCORING](docs/SCORING.md), implementation details in [ARCHITECTURE](docs/ARCHITECTURE.md), and delivery status in [ROADMAP](docs/ROADMAP.md).
 
 ## Verification decision — October 1, 2026
 
@@ -116,4 +116,4 @@ Use the required stack documented in README. No AI cost or API is necessary. Def
 
 ## Evidence on hand
 
-The original written specification and accepted plan define the product. Phases 1–5 have migrated development schemas; Phase 6 reuses those schemas and verifies foundation/tracking/fitness/Career/Planning/Insights checks. There are no production tracking records, integrations, or brand assets. Synthetic fixtures may be used in tests only; they must never be represented as the user's actual analytics.
+The original written specification and accepted plan define the product. Phases 1–5 and 7 have migrated development schemas; Phase 6 reuses owned source tables. Reflection stores only written responses and optional ratings; its adjacent statistics derive from source records through the Insights calculations. There are no production tracking records, integrations, or brand assets. Synthetic fixtures may be used in tests only; they must never be represented as the user's actual analytics.

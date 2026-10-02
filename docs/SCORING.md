@@ -143,6 +143,8 @@ Heatmaps distinguish no eligible inputs, eligible zero performance, partial scor
 
 Week-over-week comparisons of open periods compare equivalent elapsed local weekdays and disclose coverage. An entire previous week is not compared to three current days without a label. Historical aggregate views use historical rules, not today's targets.
 
+Reflection context uses the same Insights report for its saved week or month, with the end capped at the current business date. It does not save a score snapshot or score the writing itself. A later correction to a source log can change adjacent statistics, while the written response and stored period anchor remain unchanged. Empty eligible inputs show no score, and recorded/expected coverage remains visible beside the reflection.
+
 Challenge timing: `total_days = end - start + 1`; within range `day_number = date - start + 1`. Show upcoming/finished states outside the range. End-of-day time progress is clamped `day_number / total_days`; days after today are `max(end - date, 0)`, labelled as such. On September 30, 2026 the seed challenge is day 30 of 92, time progress 32.6%, with 62 days after today. This time progress is never tracking adherence.
 
 ## Required calculation cases

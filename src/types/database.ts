@@ -966,6 +966,60 @@ export type Database = {
           },
         ]
       }
+      monthly_reflections: {
+        Row: {
+          biggest_failures: string
+          biggest_wins: string
+          career_progress: string
+          changes_next_month: string
+          created_at: string
+          fitness_progress: string
+          habits_improved: string
+          habits_slipped: string
+          id: string
+          month_start: string
+          notes: string
+          revision: number
+          timezone: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          biggest_failures?: string
+          biggest_wins?: string
+          career_progress?: string
+          changes_next_month?: string
+          created_at?: string
+          fitness_progress?: string
+          habits_improved?: string
+          habits_slipped?: string
+          id?: string
+          month_start: string
+          notes?: string
+          revision?: number
+          timezone: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          biggest_failures?: string
+          biggest_wins?: string
+          career_progress?: string
+          changes_next_month?: string
+          created_at?: string
+          fitness_progress?: string
+          habits_improved?: string
+          habits_slipped?: string
+          id?: string
+          month_start?: string
+          notes?: string
+          revision?: number
+          timezone?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           created_at: string
@@ -1572,6 +1626,66 @@ export type Database = {
           },
         ]
       }
+      weekly_reviews: {
+        Row: {
+          created_at: string
+          difficulties: string
+          energy: number | null
+          focus: number | null
+          id: string
+          lessons: string
+          mood: number | null
+          motivation: number | null
+          next_week_changes: string
+          revision: number
+          stress: number | null
+          timezone: string
+          updated_at: string
+          user_id: string
+          week_start: string
+          week_starts_on: number
+          wins: string
+        }
+        Insert: {
+          created_at?: string
+          difficulties?: string
+          energy?: number | null
+          focus?: number | null
+          id?: string
+          lessons?: string
+          mood?: number | null
+          motivation?: number | null
+          next_week_changes?: string
+          revision?: number
+          stress?: number | null
+          timezone: string
+          updated_at?: string
+          user_id: string
+          week_start: string
+          week_starts_on: number
+          wins?: string
+        }
+        Update: {
+          created_at?: string
+          difficulties?: string
+          energy?: number | null
+          focus?: number | null
+          id?: string
+          lessons?: string
+          mood?: number | null
+          motivation?: number | null
+          next_week_changes?: string
+          revision?: number
+          stress?: number | null
+          timezone?: string
+          updated_at?: string
+          user_id?: string
+          week_start?: string
+          week_starts_on?: number
+          wins?: string
+        }
+        Relationships: []
+      }
       workout_exercises: {
         Row: {
           created_at: string
@@ -1813,6 +1927,7 @@ export type Database = {
       save_fitness_sleep: { Args: { p_input: Json }; Returns: Json }
       save_fitness_workout: { Args: { p_input: Json }; Returns: Json }
       save_goal_milestone: { Args: { p_input: Json }; Returns: Json }
+      save_monthly_reflection: { Args: { p_input: Json }; Returns: Json }
       save_planning_goal: { Args: { p_input: Json }; Returns: Json }
       save_planning_task: { Args: { p_input: Json }; Returns: Json }
       save_study_category: { Args: { p_input: Json }; Returns: Json }
@@ -1823,6 +1938,7 @@ export type Database = {
       save_tracking_metric: { Args: { p_input: Json }; Returns: string }
       save_tracking_score_category: { Args: { p_input: Json }; Returns: string }
       save_tracking_score_policy: { Args: { p_input: Json }; Returns: string }
+      save_weekly_review: { Args: { p_input: Json }; Returns: Json }
       set_planning_task_status: {
         Args: { p_expected_revision: number; p_id: string; p_status: string }
         Returns: Json

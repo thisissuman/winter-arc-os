@@ -2,7 +2,7 @@
 
 ## Status and ownership
 
-Phases 1–6 implement foundation, core tracking, fitness, Career, Planning, and Insights in the configured development project. Planning lives in `supabase/migrations/20261001104654_planning.sql` plus two follow-up migrations. Insights uses those existing owned tables and indexes without a new migration; Reflection and later subsystems remain a blueprint. Phase 1 signup/confirmation/recovery email verification is deferred until SMTP setup before production; see PRODUCT and QA. Product requirements are in [PRODUCT](../PRODUCT.md), calculations in [SCORING](SCORING.md), and visual conventions in [DESIGN](../DESIGN.md).
+Phases 1–7 implement foundation, core tracking, fitness, Career, Planning, Insights, and Reflection in the configured development project. Planning lives in `supabase/migrations/20261001104654_planning.sql` plus two follow-up migrations. Insights uses existing owned tables and indexes without a new migration; Reflection lives in `supabase/migrations/20261001160428_reflection.sql`. Phase 1 signup/confirmation/recovery email verification is deferred until SMTP setup before production; see PRODUCT and QA. Product requirements are in [PRODUCT](../PRODUCT.md), calculations in [SCORING](SCORING.md), and visual conventions in [DESIGN](../DESIGN.md).
 
 ## Application boundaries
 
@@ -19,6 +19,7 @@ Use one Next.js App Router application deployed to Vercel, with Supabase Auth an
 | `src/features/fitness` | Fitness-domain summaries, server actions, and focused UI; trend charts load only on fitness routes |
 | `src/features/planning` | Owned task and goal reads, checked actions, forms, and pure goal-progress calculations |
 | `src/features/insights` | Bounded filter validation, historical report calculations, accessible heatmaps, and route-local score chart |
+| `src/features/reflection` | Owned period reads, validated save actions, writing forms, and adjacent Insights-derived statistics |
 | `src/lib` | Shared validation and authenticated server helpers |
 | `src/types` | Generated database types and shared domain interfaces |
 | `supabase/migrations`, `supabase/tests` | Incremental schema/security changes and SQL tests |
@@ -179,7 +180,7 @@ Reordering has keyboard/button controls. Carry-forward actions select unfinished
 
 The report calls the same effective-dated `scoreForPeriod`, `evaluateHabit`, and `metricDailyValue` functions used by Today. The `through` option evaluates a selected part of a weekly period without changing the historical policy; the latest non-overlapping prior week is cut to the same elapsed number of calendar days, including across week-start changes. Daily score trends and overall/Fitness/Career heatmaps retain null for no eligible score, zero for an eligible zero, coverage counts, and an in-progress label. Habit heatmaps/rankings use due daily opportunities, exclude today's pending opportunity, and count skipped dates as zero. Source summaries retain raw units and recorded-day denominators; drafts do not count as completed workouts. Study time uses retained session timezones and splits at local midnight. The organizational category filter narrows habits, metrics, and study summaries; score policy categories remain independent and whole-context, clearly labelled in the UI. Chart data loads only on the Insights route and has adjacent text, numeric heatmap cells, and accessible date/value labels. Private tracker and study-category labels are masked in Privacy Mode.
 
-### Reflection — Phase 7
+### Reflection — Phase 7 (implemented)
 
 | Table | Specific fields and relationships |
 | --- | --- |
@@ -187,6 +188,10 @@ The report calls the same effective-dated `scoreForPeriod`, `evaluateHabit`, and
 | `monthly_reflections` | First-of-month date, wins/failures, improved/slipped habits, fitness/career progress, changes, notes; unique user/month |
 
 Store the actual selected period anchor; changing a week-start preference must not relabel prior reviews. Adjacent statistics are computed from shared analytics, not copied invented snapshots.
+
+The weekly row stores its week-start ISO weekday and timezone at creation. A new week must begin on the user's current preferred weekday; an existing row can be edited after that preference changes. The monthly anchor is the first day of its month. Both tables enforce one row per owner/period, 4,000-character response limits, and 1–5 nullable weekly ratings. Direct writes are revoked; owner-checked `save_weekly_review` and `save_monthly_reflection` RPCs validate current/past periods and expected revisions before inserting or editing. Authenticated reads use RLS and explicit owner filters. A stale editor reports a conflict instead of overwriting a later version.
+
+`/reflection` lists the current periods and saved history. `/reflection/weekly/[weekStart]` and `/reflection/monthly/[month]` validate URL anchors, show saved forms, and truncate current-period statistics at today. Their context panel calls `buildInsightReport` with the same source query and historical scoring rules as Insights. It stores no calculated snapshots. Privacy Mode omits written responses and the editor from the rendered page while leaving aggregate numbers visible. Mobile's More hub exposes Reflection, Challenges, and Settings.
 
 ### Migration sequence
 

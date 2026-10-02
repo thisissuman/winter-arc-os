@@ -115,6 +115,9 @@ test("authenticated account persists, profile saves, theme changes, and logout p
     await page.screenshot({ path: "test-results/today-tablet.png", fullPage: true });
     await page.setViewportSize(viewport);
   }
+  if (testInfo.project.name === "mobile") {
+    await page.getByRole("navigation", { name: "Mobile navigation" }).getByRole("link", { name: "More" }).click();
+  }
   await page.getByRole("link", { name: "Settings", exact: true }).click();
   await expect(page.getByLabel("Display name")).toBeVisible();
   const issued = await browserSession(context);

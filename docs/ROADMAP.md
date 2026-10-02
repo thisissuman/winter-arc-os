@@ -2,7 +2,7 @@
 
 ## Status
 
-**Phases 0–6 are complete in the configured development project as of October 1, 2026.** Phase 6 Insights reuses the owned source tables and historical calculations; domain, query-boundary, production build, and desktop/mobile browser checks pass. Phase 1's signup-confirmation/recovery email checks remain deferred until SMTP before production. Phases 7–9 have not started.
+**Phases 0–7 are complete in the configured development project as of October 2, 2026.** Phase 7 adds owned period-anchored reviews and Insights-derived adjacent statistics; its migration, security checks, and browser flows are recorded in QA. Phase 1's signup-confirmation/recovery email checks remain deferred until SMTP before production. Phases 8–9 have not started.
 
 The accepted plan calls for one phase at a time. Start with the earliest incomplete phase unless the user names a phase whose dependencies are already complete. Finish the phase's validation/documentation and stop with a handoff. Do not expand a phase into the entire application.
 
@@ -19,7 +19,7 @@ Read [AGENTS](../AGENTS.md), [PRODUCT](../PRODUCT.md), and the relevant [archite
 | 4 — Career | 2 | Complete in development project; release gates remain in QA |
 | 5 — Planning | 2 | Complete in development project |
 | 6 — Insights | 2, 3, 4 | Complete in development project |
-| 7 — Reflection | 6 | Not started |
+| 7 — Reflection | 6 | Complete in development project |
 | 8 — Settings and polish | 1–7 | Not started |
 | 9 — Final QA and release | 1–8 | Not started |
 
@@ -155,11 +155,13 @@ Verified: seven pure Insights tests cover filter bounds, source totals, no-score
 
 ## Phase 7 — Reflection
 
-- [ ] Add owned weekly reviews with wins/difficulties/lessons/changes and optional ratings.
-- [ ] Add monthly reflections with all requested prompts and notes.
-- [ ] Display adjacent period statistics via shared analytics and preserve period anchors across preference changes.
+- [x] Add owned weekly reviews with wins/difficulties/lessons/changes and optional ratings.
+- [x] Add monthly reflections with all requested prompts and notes.
+- [x] Display adjacent period statistics via shared analytics and preserve period anchors across preference changes.
 
 Acceptance: one review per user/period; saving/reopening/editing works; ratings/date boundaries validate; statistics agree with Insights; privacy and ownership tests and lint/typecheck/build pass.
+
+Verified: the Phase 7 migration and rollback-only hosted script pass on the matching development project. Isolated PostgreSQL tests cover one-per-period, revisions, retained week anchors, ratings/date constraints, direct-write restrictions, and cross-owner reads. Reflection browser checks exercise saved edits, statistics parity with Insights, invalid routes, Privacy Mode, accessibility, and mobile layout. See [QA](QA.md) for exact command outcomes and remaining release gates.
 
 ## Phase 8 — Settings and polish
 
