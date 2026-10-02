@@ -2,7 +2,7 @@
 
 ## Status
 
-**Phases 0–8 are complete in the configured development project as of October 2, 2026.** Phase 7 adds owned period-anchored reviews and Insights-derived adjacent statistics; its migration, security checks, and browser flows are recorded in QA. Phase 1's signup-confirmation/recovery email checks remain deferred until SMTP before production. Phase 8 adds verified private data controls, organization/calendar settings, and public offline behavior. Phase 9 has not started.
+**Phases 0–8 are complete in the configured development project as of October 2, 2026.** Phase 7 adds owned period-anchored reviews and Insights-derived adjacent statistics; its migration, security checks, and browser flows are recorded in QA. Phase 1's signup-confirmation/recovery email checks remain deferred until SMTP before production. Phase 8 adds verified private data controls, organization/calendar settings, and public offline behavior. The [UI/UX refinement plan](UI_REFINEMENT_PLAN.md) is in progress before Phase 9; its current phase A has not been implemented. Phase 9 has not started.
 
 The accepted plan calls for one phase at a time. Start with the earliest incomplete phase unless the user names a phase whose dependencies are already complete. Finish the phase's validation/documentation and stop with a handoff. Do not expand a phase into the entire application.
 
@@ -21,9 +21,10 @@ Read [AGENTS](../AGENTS.md), [PRODUCT](../PRODUCT.md), and the relevant [archite
 | 6 — Insights | 2, 3, 4 | Complete in development project |
 | 7 — Reflection | 6 | Complete in development project |
 | 8 — Settings and polish | 1–7 | Complete in development project |
-| 9 — Final QA and release | 1–8 | Not started |
+| UI/UX refinement — A–G | 8 | In progress; A selected, implementation not started |
+| 9 — Final QA and release | 1–8, UI/UX refinement | Not started |
 
-Default delivery order is 0 → 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 → 9. Dependencies allow an explicitly requested alternate order for fitness/career/planning; they do not authorize parallel agents or unchecked skipping.
+Default delivery order is 0 → 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 → UI/UX refinement A–G → 9. Dependencies allow an explicitly requested alternate order for fitness/career/planning; they do not authorize parallel agents or unchecked skipping.
 
 A phase is complete only when its delivery and verification gates are checked with evidence. Missing credentials/tooling may prevent verification; record the unmet gate and actual blocker rather than claiming completion. Include loading/empty/error handling, relevant accessibility, mobile behavior, privacy, and ownership from the first feature delivery.
 
@@ -174,6 +175,10 @@ Verified: the Phase 7 migration and rollback-only hosted script pass on the matc
 Acceptance: export is complete and owner-scoped; account/data deletion matches its stated scope; administrative credentials are absent from browser assets; privacy has no secondary-label leaks; PWA installs and offline shell works without private caching; feature/security/e2e checks and lint/typecheck/build pass.
 
 Verified: all 48 desktop/mobile production browser checks pass. Phase 8 covers 24 protected routes per browser for private client payloads, light-theme accessibility, and horizontal overflow; data controls pass keyboard and tablet checks. Export/deletion SQL and hosted fixtures pass, the private credential scan finds no leaks, and Chromium installation eligibility/offline caches are verified. Real operating-system installation and staging/email checks remain Phase 9 gates. See [QA](QA.md).
+
+## UI/UX refinement — before final QA
+
+The approved [UI/UX refinement plan](UI_REFINEMENT_PLAN.md) defines seven sequential design and interface phases with their own acceptance gates. Phase A is current, with implementation not started. Finish and verify A–G before beginning Phase 9; keep business logic, database logic, routes, auth/privacy boundaries, and responsive behavior intact.
 
 ## Phase 9 — Final QA and release
 
