@@ -2,7 +2,11 @@
 
 ## Status
 
-Accepted calculation contract implemented in `src/features/tracking/dates.ts` and `domain.ts`, with recorded-day fitness summaries in `src/features/fitness/domain.ts` and split-day study summaries in `src/features/career/domain.ts`. Focused tests cover historical scoring, sleep/gym, and study across midnight and daylight-saving transitions. Phase 4 migrations are applied to the configured development project. All examples below are illustrative fixtures, not actual user performance. See [PRODUCT](../PRODUCT.md), [schema design](ARCHITECTURE.md), and [QA](QA.md).
+Accepted calculation contract implemented in `src/features/tracking/dates.ts` and `domain.ts`, with recorded-day fitness summaries in `src/features/fitness/domain.ts` and split-day study summaries in `src/features/career/domain.ts`. Focused tests cover historical scoring, sleep/gym, and study across midnight and daylight-saving transitions. Phase 5 migrations are applied to the configured development project. Tasks and goals are planning records and do not contribute to daily or weekly scores. All examples below are illustrative fixtures, not actual user performance. See [PRODUCT](../PRODUCT.md), [schema design](ARCHITECTURE.md), and [QA](QA.md).
+
+## Insights comparison semantics
+
+Insights calls the same date-specific score evaluator as Today. A bounded `through` date may stop a weekly evaluation before its end to compare equal elapsed portions of two weeks; each week still selects its own effective historical policy, quota rule, and week-start context. If a week-start change makes the period containing the preceding day overlap the selected week, comparison steps back to the latest non-overlapping historical week. A partial historical week in such a comparison is labelled in progress for the selected portion, not presented as a full-week final score. Missing eligible logs remain zero contributions with lower recorded coverage; no eligible score stays null. The tracker-category filter narrows source and habit analysis only, because organizational categories do not replace score policy categories or their weights.
 
 ## Calendar and effective rules
 
@@ -138,6 +142,8 @@ Timestamped study sessions split elapsed seconds at local midnight using their r
 Heatmaps distinguish no eligible inputs, eligible zero performance, partial score, today, and future. Tooltips/text alternatives show date, score or absence reason, and completed/required inputs. Bounded category/source heatmaps use the same eligibility rules.
 
 Week-over-week comparisons of open periods compare equivalent elapsed local weekdays and disclose coverage. An entire previous week is not compared to three current days without a label. Historical aggregate views use historical rules, not today's targets.
+
+Reflection context uses the same Insights report for its saved week or month, with the end capped at the current business date. It does not save a score snapshot or score the writing itself. A later correction to a source log can change adjacent statistics, while the written response and stored period anchor remain unchanged. Empty eligible inputs show no score, and recorded/expected coverage remains visible beside the reflection.
 
 Challenge timing: `total_days = end - start + 1`; within range `day_number = date - start + 1`. Show upcoming/finished states outside the range. End-of-day time progress is clamped `day_number / total_days`; days after today are `max(end - date, 0)`, labelled as such. On September 30, 2026 the seed challenge is day 30 of 92, time progress 32.6%, with 62 days after today. This time progress is never tracking adherence.
 

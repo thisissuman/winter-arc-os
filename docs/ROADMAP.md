@@ -2,7 +2,7 @@
 
 ## Status
 
-**Phases 0–4 are complete in the configured development project as of October 1, 2026.** Phase 4 Career migration, generated types, local/hosted security checks, production build, and desktop/mobile browser checks pass. Phase 1's signup-confirmation/recovery email checks remain deferred until SMTP before production. Phases 5–9 have not started.
+**Phases 0–8 are complete in the configured development project as of October 2, 2026.** Phase 7 adds owned period-anchored reviews and Insights-derived adjacent statistics; its migration, security checks, and browser flows are recorded in QA. Phase 1's signup-confirmation/recovery email checks remain deferred until SMTP before production. Phase 8 adds verified private data controls, organization/calendar settings, and public offline behavior. The [UI/UX refinement plan](UI_REFINEMENT_PLAN.md) is in progress before Phase 9; Phases A–E are complete. F/G code and automated validation are delivered, with physical-device and actual screen-reader gates open. Phase 9 has not started.
 
 The accepted plan calls for one phase at a time. Start with the earliest incomplete phase unless the user names a phase whose dependencies are already complete. Finish the phase's validation/documentation and stop with a handoff. Do not expand a phase into the entire application.
 
@@ -17,13 +17,14 @@ Read [AGENTS](../AGENTS.md), [PRODUCT](../PRODUCT.md), and the relevant [archite
 | 2 — Core tracking | 1 | Complete in development project; release gates remain in QA |
 | 3 — Fitness | 2 | Complete in development project; release gates remain in QA |
 | 4 — Career | 2 | Complete in development project; release gates remain in QA |
-| 5 — Planning | 2 | Not started |
-| 6 — Insights | 2, 3, 4 | Not started |
-| 7 — Reflection | 6 | Not started |
-| 8 — Settings and polish | 1–7 | Not started |
-| 9 — Final QA and release | 1–8 | Not started |
+| 5 — Planning | 2 | Complete in development project |
+| 6 — Insights | 2, 3, 4 | Complete in development project |
+| 7 — Reflection | 6 | Complete in development project |
+| 8 — Settings and polish | 1–7 | Complete in development project |
+| UI/UX refinement — A–G | 8 | In progress; A–E complete, F/G device and assistive-technology gates open |
+| 9 — Final QA and release | 1–8, UI/UX refinement | Not started |
 
-Default delivery order is 0 → 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 → 9. Dependencies allow an explicitly requested alternate order for fitness/career/planning; they do not authorize parallel agents or unchecked skipping.
+Default delivery order is 0 → 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 → UI/UX refinement A–G → 9. Dependencies allow an explicitly requested alternate order for fitness/career/planning; they do not authorize parallel agents or unchecked skipping.
 
 A phase is complete only when its delivery and verification gates are checked with evidence. Missing credentials/tooling may prevent verification; record the unmet gate and actual blocker rather than claiming completion. Include loading/empty/error handling, relevant accessibility, mobile behavior, privacy, and ownership from the first feature delivery.
 
@@ -134,38 +135,50 @@ Verified: the local SQL suite exercises category/session ownership, retained man
 
 ## Phase 5 — Planning
 
-- [ ] Deliver seven-day tasks, CRUD, priority/category/duration, keyboard reorder, and date selection.
-- [ ] Add atomic/retry-safe move/copy unfinished actions with explicit distinction between move and copy.
-- [ ] Add goals, all three progress modes, metric intervals/baselines/targets, milestones, and owned challenge relationships.
+- [x] Deliver seven-day tasks, CRUD, priority/category/duration, keyboard reorder, and date selection.
+- [x] Add atomic/retry-safe move/copy unfinished actions with explicit distinction between move and copy.
+- [x] Add goals, all three progress modes, metric intervals/baselines/targets, milestones, and owned challenge relationships.
 
 Acceptance: completed tasks are not carried forward; copied retries do not duplicate tasks; estimates and actual duration remain separate; manual/milestone/metric progress and empty milestones work; tasks do not inflate scores; ownership, keyboard/mobile flows, domain tests, and lint/typecheck/build pass.
 
+Verified: the three Planning migrations are applied to the matching development project, full public types regenerated, and hosted rollback-only ownership checks passed. Local SQL checks cover RLS, relationships, revisions, carry retries and completed exclusions. Domain checks cover all three progress modes and missing/zero behavior. Desktop/mobile browser flows cover task creation, reorder/copy/move, all goal modes, accessibility, and horizontal overflow. The complete check counts are recorded in [QA](QA.md); SMTP and full-container replay remain release gates.
+
 ## Phase 6 — Insights
 
-- [ ] Reuse shared calculations for score/consistency, protein/sleep/weight/gym/study summaries, and category breakdown.
-- [ ] Add bounded date/challenge/category filters, overall/fitness/career/habit heatmaps, rankings, and comparable-period changes.
-- [ ] Show missing-data coverage, historical expectations, units, text alternatives, and in-progress status.
-- [ ] Add only justified query indexes/routines; preserve caller ownership and private caching rules.
+- [x] Reuse shared calculations for score/consistency, protein/sleep/weight/gym/study summaries, and category breakdown.
+- [x] Add bounded date/challenge/category filters, overall/fitness/career/habit heatmaps, rankings, and comparable-period changes.
+- [x] Show missing-data coverage, historical expectations, units, text alternatives, and in-progress status.
+- [x] Reuse existing owner/date indexes; preserve caller ownership and private caching rules without a new migration.
 
 Acceptance: chart totals match source fixtures; missing and zero remain distinct; open weeks use comparable elapsed coverage; historical rules survive later edits; no fake charts or future scores; RLS/query/domain tests and lint/typecheck/build pass.
 
+Verified: seven pure Insights tests cover filter bounds, source totals, no-score versus zero, historical target versions, equivalent open-week portions, historical week-start changes, and category-scoped habits. Existing RLS/migration checks pass unchanged; the route reuses existing owner/date indexes and needs no new migration. Desktop/mobile browser checks cover filters, protected IDs, four heatmaps, accessibility, and overflow. Exact command outcomes are recorded in [QA](QA.md).
+
 ## Phase 7 — Reflection
 
-- [ ] Add owned weekly reviews with wins/difficulties/lessons/changes and optional ratings.
-- [ ] Add monthly reflections with all requested prompts and notes.
-- [ ] Display adjacent period statistics via shared analytics and preserve period anchors across preference changes.
+- [x] Add owned weekly reviews with wins/difficulties/lessons/changes and optional ratings.
+- [x] Add monthly reflections with all requested prompts and notes.
+- [x] Display adjacent period statistics via shared analytics and preserve period anchors across preference changes.
 
 Acceptance: one review per user/period; saving/reopening/editing works; ratings/date boundaries validate; statistics agree with Insights; privacy and ownership tests and lint/typecheck/build pass.
 
+Verified: the Phase 7 migration and rollback-only hosted script pass on the matching development project. Isolated PostgreSQL tests cover one-per-period, revisions, retained week anchors, ratings/date constraints, direct-write restrictions, and cross-owner reads. Reflection browser checks exercise saved edits, statistics parity with Insights, invalid routes, Privacy Mode, accessibility, and mobile layout. See [QA](QA.md) for exact command outcomes and remaining release gates.
+
 ## Phase 8 — Settings and polish
 
-- [ ] Complete profile/appearance/timezone/week-start/target/organization/challenge/habit settings.
-- [ ] Finish Privacy Mode across notes/labels/tooltips/search/accessibility and the separate hide-private-Today preference.
-- [ ] Add private versioned JSON export, tracking-data deletion, recently verified account deletion, and isolated administrative client.
-- [ ] Add installable manifest/icons/theme metadata and public offline shell; explicitly exclude personal/auth/API responses from service-worker caches.
-- [ ] Finish light-theme, mobile, keyboard, contrast, reduced-motion, empty/error, chart-loading, and performance review.
+- [x] Complete profile/appearance/timezone/week-start/target/organization/challenge/habit settings.
+- [x] Finish Privacy Mode across notes/labels/tooltips/search/accessibility and the separate hide-private-Today preference.
+- [x] Add private versioned JSON export, tracking-data deletion, recently verified account deletion, and isolated administrative client.
+- [x] Add installable manifest/icons/theme metadata and public offline shell; explicitly exclude personal/auth/API responses from service-worker caches.
+- [x] Finish light-theme, mobile, keyboard, contrast, reduced-motion, empty/error, chart-loading, and performance review.
 
 Acceptance: export is complete and owner-scoped; account/data deletion matches its stated scope; administrative credentials are absent from browser assets; privacy has no secondary-label leaks; PWA installs and offline shell works without private caching; feature/security/e2e checks and lint/typecheck/build pass.
+
+Verified: all 48 desktop/mobile production browser checks pass. Phase 8 covers 24 protected routes per browser for private client payloads, light-theme accessibility, and horizontal overflow; data controls pass keyboard and tablet checks. Export/deletion SQL and hosted fixtures pass, the private credential scan finds no leaks, and Chromium installation eligibility/offline caches are verified. Real operating-system installation and staging/email checks remain Phase 9 gates. See [QA](QA.md).
+
+## UI/UX refinement — before final QA
+
+The approved [UI/UX refinement plan](UI_REFINEMENT_PLAN.md) defines seven sequential design and interface phases with their own acceptance gates. Phases A–E passed their recorded gates on October 2, 2026. F/G code and automated checks are delivered; finish physical-device and actual screen-reader verification before beginning Phase 9; keep business logic, database logic, routes, auth/privacy boundaries, and responsive behavior intact.
 
 ## Phase 9 — Final QA and release
 
@@ -183,5 +196,16 @@ Acceptance: the complete [QA release checklist](QA.md) passes with evidence. Pen
 | --- | --- | --- |
 | 0 | September 30, 2026 | Nine Markdown files, 50 local links, preserved original source, balanced fences, phase/status review, illustrative math, and staged whitespace checks passed; see QA |
 | 1 | October 1, 2026 | Foundation code/migrations/types delivered; lint/typecheck/build, 11 unit tests, 66 database checks, 16 real browser checks, hosted ownership/advisors, and responsive/accessibility review passed. Email tests explicitly deferred by the user until SMTP setup before production; see QA |
+| 2 | October 1, 2026 | Shared trackers, historical scheduling/scoring, migrations/types, hosted security, and production tracking gates verified; see QA |
+| 3 | October 1, 2026 | Fitness source/workout migrations, concurrent water, ownership, and 22 production browser checks verified; see QA |
+| 4 | October 1, 2026 | Career source/timer migration, recovery/retry security, and 24 production browser regressions verified; see QA |
+| 5 | October 1, 2026 | Planning migrations, all goal modes, carry/reorder ownership, and 30 production browser checks verified; see QA |
+| 6 | October 1, 2026 | Shared bounded analytics, 40 domain/96 SQL cases and 34 production browser checks verified; see QA |
+| 7 | October 2, 2026 | Owned reviews, shared period statistics, hosted migration/security checks, and focused browser gates verified; all regressions subsequently pass in Phase 8 |
+| 8 | October 2, 2026 | 41 domain, 106 database, 48 real browser checks; hosted data controls, types, lint/typecheck/build, privacy, exports/deletion, and public offline shell verified; see QA |
+| UI A | October 2, 2026 | Dark/light design tokens, mobile controls, contrast, focused desktop/mobile browser checks, 41 domain cases, lint/typecheck/build, and rendered review passed; see UI plan, DESIGN, and QA |
+| UI E | October 2, 2026 | Feature-page refinement, 42 Vitest cases, lint/typecheck/build, both-theme layout/axe scans, populated chart review, and passing evidence for all 62 browser cases across full run and corrected rerun; see QA. F/G device/assistive-technology gates remain open |
 
 Add an entry only after its gate passes. Keep later phases uncompleted until actual verification.
+
+October 2, 2026 — post-rollback A–G QA: lint/typecheck, 42 unit cases, production build, and all 62 browser cases have passing evidence across the 60/62 full run and corrected 4/4 Fitness rerun. No application changes were required. Component adoption is cancelled. F/G physical-device and actual screen-reader gates remain open; Phase 9 has not started. See QA for fixture cleanup, command results, and remaining limits.

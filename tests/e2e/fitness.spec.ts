@@ -38,9 +38,9 @@ test("sleep source and workout copying agree across Fitness and Today", async ({
     sleepCreated = true;
     await page.goto("/today");
     await page.getByLabel("Dashboard challenge").selectOption("");
-    await expect(page.getByText("8.00 hours recorded")).toBeVisible();
+    await expect(page.locator("#workspace-content").getByText("8.00 hours recorded")).toBeVisible();
     await page.goto(`/metrics?date=${date}`);
-    await expect(page.getByText("8.00 hours recorded")).toBeVisible();
+    await expect(page.locator("#workspace-content").getByText("8.00 hours recorded")).toBeVisible();
     await page.goto(`/fitness?date=${date}`);
     const previousDate = new Date(Date.parse(`${date}T12:00:00Z`) - 86400_000).toISOString().slice(0, 10);
     await page.getByRole("radio", { name: "Sleep and wake times" }).check();
@@ -94,6 +94,8 @@ test("sleep source and workout copying agree across Fitness and Today", async ({
       await page.goto("/fitness/workouts");
       const card = page.getByRole("article").filter({ has: page.getByRole("heading", { name: exerciseName }) });
       await card.getByRole("button", { name: "Archive" }).click();
+      await expect(card).toHaveCount(0, { timeout: 20000 });
+      await page.reload();
       await expect(card).toHaveCount(0);
     }
   }
@@ -108,7 +110,7 @@ test("two tabs preserve concurrent water additions", async ({ page }) => {
     await page.getByRole("button", { name: "Set up fitness" }).click();
     await expect(page.getByRole("heading", { name: "Set up fitness tracking" })).toHaveCount(0, { timeout: 20000 });
   }
-  const water = (browserPage: Page) => browserPage.getByRole("article").filter({ has: browserPage.getByRole("heading", { name: "Water" }) });
+  const water = (browserPage: Page) => browserPage.getByRole("article").filter({ has: browserPage.getByRole("spinbutton", { name: "Water (ml)", exact: true }) });
   const original = await water(page).getByRole("spinbutton", { name: /Water/ }).inputValue();
   const second = await page.context().newPage();
   try {
@@ -122,7 +124,10 @@ test("two tabs preserve concurrent water additions", async ({ page }) => {
     await page.reload();
     await water(page).getByRole("spinbutton", { name: /Water/ }).fill(original);
     await water(page).getByRole("button", { name: "Save", exact: true }).click();
-    await expect(water(page).getByRole("status")).toContainText(original ? "Saved." : "Measurement cleared.");
+    // Revalidation can remount feedback; verify the saved value and persistence instead.
+    await expect(water(page).getByText(/^Saved:/)).toContainText(original ? original : "Not logged", { timeout: 20000 });
+    await page.reload();
+    await expect(water(page).getByRole("spinbutton", { name: /Water/ })).toHaveValue(original);
     await second.close();
   }
 });

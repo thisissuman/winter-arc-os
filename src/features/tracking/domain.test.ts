@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import { addDays, inclusiveChallengeProgress, isBusinessDate, monthRange, weekRange } from "./dates";
 import { evaluateHabit, frequencyProgress, habitStreak, metricAdherence, metricDailyValue, scoreForPeriod } from "./domain";
 import { averageRecorded } from "@/features/fitness/domain";
+import { presentTrackingSnapshot } from "./privacy";
 import type { Habit, HabitLog, HabitSchedule, MetricDefinition, MetricLog, MetricTarget, ScoreCategory, ScoreItem, ScorePolicy, TrackingSnapshot } from "./types";
 
 const id = (suffix: string) => `00000000-0000-4000-8000-${suffix.padStart(12, "0")}`;
@@ -36,6 +37,19 @@ function snapshot(changes: Partial<TrackingSnapshot> = {}): TrackingSnapshot {
     ...changes,
   };
 }
+
+it("removes private labels and notes before client serialization without changing adherence", () => {
+  const tracked = snapshot({
+    privacyMode: true,
+    habits: [{ ...habit, is_private: true, name: "Sensitive behavior", description: "Sensitive description" }],
+    habitLogs: [{ ...owned, id: id("90"), habit_id: habit.id, business_date: "2026-10-01", timezone: "Asia/Kolkata", status: "completed", completion_count: 1, notes: "Sensitive notes", revision: 1 }],
+  });
+  const presented = presentTrackingSnapshot(tracked);
+  expect(JSON.stringify(presented)).not.toContain("Sensitive");
+  expect(presented.habitLogs[0].completion_count).toBe(1);
+  expect(scoreForPeriod(presented, { date: "2026-10-01", period: "daily" }).total).toBe(scoreForPeriod(tracked, { date: "2026-10-01", period: "daily" }).total);
+  expect(tracked.habits[0].name).toBe("Sensitive behavior");
+});
 const habitLog = (date: string, status: HabitLog["status"] = "completed", count = 1): HabitLog => ({ ...owned, id: id(date.replaceAll("-", "")), habit_id: habit.id, business_date: date, timezone: "Asia/Kolkata", status, completion_count: count, notes: "", revision: 1 });
 const metricLog = (date: string, value: number): MetricLog => ({ ...owned, id: id(`9${date.replaceAll("-", "")}`), metric_id: metric.id, business_date: date, timezone: "Asia/Kolkata", value, notes: "", revision: 1 });
 

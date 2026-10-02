@@ -2,7 +2,7 @@
 
 ## Status and ownership
 
-Phases 1–4 implement foundation, core tracking, fitness, and Career in the configured development project. Phase 4 lives in `supabase/migrations/20261001052104_career.sql`; it is applied after all Phase 3 migrations. Planning and later subsystems remain a blueprint. Phase 1 signup/confirmation/recovery email verification is deferred until SMTP setup before production; see PRODUCT and QA. Product requirements are in [PRODUCT](../PRODUCT.md), calculations in [SCORING](SCORING.md), and visual conventions in [DESIGN](../DESIGN.md).
+Phases 1–7 implement foundation, core tracking, fitness, Career, Planning, Insights, and Reflection in the configured development project. Planning lives in `supabase/migrations/20261001104654_planning.sql` plus two follow-up migrations. Insights uses existing owned tables and indexes without a new migration; Reflection lives in `supabase/migrations/20261001160428_reflection.sql`. Phase 1 signup/confirmation/recovery email verification is deferred until SMTP setup before production; see PRODUCT and QA. Product requirements are in [PRODUCT](../PRODUCT.md), calculations in [SCORING](SCORING.md), and visual conventions in [DESIGN](../DESIGN.md).
 
 ## Application boundaries
 
@@ -17,6 +17,9 @@ Use one Next.js App Router application deployed to Vercel, with Supabase Auth an
 | `src/lib/supabase` | Cookie-aware server/browser clients and session refresh |
 | `src/features/tracking/domain.ts`, `dates.ts` | Shared scheduling, source evaluation, score, and calendar calculations |
 | `src/features/fitness` | Fitness-domain summaries, server actions, and focused UI; trend charts load only on fitness routes |
+| `src/features/planning` | Owned task and goal reads, checked actions, forms, and pure goal-progress calculations |
+| `src/features/insights` | Bounded filter validation, historical report calculations, accessible heatmaps, and route-local score chart |
+| `src/features/reflection` | Owned period reads, validated save actions, writing forms, and adjacent Insights-derived statistics |
 | `src/lib` | Shared validation and authenticated server helpers |
 | `src/types` | Generated database types and shared domain interfaces |
 | `supabase/migrations`, `supabase/tests` | Incremental schema/security changes and SQL tests |
@@ -96,7 +99,7 @@ Testing replays migrations against isolated PGlite PostgreSQL with minimal test-
 
 The applied migration adds selected challenge and starter-applied metadata to preferences; 17 owned tracking tables including `tracking_operations` for retry receipts; same-owner composite references, indexes, update triggers, explicit RLS policies, and authenticated transaction functions. Direct authenticated access to the new tables is read-only; Server Actions use narrowly named `security definer` functions that verify `auth.uid()` again and fix `search_path`. Business dates and original capture timezone are stored on logs. Revisions prevent stale replacement writes, and operation UUIDs make water-style increments retry-safe. The follow-up migration covers the composite score-item policy/category foreign key.
 
-`src/features/tracking/queries.ts` pages owner-filtered rows in batches rather than relying on the PostgREST default limit. `src/types/database.ts` is generated from the hosted Phase 4 public schema. Supabase widens CHECK-constrained text columns to `string`; the domain boundary narrows them to the literals enforced by verified SQL constraints. Challenge associations share tracker definitions and logs; the optional starter is a single idempotent function guarded by `starter_applied_on`. It inserts no completion, measurement, or study-session records.
+`src/features/tracking/queries.ts` pages owner-filtered rows in batches rather than relying on the PostgREST default limit. `src/types/database.ts` is generated from the hosted Phase 5 public schema. Supabase widens CHECK-constrained text columns to `string`; the domain boundary narrows them to the literals enforced by verified SQL constraints. Challenge associations share tracker definitions and logs; the optional starter is a single idempotent function guarded by `starter_applied_on`. It inserts no completion, measurement, or study-session records.
 
 | Table | Specific fields and relationships |
 | --- | --- |
@@ -154,19 +157,30 @@ Manual duration-only sessions are attributed to the chosen date. Timestamped ses
 
 Start a timer only after the server creates its record. Render elapsed time from timestamps plus saved accumulated duration, not tick counts. Navigation/refresh resumes from server state through the workspace timer bar. Focus/visibility changes, a periodic read, and BroadcastChannel reconcile tabs; SQL revisions and the one-active partial index settle races. Finish locks the timer, creates one session, and marks the timer terminal in one transaction; repeated finish returns that session. Discard is an explicit terminal action. A browser confirmation reviews elapsed time above four hours before finishing; the database retains the complete value up to seven days. Running segments preserve pause gaps for split-day analytics. No second-by-second database writes or background worker is needed.
 
-### Planning — Phase 5
+### Planning — Phase 5 (implemented)
 
 | Table | Specific fields and relationships |
 | --- | --- |
 | `tasks` | Title, notes, date, status (`todo`, `in_progress`, `completed`), priority, category, position, estimated/actual seconds, optional goal/challenge |
 | `goals` | Title, description, category, target date, optional challenge, status, progress kind, manual percentage or metric reference/aggregation/baseline/target |
 | `goal_milestones` | Goal reference, title, position, completion timestamp |
+| `task_carry_operations` | Owner, operation UUID, source/target date, move/copy kind, result IDs; transactional result for retries |
 
 Manual progress is 0–100. Milestone progress is completed/total; no milestones means unconfigured, not 100%. Metric progress is clamped advancement from baseline toward target; reject equal baseline/target and support downward goals. Latest/sum/count aggregations are explicit and use the goal's configured interval. Milestones may exist on any goal, but only milestone mode derives its percentage from them.
 
 Reordering has keyboard/button controls. Carry-forward actions select unfinished tasks only; a move changes the existing date, a copy makes new IDs. Batch retries cannot duplicate copies. Tasks are not score inputs by default.
 
-### Reflection — Phase 7
+`/tasks` shows a seven-day board anchored to the user’s week-start preference and selected-day editor; `/plan` is the mobile planning entry. Task records retain separate estimated and actual integer seconds, completion time, position, and optimistic revision. `save_planning_task`, `set_planning_task_status`, and `move_planning_task` validate ownership and revisions. A per-user advisory transaction lock serializes task ordering and carry operations. `carry_planning_tasks` writes an owner-scoped receipt in the same transaction as its changes. A copy starts as `todo`, keeps its estimate, and clears recorded actual time; a move retains status and work. Completed tasks are excluded from both operations.
+
+`/goals` and `/goals/[id]` expose creation, editing, milestones, and all three progress modes. `save_planning_goal` and `save_goal_milestone` validate revision and owned category/challenge/metric relationships. Goal calculations use raw metric logs, study sessions, or sleep logs over the configured interval, distinguish missing from a measured zero, and support latest/sum/count aggregation and downward targets. Milestones remain attached when the progress mode changes. Private goal/task text is masked before passing it to interactive client components in Privacy Mode. The four tables have owner RLS and authenticated direct writes revoked; only checked RPCs mutate them. The hosted index follow-up covers the milestone owner FK. The copy-reset follow-up preserves earlier applied SQL and ensures copied work starts fresh.
+
+### Insights — Phase 6 (implemented)
+
+`/insights` accepts an inclusive range of 1–180 past or current business dates plus an owned challenge and an owned organizational tracker category. Invalid/future ranges and unknown filter IDs display an error without an analytics report. The server verifies the caller and uses the existing owner-scoped, paginated tracking query. In compact mode it bounds log, sleep, workout, and study-session reads by business date, includes a short preceding comparison window, and skips exercise/set/timer detail unrelated to Insights. Sessions may finish after a displayed day; the reader includes seven later completion dates so split-day study time is not lost. Existing `(user_id, business_date)` indexes cover the source reads. No schema migration or new RLS surface is required.
+
+The report calls the same effective-dated `scoreForPeriod`, `evaluateHabit`, and `metricDailyValue` functions used by Today. The `through` option evaluates a selected part of a weekly period without changing the historical policy; the latest non-overlapping prior week is cut to the same elapsed number of calendar days, including across week-start changes. Daily score trends and overall/Fitness/Career heatmaps retain null for no eligible score, zero for an eligible zero, coverage counts, and an in-progress label. Habit heatmaps/rankings use due daily opportunities, exclude today's pending opportunity, and count skipped dates as zero. Source summaries retain raw units and recorded-day denominators; drafts do not count as completed workouts. Study time uses retained session timezones and splits at local midnight. The organizational category filter narrows habits, metrics, and study summaries; score policy categories remain independent and whole-context, clearly labelled in the UI. Chart data loads only on the Insights route and has adjacent text, numeric heatmap cells, and accessible date/value labels. Private tracker and study-category labels are masked in Privacy Mode.
+
+### Reflection — Phase 7 (implemented)
 
 | Table | Specific fields and relationships |
 | --- | --- |
@@ -174,6 +188,22 @@ Reordering has keyboard/button controls. Carry-forward actions select unfinished
 | `monthly_reflections` | First-of-month date, wins/failures, improved/slipped habits, fitness/career progress, changes, notes; unique user/month |
 
 Store the actual selected period anchor; changing a week-start preference must not relabel prior reviews. Adjacent statistics are computed from shared analytics, not copied invented snapshots.
+
+The weekly row stores its week-start ISO weekday and timezone at creation. A new week must begin on the user's current preferred weekday; an existing row can be edited after that preference changes. The monthly anchor is the first day of its month. Both tables enforce one row per owner/period, 4,000-character response limits, and 1–5 nullable weekly ratings. Direct writes are revoked; owner-checked `save_weekly_review` and `save_monthly_reflection` RPCs validate current/past periods and expected revisions before inserting or editing. Authenticated reads use RLS and explicit owner filters. A stale editor reports a conflict instead of overwriting a later version.
+
+`/reflection` lists the current periods and saved history. `/reflection/weekly/[weekStart]` and `/reflection/monthly/[month]` validate URL anchors, show saved forms, and truncate current-period statistics at today. Their context panel calls `buildInsightReport` with the same source query and historical scoring rules as Insights. It stores no calculated snapshots. Privacy Mode omits written responses and the editor from the rendered page while leaving aggregate numbers visible. Mobile's More hub exposes Reflection, Challenges, and Settings.
+
+### Settings and data controls — Phase 8
+
+Organization settings manage owned life areas/categories with archive/restore, parent ownership checks, and stale-edit protection. Calendar preferences use the existing onboarding routine without applying starters. Target/tracker settings link to their delivered editors.
+
+The private export returns format version 1 from a single PostgreSQL statement snapshot. A fixed allowlist includes all owned product records, archived/private records, and active timer timestamps, excluding the three internal retry-receipt tables. No REST row cap truncates the arrays; the attachment is private/no-store.
+
+Delete workspace data removes tracking definitions, organization, challenges, logs, workout/study history, timers, planning, reviews, and operation receipts. It retains Auth, profile, calendar, theme, and privacy preferences; selected challenge and setup flags reset. Typed confirmation and a password check precede the authenticated transaction. Account deletion verifies the caller's password in the same request, requires typed account confirmation and same-origin POST, then calls Auth admin deletion using an isolated server-only secret client. A private before-delete Auth trigger clears children in dependency order inside the account deletion transaction, protecting restrictive relationships. No browser admin client or arbitrary target-user parameter is exposed.
+
+The PWA uses Next's manifest, local PNG icons, and a standalone public offline document. Its worker caches only `/offline.html` and the three local PNG icons in `winter-arc-public-v1`. Private navigations remain network-only, with a generic offline fallback on failure. API, Auth, RSC, and mutations are never cached or queued. Connection feedback explains unavailable writes; settings action wrappers catch network failures and preserve entered form text. Installation requires HTTPS or localhost and browser support; full offline synchronization and push remain excluded.
+
+The migration is `20261002004151_data_controls`. `export_workspace_data()` is stable and owner-scoped; `delete_workspace_data()` is owner-scoped and transactional. Both revoke anonymous execution and fix their search path. `private.clear_workspace()` and `private.before_account_delete()` are inaccessible to anonymous/authenticated callers. Fixed table allowlists are verified against the catalog; update them whenever product tables are added. Privacy presentation is applied at tracking/planning query boundaries before client serialization; mutation results use the same masking rules.
 
 ### Migration sequence
 
@@ -208,12 +238,13 @@ Desktop/mobile use identical routes. Use `(auth)` and protected route groups for
 | 5 | `/plan`, `/tasks`, `/goals`, `/goals/[id]` | Weekly planner, outcomes, milestones |
 | 6 | `/insights` | Bounded analytics, heatmaps, comparisons |
 | 7 | `/reflection`, `/reflection/weekly/[weekStart]`, `/reflection/monthly/[month]` | Period history, review editors, statistics |
-| 8 | `/settings/[section]`, `/more` | Complete settings and mobile secondary navigation |
+| 7 | `/more` | Delivered mobile secondary navigation |
+| 8 | `/settings/organization`, `/settings/data` | Organization editors, private export, and deletion controls |
 | 8 | `GET /api/export`, `POST /api/account/delete` | Private versioned JSON download; recently verified account deletion |
 
 `/more` may be introduced when there are actual secondary destinations. Phase 2 navigation uses desktop feature links and a mobile Track hub. Date/month/week/challenge/tab selection belongs in URL parameters with validated formats. Edit/create actions primarily use dialogs/sheets. Invalid IDs return safe not-found states, never another user's data. A setup notice remains as a safe fallback for an environment missing the migration.
 
-Export includes a format version, generated timestamp, preferences, definitions, associations, logs, sessions, planning, and reviews for the caller. Exclude credentials, auth tokens, internal retry/timer secrets, and other owners. Private records are included with a clear download notice. The account deletion endpoint accepts no arbitrary target account and returns only operational outcome.
+Export includes a format version, generated timestamp, preferences, definitions, associations, logs, sessions, planning, and reviews for the caller. Exclude credentials, auth tokens, internal retry receipts, and other owners. Private records and active timer timestamps are included with a clear download notice. The account deletion endpoint accepts no arbitrary target account and returns only operational outcome.
 
 ## Component responsibilities
 

@@ -450,6 +450,141 @@ export type Database = {
           },
         ]
       }
+      goal_milestones: {
+        Row: {
+          completed_at: string | null
+          created_at: string
+          goal_id: string
+          id: string
+          position: number
+          revision: number
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          completed_at?: string | null
+          created_at?: string
+          goal_id: string
+          id?: string
+          position?: number
+          revision?: number
+          title: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          completed_at?: string | null
+          created_at?: string
+          goal_id?: string
+          id?: string
+          position?: number
+          revision?: number
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "goal_milestones_goal_id_user_id_fkey"
+            columns: ["goal_id", "user_id"]
+            isOneToOne: false
+            referencedRelation: "goals"
+            referencedColumns: ["id", "user_id"]
+          },
+        ]
+      }
+      goals: {
+        Row: {
+          category_id: string | null
+          challenge_id: string | null
+          created_at: string
+          description: string
+          id: string
+          is_private: boolean
+          manual_percent: number
+          metric_aggregation: string | null
+          metric_baseline: number | null
+          metric_end_date: string | null
+          metric_id: string | null
+          metric_start_date: string | null
+          metric_target: number | null
+          progress_mode: string
+          revision: number
+          status: string
+          target_date: string | null
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          category_id?: string | null
+          challenge_id?: string | null
+          created_at?: string
+          description?: string
+          id?: string
+          is_private?: boolean
+          manual_percent?: number
+          metric_aggregation?: string | null
+          metric_baseline?: number | null
+          metric_end_date?: string | null
+          metric_id?: string | null
+          metric_start_date?: string | null
+          metric_target?: number | null
+          progress_mode?: string
+          revision?: number
+          status?: string
+          target_date?: string | null
+          title: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          category_id?: string | null
+          challenge_id?: string | null
+          created_at?: string
+          description?: string
+          id?: string
+          is_private?: boolean
+          manual_percent?: number
+          metric_aggregation?: string | null
+          metric_baseline?: number | null
+          metric_end_date?: string | null
+          metric_id?: string | null
+          metric_start_date?: string | null
+          metric_target?: number | null
+          progress_mode?: string
+          revision?: number
+          status?: string
+          target_date?: string | null
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "goals_category_id_user_id_fkey"
+            columns: ["category_id", "user_id"]
+            isOneToOne: false
+            referencedRelation: "categories"
+            referencedColumns: ["id", "user_id"]
+          },
+          {
+            foreignKeyName: "goals_challenge_id_user_id_fkey"
+            columns: ["challenge_id", "user_id"]
+            isOneToOne: false
+            referencedRelation: "challenges"
+            referencedColumns: ["id", "user_id"]
+          },
+          {
+            foreignKeyName: "goals_metric_id_user_id_fkey"
+            columns: ["metric_id", "user_id"]
+            isOneToOne: false
+            referencedRelation: "metric_definitions"
+            referencedColumns: ["id", "user_id"]
+          },
+        ]
+      }
       habit_logs: {
         Row: {
           business_date: string
@@ -830,6 +965,60 @@ export type Database = {
             referencedColumns: ["id", "user_id"]
           },
         ]
+      }
+      monthly_reflections: {
+        Row: {
+          biggest_failures: string
+          biggest_wins: string
+          career_progress: string
+          changes_next_month: string
+          created_at: string
+          fitness_progress: string
+          habits_improved: string
+          habits_slipped: string
+          id: string
+          month_start: string
+          notes: string
+          revision: number
+          timezone: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          biggest_failures?: string
+          biggest_wins?: string
+          career_progress?: string
+          changes_next_month?: string
+          created_at?: string
+          fitness_progress?: string
+          habits_improved?: string
+          habits_slipped?: string
+          id?: string
+          month_start: string
+          notes?: string
+          revision?: number
+          timezone: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          biggest_failures?: string
+          biggest_wins?: string
+          career_progress?: string
+          changes_next_month?: string
+          created_at?: string
+          fitness_progress?: string
+          habits_improved?: string
+          habits_slipped?: string
+          id?: string
+          month_start?: string
+          notes?: string
+          revision?: number
+          timezone?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
       }
       profiles: {
         Row: {
@@ -1222,6 +1411,130 @@ export type Database = {
           },
         ]
       }
+      task_carry_operations: {
+        Row: {
+          created_at: string
+          id: string
+          mode: string
+          operation_id: string
+          result_ids: string[]
+          source_date: string
+          target_date: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          mode: string
+          operation_id: string
+          result_ids?: string[]
+          source_date: string
+          target_date: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          mode?: string
+          operation_id?: string
+          result_ids?: string[]
+          source_date?: string
+          target_date?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      tasks: {
+        Row: {
+          actual_seconds: number | null
+          business_date: string
+          category_id: string | null
+          challenge_id: string | null
+          completed_at: string | null
+          created_at: string
+          estimated_seconds: number | null
+          goal_id: string | null
+          id: string
+          is_private: boolean
+          notes: string
+          position: number
+          priority: string
+          revision: number
+          status: string
+          timezone: string
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          actual_seconds?: number | null
+          business_date: string
+          category_id?: string | null
+          challenge_id?: string | null
+          completed_at?: string | null
+          created_at?: string
+          estimated_seconds?: number | null
+          goal_id?: string | null
+          id?: string
+          is_private?: boolean
+          notes?: string
+          position?: number
+          priority?: string
+          revision?: number
+          status?: string
+          timezone: string
+          title: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          actual_seconds?: number | null
+          business_date?: string
+          category_id?: string | null
+          challenge_id?: string | null
+          completed_at?: string | null
+          created_at?: string
+          estimated_seconds?: number | null
+          goal_id?: string | null
+          id?: string
+          is_private?: boolean
+          notes?: string
+          position?: number
+          priority?: string
+          revision?: number
+          status?: string
+          timezone?: string
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tasks_category_id_user_id_fkey"
+            columns: ["category_id", "user_id"]
+            isOneToOne: false
+            referencedRelation: "categories"
+            referencedColumns: ["id", "user_id"]
+          },
+          {
+            foreignKeyName: "tasks_challenge_id_user_id_fkey"
+            columns: ["challenge_id", "user_id"]
+            isOneToOne: false
+            referencedRelation: "challenges"
+            referencedColumns: ["id", "user_id"]
+          },
+          {
+            foreignKeyName: "tasks_goal_id_user_id_fkey"
+            columns: ["goal_id", "user_id"]
+            isOneToOne: false
+            referencedRelation: "goals"
+            referencedColumns: ["id", "user_id"]
+          },
+        ]
+      }
       tracking_operations: {
         Row: {
           created_at: string
@@ -1312,6 +1625,66 @@ export type Database = {
             referencedColumns: ["id", "user_id"]
           },
         ]
+      }
+      weekly_reviews: {
+        Row: {
+          created_at: string
+          difficulties: string
+          energy: number | null
+          focus: number | null
+          id: string
+          lessons: string
+          mood: number | null
+          motivation: number | null
+          next_week_changes: string
+          revision: number
+          stress: number | null
+          timezone: string
+          updated_at: string
+          user_id: string
+          week_start: string
+          week_starts_on: number
+          wins: string
+        }
+        Insert: {
+          created_at?: string
+          difficulties?: string
+          energy?: number | null
+          focus?: number | null
+          id?: string
+          lessons?: string
+          mood?: number | null
+          motivation?: number | null
+          next_week_changes?: string
+          revision?: number
+          stress?: number | null
+          timezone: string
+          updated_at?: string
+          user_id: string
+          week_start: string
+          week_starts_on: number
+          wins?: string
+        }
+        Update: {
+          created_at?: string
+          difficulties?: string
+          energy?: number | null
+          focus?: number | null
+          id?: string
+          lessons?: string
+          mood?: number | null
+          motivation?: number | null
+          next_week_changes?: string
+          revision?: number
+          stress?: number | null
+          timezone?: string
+          updated_at?: string
+          user_id?: string
+          week_start?: string
+          week_starts_on?: number
+          wins?: string
+        }
+        Relationships: []
       }
       workout_exercises: {
         Row: {
@@ -1516,6 +1889,15 @@ export type Database = {
         Returns: undefined
       }
       associate_tracking_challenge: { Args: { p_input: Json }; Returns: string }
+      carry_planning_tasks: {
+        Args: {
+          p_mode: string
+          p_operation_id: string
+          p_source_date: string
+          p_target_date: string
+        }
+        Returns: Json
+      }
       complete_tracking_onboarding: {
         Args: { p_input: Json }
         Returns: undefined
@@ -1536,10 +1918,23 @@ export type Database = {
         Args: { p_expected_at: string; p_id: string; p_kind: string }
         Returns: undefined
       }
+      delete_workspace_data: {
+        Args: { p_confirmation: string }
+        Returns: undefined
+      }
+      export_workspace_data: { Args: never; Returns: Json }
       increment_tracking_metric: { Args: { p_input: Json }; Returns: Json }
+      move_planning_task: {
+        Args: { p_direction: string; p_expected_revision: number; p_id: string }
+        Returns: Json
+      }
       save_fitness_exercise: { Args: { p_input: Json }; Returns: Json }
       save_fitness_sleep: { Args: { p_input: Json }; Returns: Json }
       save_fitness_workout: { Args: { p_input: Json }; Returns: Json }
+      save_goal_milestone: { Args: { p_input: Json }; Returns: Json }
+      save_monthly_reflection: { Args: { p_input: Json }; Returns: Json }
+      save_planning_goal: { Args: { p_input: Json }; Returns: Json }
+      save_planning_task: { Args: { p_input: Json }; Returns: Json }
       save_study_category: { Args: { p_input: Json }; Returns: Json }
       save_study_session: { Args: { p_input: Json }; Returns: Json }
       save_tracking_challenge: { Args: { p_input: Json }; Returns: string }
@@ -1548,6 +1943,11 @@ export type Database = {
       save_tracking_metric: { Args: { p_input: Json }; Returns: string }
       save_tracking_score_category: { Args: { p_input: Json }; Returns: string }
       save_tracking_score_policy: { Args: { p_input: Json }; Returns: string }
+      save_weekly_review: { Args: { p_input: Json }; Returns: Json }
+      set_planning_task_status: {
+        Args: { p_expected_revision: number; p_id: string; p_status: string }
+        Returns: Json
+      }
       setup_career: { Args: { p_input: Json }; Returns: undefined }
       setup_fitness: { Args: { p_input: Json }; Returns: undefined }
       start_focus_timer: { Args: { p_input: Json }; Returns: Json }

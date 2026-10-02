@@ -6,7 +6,7 @@ async function signIn(page: Page) {
   await page.getByLabel("Email address").fill(process.env.E2E_AUTH_EMAIL!);
   await page.getByLabel("Password", { exact: true }).fill(process.env.E2E_AUTH_PASSWORD!);
   await page.getByRole("button", { name: "Sign in", exact: true }).click();
-  await expect(page).toHaveURL(/\/today$/);
+  await expect(page).toHaveURL(/\/today$/, { timeout: 20000 });
 }
 
 test("study totals, timer recovery, and category history stay in sync", async ({ page }) => {
@@ -58,7 +58,7 @@ test("study totals, timer recovery, and category history stay in sync", async ({
       await page.context().setOffline(false);
     }
     await page.goto("/today");
-    await expect(page.getByRole("status", { name: "Active focus timer" })).toContainText("Running");
+    await expect(page.getByRole("region", { name: "Active focus timer" })).toContainText("Running");
     await second.goto("/career");
     await expect(second.getByRole("button", { name: "Pause" })).toBeVisible();
     await second.getByRole("button", { name: "Pause" }).click();

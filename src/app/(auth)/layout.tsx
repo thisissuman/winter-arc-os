@@ -14,7 +14,7 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
       </div>
       <span className="flex items-center gap-2 text-xs text-muted-foreground"><LockKeyhole className="size-3.5" aria-hidden="true" />Your workspace stays yours.</span>
     </aside>
-    <main id="auth-content" className="flex min-h-dvh flex-col px-6 py-8 sm:px-12">
+    <main id="auth-content" className="auth-main flex min-h-dvh min-w-0 flex-col px-6 py-8 sm:px-12">
       <Link href="/login" aria-label="Winter Arc OS sign in" className="self-start lg:hidden"><Brand /></Link>
       <div className="flex flex-1 items-center justify-center py-14">{children}</div>
       <p className="text-center text-xs text-muted-foreground">Winter Arc OS · Personal workspace</p>
