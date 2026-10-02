@@ -1,9 +1,9 @@
 Status: In Progress
-Current phase: A — Design Tokens
+Current phase: F — Responsive/Mobile Polish
 
 # Winter Arc OS — UI/UX refinement plan
 
-Approved October 2, 2026. This plan records the read-only architecture and interface review completed before final QA. “Current phase” identifies the next planned work; implementation has not started. The existing [product contract](../PRODUCT.md), [architecture](ARCHITECTURE.md), [scoring rules](SCORING.md), [design record](../DESIGN.md), [roadmap](ROADMAP.md), and [QA evidence](QA.md) remain authoritative for implemented behavior.
+Approved October 2, 2026. This plan records the original architecture/interface review and the subsequently authorized A–G implementation. Phases A–E have recorded gates; E–G code changes were made at the user's request with checks deferred until the explicit validation request. Automated validation now passes, with the exact full-run/rerun results in QA. Physical-device and actual screen-reader checks remain open for F/G. The existing [product contract](../PRODUCT.md), [architecture](ARCHITECTURE.md), [scoring rules](SCORING.md), [design record](../DESIGN.md), [roadmap](ROADMAP.md), and [QA evidence](QA.md) remain authoritative for implemented behavior.
 
 ## 1. Goals
 
@@ -21,7 +21,7 @@ Approved October 2, 2026. This plan records the read-only architecture and inter
 - No fabricated analytics, synthesized measurements, new career pipeline, new tracker type, or gamification system.
 - No wholesale component-library migration or adoption of a Watermelon dashboard template as application code.
 - No deployment, release, or claim that deferred SMTP and device checks have passed.
-- This document and its roadmap reference do not authorize UI implementation.
+- Each implementation phase requires an explicit request; A–G have now been requested. This refinement does not authorize Phase 9 or deployment.
 
 ## 3. Current UI findings
 
@@ -76,7 +76,7 @@ The existing charcoal/violet palette and light-theme mapping are a sound base. A
 | Charts | Use one frame for title, unit, period, source coverage, text alternative, loading/empty state, and theme-aware tooltip. Keep Recharts and existing calculations. Gaps remain gaps; measured zero remains zero. |
 | Motion | Prefer 150–200 ms color, opacity, and overlay transitions when useful. Keep spatial controls stable, disable ornamental chart animation, and honor reduced motion. No motion dependency is required. |
 
-The values above are intended design rules, not a claim that all are already implemented. Record actual final tokens and conventions in [DESIGN](../DESIGN.md) during implementation.
+The values above guide all phases. Implemented token, component, layout, and interaction conventions are recorded in [DESIGN](../DESIGN.md).
 
 ## 6. Shared component strategy
 
@@ -95,6 +95,8 @@ Keep feature-specific controls near their owners: habit toggles and grids under 
 ## 7. Watermelon/shadcn usage rules
 
 Both catalogs are design and component resources. Inspect examples before choosing a pattern; adapt to the existing Next.js, React, Tailwind, Radix Nova, Supabase, and Recharts stack. Do not copy demo data, providers, navigation, CSS resets, dependencies, route assumptions, or unverified accessibility behavior.
+
+The tables below record historical A–G catalog references. The later CA1–CA5 adoption proposal is withdrawn; CA1–CA2 code was reverted, and CA3–CA5 were not implemented. Retain the original shared primitives and native controls. Watermelon is no longer an active project resource.
 
 | Resource | Read-only tools used in the analysis | Decision |
 | --- | --- | --- |
@@ -137,11 +139,11 @@ Responsive and accessibility checks belong to every phase; F and G are final cro
 
 ## 9. Acceptance criteria for each phase
 
-- [ ] **A:** Dark and light roles cover text, surfaces, controls, selected states, status, focus, and charts. Type/spacing/control scales are applied coherently. Text contrast and input boundaries receive a recorded manual and automated review; no feature behavior changes.
-- [ ] **B:** Shared patterns work by keyboard and touch, have visible labels and associated errors, report real pending/saved/failure states, and return focus correctly. Privacy-safe presentation is preserved.
-- [ ] **C:** Every existing destination and active state remains reachable at phone, tablet, desktop, and short desktop heights. Protected navigation and URL behavior are unchanged. Timer and navigation do not obscure content or each other.
-- [ ] **D:** On a configured phone, the first relevant daily action is reachable early. Daily and weekly scores, coverage, setup needs, and challenge elapsed time remain distinct; all values and mutations match the existing route.
-- [ ] **E:** Fitness measurements, workouts, Career sessions/timer, habit states/quotas, metrics, Planning, Insights, Reflection, and Settings/Auth retain their workflows. Charts and summaries agree with existing source values, units, missing-data rules, privacy, and ownership.
+- [x] **A:** Dark and light roles cover text, surfaces, controls, selected states, status, focus, and charts. Type/spacing/control scales are applied coherently. Text contrast and input boundaries received recorded manual and computed reviews; no feature behavior changed. See [DESIGN](../DESIGN.md) and [QA](QA.md).
+- [x] **B:** Shared patterns work by keyboard and touch, have visible labels and associated errors, report real pending/saved/failure states, and return focus correctly. Privacy-safe presentation is preserved.
+- [x] **C:** Every existing destination and active state remains reachable at phone, tablet, desktop, and short desktop heights. Protected navigation and URL behavior are unchanged. Timer and navigation do not obscure content or each other.
+- [x] **D:** On a configured phone, the first relevant daily action is reachable early. Daily and weekly scores, coverage, setup needs, and challenge elapsed time remain distinct; all values and mutations match the existing route.
+- [x] **E:** Fitness measurements, workouts, Career sessions/timer, habit states/quotas, metrics, Planning, Insights, Reflection, and Settings/Auth retain their workflows. Charts and summaries agree with existing source values, units, missing-data rules, privacy, and ownership. The full regression and corrected focused rerun cover all 62 browser cases; populated weight values/tooltips and source restoration passed on desktop/mobile. See QA for exact results.
 - [ ] **F:** Check 360, 390, 768, 1024, and 1440 px widths plus landscape/short-height, open keyboard, long labels, active timer, and intentional habit-grid scrolling. No accidental page-wide overflow or unreachable action.
 - [ ] **G:** Automated axe checks and manual keyboard/screen-reader/reduced-motion review pass on affected routes. Focus is visible, non-color state cues remain, chart/date detail works without hover, and timer updates do not create continuous announcements.
 
@@ -159,34 +161,77 @@ Each checked gate needs a dated result in [QA](QA.md). Update the implemented co
 | New form wrappers clear unsaved input on offline or failed Server Actions. | Preserve controlled inputs and explicit failure feedback; test offline save/retry paths. |
 | Component catalog examples introduce Base UI, conflicting Recharts versions, demo actions, or alternate routing. | Adapt visual patterns into the existing primitives; inspect lockfile changes and every interactive control. |
 | Theme/token changes reduce legibility or conceal boundaries in light mode. | Review contrast, focus, inputs, statuses, and charts in both themes. |
+| Generated registry files overwrite customized shared controls or add missing aliases/transitive packages. | Preview exact source/dependency/file changes, decline replacements, adapt locally, preserve the existing diff, and record the smallest compatible lockfile delta. |
+| Custom select/checkbox/switch/date fields change FormData, disabled-field omission, validation, or auto-submit timing. | Preserve exact names/values, native required behavior and submitters; inspect submitted payload parity and test blank/unchecked/pending/offline states. |
+| Radix portals conflict with a native dialog's top layer, focus trap, or mobile viewport handling. | Choose one modal architecture per flow; test nested date/menu controls in the actual editor before expanding. Keep the native editor until the replacement passes. |
+| Toasts disappear before an error is understood or announce the same outcome twice. | Keep persistent field/action errors, deduplicate live regions, mount only the justified toaster, and preserve timer/keyboard/safe-area clearance. |
 
 ## 11. Validation checklist
 
-For this documentation-only handoff:
+The original documentation-only handoff completed these checks before Phase A implementation:
 
 - [x] Confirm the twelve requested sections, exact status/current-phase lines, and A–G sequence.
 - [x] Check local Markdown destinations, balanced fences, and whitespace in the two changed documents.
 - [x] Check the task diff contains only this plan and the roadmap reference; preserve pre-existing unrelated work.
 - [x] Record clearly that application tests and live UI checks were not run for documentation-only changes.
 
-For each later implementation phase, run the relevant checks and record actual commands and outcomes in [QA](QA.md):
+For phases B–G, run the relevant checks and record actual commands and outcomes in [QA](QA.md). Phase A's completed checks are recorded in the progress section below and in QA:
 
-- [ ] Run `npm run lint`, then `npm run typecheck`, relevant Vitest checks, and `npm run build`; keep typecheck and build sequential because both write `.next/types`.
-- [ ] Run affected authenticated desktop/mobile Playwright flows and privacy/ownership assertions. Use `npm run test:db` when database or authorization contracts could be affected; do not treat it as proof of hosted Auth/email.
+- [x] Run `npm run lint`, then `npm run typecheck`, relevant Vitest checks, and `npm run build`; keep typecheck and build sequential because both write `.next/types`.
+- [x] Run affected authenticated desktop/mobile Playwright flows and privacy/ownership assertions. Use `npm run test:db` when database or authorization contracts could be affected; do not treat it as proof of hosted Auth/email.
 - [ ] Inspect rendered dark/light layouts and the widths, timer, keyboard, touch, zoom, focus, screen reader, and reduced-motion scenarios relevant to the phase.
-- [ ] Compare scores, quotas, metrics, units, source coverage, and zero-versus-missing states with the existing domain fixtures.
-- [ ] Update [DESIGN](../DESIGN.md), [QA](QA.md), and roadmap/progress evidence for delivered work. After code changes, run `graphify update .` as required by [AGENTS](../AGENTS.md).
+- [x] Compare scores, quotas, metrics, units, source coverage, and zero-versus-missing states with the existing domain fixtures.
+- [x] Update [DESIGN](../DESIGN.md), [QA](QA.md), and roadmap/progress evidence for delivered work. After code changes, run `graphify update .` as required by [AGENTS](../AGENTS.md).
 
 ## 12. Progress/status section
 
 | Phase | Status | Evidence |
 | --- | --- | --- |
-| A — Design Tokens | Current; implementation not started | Plan approved and recorded October 2, 2026. Acceptance gate open. |
-| B — Shared Components | Not started | Depends on A. |
-| C — Shell/Navigation | Not started | Depends on B. |
-| D — Today Dashboard | Not started | Depends on C. |
-| E — Feature Pages | Not started | Depends on D. |
-| F — Responsive/Mobile Polish | Not started | Depends on E. |
-| G — Accessibility/Animation Polish | Not started | Depends on F. |
+| A — Design Tokens | Complete | Tokens, shared controls, selected/focus/status/chart roles, both-theme contrast and rendered checks; lint, typecheck, 41 Vitest cases, build, and focused desktop/mobile browser checks passed October 2, 2026. |
+| B — Shared Components | Complete | Shared contracts, field associations, editor focus return, privacy-safe ScorePanel, and authenticated browser regression passed October 2, 2026. |
+| C — Shell/Navigation | Complete | Grouped sidebar, compact hubs, timer/nav insets, all requested widths and short-height browser checks passed October 2, 2026. |
+| D — Today Dashboard | Complete | Existing source calculations/actions retained; phone hierarchy, themes, empty/setup states, and logging regressions passed October 2, 2026. |
+| E — Feature Pages | Complete | Lint/typecheck, 42 Vitest cases, production build, feature/source/privacy browser regressions, populated-chart review, both-theme 14-route layout/axe checks, and corrected assertion reruns passed October 2, 2026. |
+| F — Responsive/Mobile Polish | Implemented; device gate open | Responsive controls, visual viewport handling, safe-area roles, and scrolling editors implemented. Actual phone keyboards, OS safe areas, and device zoom remain unverified. |
+| G — Accessibility/Animation Polish | Implemented; assistive-technology gate open | Accessible chart disclosures, quieter timer semantics, atomic feedback, and reduced-motion handling implemented. Actual screen-reader announcement behavior remains unverified. |
+| Component adoption — CA1–CA5 | Cancelled | CA1–CA2 reverted at the user’s request; CA3–CA5 were never implemented. No further adoption is authorized. |
 
-The earlier Phase 0–8 implementation and its recorded test results remain as stated in [QA](QA.md). No application tests or fresh live UI checks were run for this documentation-only handoff. SMTP-dependent signup/recovery checks, operating-system install/device review, staging, backups, and release verification remain open for final QA. Mark this refinement complete only after every A–G acceptance gate has evidence.
+### Phase A implementation decisions and evidence
+
+- Preserved the charcoal/violet palette and Geist. Added named page/section/stat/body/caption/chart type roles, a 4 px-based spacing role set, compact 32 px and touch 44 px control heights, 8 px control radius, and restrained floating-editor shadows.
+- Strengthened light/dark control borders, assigned explicit raised/inset, selected, feedback, focus, and chart roles, and retained existing text, state, and reduced-motion semantics. Shared Button defaults reach 44 px on phones after auditing callers; shared Input and native form controls reach 44 px, with 16 px form text on phones.
+- Applied tokens to the shared primitives, navigation selection, feedback, headers/editor/score panel, Fitness and Insights chart chrome, and heatmap labels. No route, Server Action, business rule, database, Auth/privacy, scoring calculation, or dependency changed. The foundation browser test's authenticated Today assertion now allows 20 seconds for the observed hosted load; it does not alter the application timeout.
+- Key changed files: [`src/app/globals.css`](../src/app/globals.css), [`src/components/ui/button.tsx`](../src/components/ui/button.tsx), [`src/components/ui/input.tsx`](../src/components/ui/input.tsx), [`src/components/tracking/form-field.tsx`](../src/components/tracking/form-field.tsx), [`src/components/form-feedback.tsx`](../src/components/form-feedback.tsx), [`src/components/shell/navigation.tsx`](../src/components/shell/navigation.tsx), [`src/features/fitness/trend-chart.tsx`](../src/features/fitness/trend-chart.tsx), [`src/features/insights/score-trend.tsx`](../src/features/insights/score-trend.tsx), [`src/features/insights/insight-view.tsx`](../src/features/insights/insight-view.tsx), and [`tests/e2e/foundation.spec.ts`](../tests/e2e/foundation.spec.ts). The shared header, editor, score panel, design/QA/roadmap records, and generated `graphify-out/` graph were also updated.
+- Validation: `npm run lint`, `npm run typecheck`, `npm run test` (41/41), and `npm run build` passed sequentially. Focused authenticated foundation and Insights browser checks passed on desktop/mobile (2/2 each), including axe, keyboard/reduced-motion, and overflow checks. Rendered dark Today and light Settings were inspected at desktop/phone sizes; a persisted light Today phone screenshot and computed phone control/focus checks also passed. Career's three rendered shared buttons measured at least 44 px on phone, with an unconstrained default at 32 px on desktop. Both-theme token contrast was calculated from the final CSS, and `graphify update .` completed.
+- Deferred to later phases: the dedicated test account has no populated line-chart series, so the new series/tooltip treatment was reviewed in source and its route passed browser checks, but a populated tooltip was not visually exercised. Phase E/G will review it with real recorded data, alongside chart touch/keyboard details. No Phase A acceptance item remains open.
+
+### Phases B–D implementation decisions and evidence
+
+- **B — Shared Components:** Added `Panel`, `StatSummary`, `ActionRow`, `DestinationRow`, `PeriodToolbar`, `SectionHeader`, `InlineFeedback`, `ChartFrame`, `CoverageLabel`, and `EmptyState` presentation contracts. `PageHeader` supports compact use while its default remains compatible with feature pages. `FormField` now binds the visible label, hint, and error to a direct control while retaining a caller's existing description; a focused unit test covers the association. The existing native dialog is exported as `ResponsiveEditor` with its `EditorDialog` alias retained, and `Confirmation` retains typed destructive confirmation and focus return. Habit/metric feedback uses the common presentational state without changing its save, retry, or rollback logic. `ScorePanel` uses the shared summary contract; the optional compact form separates its unchanged, privacy-aware explanation for Today. No shadcn package, Base UI, Recharts replacement, or other dependency was added. `ChartFrame` is a ready contract; applying it to chart-heavy feature routes remains Phase E.
+- **C — Shell/Navigation:** Grouped desktop links under Daily Work, Review, and Manage with the original destination and active-route expression. Track, Plan, and More now use compact `DestinationRow` links with the same paths and descriptions. The short-height desktop sidebar scrolls independently. Mobile navigation and the persistent timer share a bottom dock and safe-area-aware height; content receives matching scroll clearance. The timer's existing accessible status name remains, while the ticking clock is marked `aria-live="off"` for the Phase G screen-reader review. No timer action or synchronization behavior changed.
+- **D — Today Dashboard:** Kept `loadTrackingSnapshot`, date/challenge selection, `scoreForPeriod`, habit/metric/frequency calculations, all logger props, links, and Server Actions. The date and challenge timeline are compact, separate daily/weekly score summaries precede the due habit and measurement actions, setup remains visible, and detailed score explanations sit after period progress. Habit identity is shown by its logger rather than repeated in its wrapper. Challenge elapsed time is explicitly separate from achievement. Empty and configuration states remain visible.
+- **Key files:** [`src/components/presentation/`](../src/components/presentation/), [`src/components/tracking/page-header.tsx`](../src/components/tracking/page-header.tsx), [`src/components/tracking/form-field.tsx`](../src/components/tracking/form-field.tsx), [`src/components/tracking/editor-dialog.tsx`](../src/components/tracking/editor-dialog.tsx), [`src/components/shell/navigation.tsx`](../src/components/shell/navigation.tsx), [`src/app/(workspace)/layout.tsx`](../src/app/%28workspace%29/layout.tsx), [`src/app/(workspace)/today/page.tsx`](../src/app/%28workspace%29/today/page.tsx), the Track/Plan/More hub pages, [`src/features/career/focus-timer.tsx`](../src/features/career/focus-timer.tsx), [`src/features/today/score-panel.tsx`](../src/features/today/score-panel.tsx), and the focused [unit](../src/components/tracking/form-field.test.ts) and [browser](../tests/e2e/ui-refinement.spec.ts) checks.
+- **Validation:** Final lint, typecheck, 42 Vitest cases, and production build passed. Existing authenticated foundation/Career and Insights/tracking focused runs passed 4/4 each across desktop/mobile; the new B–D browser regression passed 6/6 and the full browser suite passed 54/54. It checked both themes, 360/390/768/1024/1440 px widths, 500 px desktop height, all hub destinations, horizontal overflow, compressed-height field focus, dialog Escape/focus return, running/paused timer alignment, and the ability to scroll the last Today content above the dock. Rendered dark/light Today and hubs plus running/paused timer screenshots were inspected. `graphify update .` refreshed the source graph. Marked browser fixtures were removed from the matching development project and verified absent. See [QA](QA.md) for exact commands and limitations.
+- **Deferred to F/G and final QA:** A headless viewport-height reduction does not reproduce an actual iOS/Android software keyboard or device safe-area inset. Physical-device keyboard, landscape/safe-area, screen-reader announcements, zoom, and full cross-route accessibility review remain scheduled for F/G. Phase E will adopt `ChartFrame` on chart-heavy routes and visually check a populated Recharts tooltip. No B–D acceptance item remains open.
+
+### Phases E–G implementation decisions
+
+- **E — Feature Pages:** Fitness puts daily measurement entry before recorded trends and avoids duplicate measurement headings. Career puts the existing timer before duration summaries and adds a compact recent-session presentation from the already loaded snapshot. Habits gets a named keyboard-scrollable calendar; date controls on Metrics, Planning, Reflection, and Settings share the implemented control styling. Fitness and Insights use `ChartFrame` with existing units/coverage, and heatmaps expose dates without hover. Reflection's optional ratings use a disclosure; saved ratings open it initially. Auth password hints are associated with the existing fields. Existing queries, Server Actions, validation, scoring, routes, and privacy boundaries were preserved.
+- **F — Responsive/Mobile Polish:** Workout-set and timer action controls wrap at phone widths. Editor headers stay outside their scrolling form bodies, with safe-area-aware padding and visual-viewport bounds. The mobile shell coordinates gutters, landscape heights, timer/navigation clearance, and keyboard contraction through `MobileViewport`. Phone inputs remain at least 16 px, and primary controls retain their 44 px targets. Physical-device keyboard, nonzero OS safe-area, rotation, and zoom checks remain open.
+- **G — Accessibility/Animation Polish:** Score/fitness trends include keyboard/touch disclosures listing exact dates, raw values, missing entries, and score coverage, even without enough entries to plot. The persistent timer is a named region instead of a live status; elapsed time is not continuously announced, and action feedback remains separate. The panel exposes the actual elapsed value with a screen-reader prefix. Shared feedback is atomic, Button transitions cover colors for 150 ms, and reduced-motion CSS disables animations/transitions while keeping pending copy available. Actual screen-reader behavior remains unverified.
+- **Catalog decision:** Reused existing local shadcn-style primitives and native dialog/details/form controls. Watermelon remained a visual reference. No component installation, Base UI adoption, Recharts replacement, dependency change, or form-library migration occurred.
+- **Key files:** Feature pages under [`src/app/(workspace)/`](../src/app/%28workspace%29/), [`src/components/shell/mobile-viewport.tsx`](../src/components/shell/mobile-viewport.tsx), [`src/app/globals.css`](../src/app/globals.css), [`src/components/tracking/editor-dialog.tsx`](../src/components/tracking/editor-dialog.tsx), [`src/components/presentation/`](../src/components/presentation/), [`src/features/fitness/workout-editor.tsx`](../src/features/fitness/workout-editor.tsx), the Fitness/Insights chart components, [`src/features/career/focus-timer.tsx`](../src/features/career/focus-timer.tsx), [`src/features/reflection/review-form.tsx`](../src/features/reflection/review-form.tsx), and [`src/features/auth/auth-form.tsx`](../src/features/auth/auth-form.tsx). Regression coverage lives in [`tests/e2e/ui-refinement.spec.ts`](../tests/e2e/ui-refinement.spec.ts); existing Career, Fitness, Foundation, and Reflection selectors were aligned with the refined presentation.
+- **Validation:** Lint/typecheck, 42/42 Vitest cases, and production build passed. The full 62-case production browser run passed 59 and identified three test-assertion failures. The corrected focused rerun passed 8/8 desktop/mobile cases, including all failed cases and added landscape/keyboard coverage. All 62 browser cases therefore have passing evidence across the full run and final rerun; this is not a claim of a single 62/62 run. Both-theme feature checks cover 14 routes at 360/390/768/1024/1440 px, short desktop heights, axe, and phone form text. Timer checks additionally cover 740×360 landscape. Populated weight charts/tooltips, keyboard chart disclosures, native editor focus return/wrapping, reduced motion, simulated visual-viewport contraction, and keyboard habit-grid scrolling passed. Screenshots, final token contrast, fixture restoration, and graph refresh are recorded in QA.
+- **Remaining gates:** F stays open for physical iOS/Android keyboards, nonzero safe-area insets/rotation, device zoom, and configured/long-content device review. G stays open for actual VoiceOver/TalkBack or equivalent screen-reader traversal and timer announcement review. Populated daily-score and workout-progression visuals were not separately seeded; their components/domain logic were reviewed and existing analytics/workout regressions passed. No browser emulation is represented as physical-device or screen-reader verification.
+
+The earlier Phase 0–8 implementation and its recorded test results remain as stated in [QA](QA.md). SMTP-dependent signup/recovery checks, operating-system install/device review, staging, backups, and release verification remain open for final QA. Mark the full refinement complete only after every A–G acceptance gate has evidence.
+
+### Component adoption cancellation — October 2, 2026
+
+The user withdrew the component-adoption direction and requested its reversal. Removed CA1/CA2 registry primitives and adapted Watermelon patterns, restored the original consuming controls, and removed the CA1–CA5 implementation instructions and acceptance gates. Preserve all pre-existing A–G refinement work and its open F/G gates. No additional adoption work is authorized. This record describes the cancellation rather than treating adoption as current approved direction.
+
+### Final A–G QA after adoption rollback — October 2, 2026
+
+- Lint, typecheck, 42/42 unit cases, and production build passed. The complete browser suite passed 60/62; two desktop Fitness cleanup assertions were corrected using hosted-action timing and saved-state persistence, then the focused Fitness rerun passed 4/4. All 62 cases have passing evidence across runs, with no skipped authenticated checks. Exact commands and outcomes are in [QA](QA.md).
+- Both-theme responsive/axe checks, requested widths, short/landscape timer states, keyboard focus/disclosures/grid scrolling, populated weight tooltips/values, privacy, offline forms, and simulated keyboard response passed. Current screenshots were inspected. Only Fitness test assertions and documentation were edited; application behavior and existing uncommitted refinement work were preserved.
+- A–E retain their completed status. F/G remain implemented with real-device and actual screen-reader acceptance gates open; current phase remains F. Do not mark them complete from emulation, ARIA inspection, or axe alone. Component adoption remains cancelled; product Phase 9 has not started.

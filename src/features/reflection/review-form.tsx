@@ -32,9 +32,9 @@ export function WeeklyReviewForm({ periodStart, review }: { periodStart: string;
     <input type="hidden" name="periodStart" value={periodStart} />
     <input type="hidden" name="expectedRevision" value={state.revision ?? review?.revision ?? ""} />
     {weeklyPrompts.map(({ name, label, column }) => <FormField key={name} name={name} label={label}><textarea id={name} name={name} maxLength={4000} defaultValue={review?.[column] ?? ""} className={`${controlClass} min-h-28 resize-y`} /></FormField>)}
-    <fieldset><legend className="font-medium">Optional check-in · 1–5</legend><p className="mt-1 text-sm text-muted-foreground">Leave any rating blank if it does not fit this week.</p>
+    <details className="border-t pt-3" open={Boolean(review && ratings.some((name) => review[name] !== null))}><summary className="flex min-h-11 cursor-pointer items-center font-medium">Optional check-in · 1–5</summary><p className="mt-1 text-sm text-muted-foreground">Leave any rating blank if it does not fit this week.</p>
       <div className="mt-3 grid gap-4 sm:grid-cols-2 xl:grid-cols-5">{ratings.map((name) => <FormField key={name} name={name} label={name[0].toUpperCase() + name.slice(1)}><select id={name} name={name} defaultValue={review?.[name] ?? ""} className={controlClass}><option value="">Not rated</option>{[1, 2, 3, 4, 5].map((value) => <option key={value} value={value}>{value}</option>)}</select></FormField>)}</div>
-    </fieldset>
+    </details>
     <div className="flex flex-wrap items-center gap-3"><Button disabled={pending} className="min-h-11">{pending ? "Saving…" : review ? "Save changes" : "Save weekly review"}</Button><FormFeedback state={state} /></div>
   </form>;
 }

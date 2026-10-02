@@ -17,7 +17,7 @@ export default async function ReflectionPage() {
   const currentWeek = reviews.weekly.find((item) => item.week_start === week.start);
   const currentMonth = reviews.monthly.find((item) => item.month_start === month.start);
   return <><PageHeader title="Reflection" description="Review what happened, decide what to change, and keep a record beside your actual results." />
-    <div className="mt-7 grid gap-4 md:grid-cols-2">
+    <div className="mt-7 grid gap-4 lg:grid-cols-2">
       <Link href={`/reflection/weekly/${week.start}`} className="rounded-xl border bg-card p-6 transition-colors hover:border-primary/50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"><p className="text-xs uppercase tracking-wide text-muted-foreground">This week · {week.start}–{week.end}</p><h2 className="mt-2 text-xl font-medium">Weekly review</h2><p className="mt-2 text-sm text-muted-foreground">{currentWeek ? "Open saved review" : "Write wins, lessons, next steps, and optional check-in ratings."}</p></Link>
       <Link href={`/reflection/monthly/${month.start.slice(0, 7)}`} className="rounded-xl border bg-card p-6 transition-colors hover:border-primary/50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"><p className="text-xs uppercase tracking-wide text-muted-foreground">This month · {month.start.slice(0, 7)}</p><h2 className="mt-2 text-xl font-medium">Monthly reflection</h2><p className="mt-2 text-sm text-muted-foreground">{currentMonth ? "Open saved reflection" : "Look back at habits, Fitness, Career, and what to change."}</p></Link>
     </div>

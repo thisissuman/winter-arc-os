@@ -58,7 +58,7 @@ test("study totals, timer recovery, and category history stay in sync", async ({
       await page.context().setOffline(false);
     }
     await page.goto("/today");
-    await expect(page.getByRole("status", { name: "Active focus timer" })).toContainText("Running");
+    await expect(page.getByRole("region", { name: "Active focus timer" })).toContainText("Running");
     await second.goto("/career");
     await expect(second.getByRole("button", { name: "Pause" })).toBeVisible();
     await second.getByRole("button", { name: "Pause" }).click();

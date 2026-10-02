@@ -2,7 +2,7 @@
 
 ## Status
 
-**Phases 0–8 are complete in the configured development project as of October 2, 2026.** Phase 7 adds owned period-anchored reviews and Insights-derived adjacent statistics; its migration, security checks, and browser flows are recorded in QA. Phase 1's signup-confirmation/recovery email checks remain deferred until SMTP before production. Phase 8 adds verified private data controls, organization/calendar settings, and public offline behavior. The [UI/UX refinement plan](UI_REFINEMENT_PLAN.md) is in progress before Phase 9; its current phase A has not been implemented. Phase 9 has not started.
+**Phases 0–8 are complete in the configured development project as of October 2, 2026.** Phase 7 adds owned period-anchored reviews and Insights-derived adjacent statistics; its migration, security checks, and browser flows are recorded in QA. Phase 1's signup-confirmation/recovery email checks remain deferred until SMTP before production. Phase 8 adds verified private data controls, organization/calendar settings, and public offline behavior. The [UI/UX refinement plan](UI_REFINEMENT_PLAN.md) is in progress before Phase 9; Phases A–E are complete. F/G code and automated validation are delivered, with physical-device and actual screen-reader gates open. Phase 9 has not started.
 
 The accepted plan calls for one phase at a time. Start with the earliest incomplete phase unless the user names a phase whose dependencies are already complete. Finish the phase's validation/documentation and stop with a handoff. Do not expand a phase into the entire application.
 
@@ -21,7 +21,7 @@ Read [AGENTS](../AGENTS.md), [PRODUCT](../PRODUCT.md), and the relevant [archite
 | 6 — Insights | 2, 3, 4 | Complete in development project |
 | 7 — Reflection | 6 | Complete in development project |
 | 8 — Settings and polish | 1–7 | Complete in development project |
-| UI/UX refinement — A–G | 8 | In progress; A selected, implementation not started |
+| UI/UX refinement — A–G | 8 | In progress; A–E complete, F/G device and assistive-technology gates open |
 | 9 — Final QA and release | 1–8, UI/UX refinement | Not started |
 
 Default delivery order is 0 → 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 → UI/UX refinement A–G → 9. Dependencies allow an explicitly requested alternate order for fitness/career/planning; they do not authorize parallel agents or unchecked skipping.
@@ -178,7 +178,7 @@ Verified: all 48 desktop/mobile production browser checks pass. Phase 8 covers 2
 
 ## UI/UX refinement — before final QA
 
-The approved [UI/UX refinement plan](UI_REFINEMENT_PLAN.md) defines seven sequential design and interface phases with their own acceptance gates. Phase A is current, with implementation not started. Finish and verify A–G before beginning Phase 9; keep business logic, database logic, routes, auth/privacy boundaries, and responsive behavior intact.
+The approved [UI/UX refinement plan](UI_REFINEMENT_PLAN.md) defines seven sequential design and interface phases with their own acceptance gates. Phases A–E passed their recorded gates on October 2, 2026. F/G code and automated checks are delivered; finish physical-device and actual screen-reader verification before beginning Phase 9; keep business logic, database logic, routes, auth/privacy boundaries, and responsive behavior intact.
 
 ## Phase 9 — Final QA and release
 
@@ -203,5 +203,9 @@ Acceptance: the complete [QA release checklist](QA.md) passes with evidence. Pen
 | 6 | October 1, 2026 | Shared bounded analytics, 40 domain/96 SQL cases and 34 production browser checks verified; see QA |
 | 7 | October 2, 2026 | Owned reviews, shared period statistics, hosted migration/security checks, and focused browser gates verified; all regressions subsequently pass in Phase 8 |
 | 8 | October 2, 2026 | 41 domain, 106 database, 48 real browser checks; hosted data controls, types, lint/typecheck/build, privacy, exports/deletion, and public offline shell verified; see QA |
+| UI A | October 2, 2026 | Dark/light design tokens, mobile controls, contrast, focused desktop/mobile browser checks, 41 domain cases, lint/typecheck/build, and rendered review passed; see UI plan, DESIGN, and QA |
+| UI E | October 2, 2026 | Feature-page refinement, 42 Vitest cases, lint/typecheck/build, both-theme layout/axe scans, populated chart review, and passing evidence for all 62 browser cases across full run and corrected rerun; see QA. F/G device/assistive-technology gates remain open |
 
 Add an entry only after its gate passes. Keep later phases uncompleted until actual verification.
+
+October 2, 2026 — post-rollback A–G QA: lint/typecheck, 42 unit cases, production build, and all 62 browser cases have passing evidence across the 60/62 full run and corrected 4/4 Fitness rerun. No application changes were required. Component adoption is cancelled. F/G physical-device and actual screen-reader gates remain open; Phase 9 has not started. See QA for fixture cleanup, command results, and remaining limits.

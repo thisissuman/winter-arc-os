@@ -3,11 +3,12 @@ import { ProfileForm, AppearanceForm, CalendarForm } from "@/features/settings/s
 import { InstallControl } from "@/features/settings/install-control";
 import { LogoutButton } from "@/components/shell/logout-button";
 import Link from "next/link";
+import { PageHeader } from "@/components/tracking/page-header";
 export const metadata = { title: "Settings" };
 export default async function SettingsPage() {
   const { profile, preferences, email } = await requireAccount();
   return <>
-    <header className="border-b pb-7"><p className="mb-2 text-sm text-muted-foreground">Your workspace, your preferences</p><h1 className="text-3xl font-semibold tracking-[-0.03em]">Settings</h1></header>
+    <PageHeader title="Settings" description="Your workspace, your preferences." />
     <section aria-labelledby="profile-title" className="grid gap-6 border-b py-8 lg:grid-cols-[1fr_1.6fr]"><div><h2 id="profile-title" className="text-base font-medium">Profile</h2><p className="mt-2 text-sm text-muted-foreground">The name you see in your workspace.</p></div><ProfileForm name={profile.display_name} email={email} /></section>
     <section aria-labelledby="appearance-title" className="grid gap-6 border-b py-8 lg:grid-cols-[1fr_1.6fr]"><div><h2 id="appearance-title" className="text-base font-medium">Appearance</h2><p className="mt-2 text-sm text-muted-foreground">Choose the light that works for you.</p></div><AppearanceForm theme={preferences.theme} /></section>
     <section aria-labelledby="calendar-title" className="grid gap-6 border-b py-8 lg:grid-cols-[1fr_1.6fr]"><div><h2 id="calendar-title" className="text-base font-medium">Calendar</h2><p className="mt-2 text-sm text-muted-foreground">How your future days are organized.</p></div><CalendarForm timezone={preferences.timezone} weekStartsOn={preferences.week_starts_on} /></section>

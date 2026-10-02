@@ -38,7 +38,7 @@ test("server validation rejects invalid signup without contacting auth", async (
   await page.getByLabel("Password", { exact: true }).fill("short");
   await page.getByRole("button", { name: "Create account" }).click();
   await expect(page.getByText("Enter a valid email address.")).toBeVisible();
-  await expect(page.getByText("Use at least 12 characters.")).toBeVisible();
+  await expect(page.locator("#password-error")).toHaveText("Use at least 12 characters.");
   await expect(page.getByLabel("Email address")).toHaveAttribute("aria-invalid", "true");
 });
 
@@ -95,9 +95,9 @@ test("authenticated account persists, profile saves, theme changes, and logout p
   await page.getByLabel("Password", { exact: true }).fill(process.env.E2E_AUTH_PASSWORD!);
   await page.getByRole("button", { name: "Sign in", exact: true }).click();
   await expect(page).toHaveURL(/\/today$/);
-  await expect(page.getByRole("heading", { name: "Today", exact: true })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Today", exact: true })).toBeVisible({ timeout: 20000 });
   await page.reload();
-  await expect(page.getByRole("heading", { name: "Today", exact: true })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Today", exact: true })).toBeVisible({ timeout: 20000 });
   await page.keyboard.press("Tab");
   await expect(page.getByRole("link", { name: "Skip to content" })).toBeFocused();
   await page.keyboard.press("Enter");

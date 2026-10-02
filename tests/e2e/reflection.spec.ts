@@ -21,6 +21,8 @@ test("weekly and monthly reflections save, reopen, edit, and agree with Insights
   if (testInfo.project.name === "mobile") await expect(page.getByRole("navigation", { name: "Mobile navigation" }).getByRole("link", { name: "More" })).toBeVisible();
   await page.goto(`/reflection/weekly/${week}`);
   await page.getByLabel("Wins").fill("E2E reflection win");
+  const checkIn = page.locator("details").filter({ has: page.locator("summary").filter({ hasText: "Optional check-in" }) });
+  if (!await checkIn.evaluate((element) => (element as HTMLDetailsElement).open)) await checkIn.locator("summary").click();
   await page.getByLabel("Energy").selectOption("4");
   await page.getByRole("button", { name: /Save weekly review|Save changes/ }).click();
   await expect(page.getByRole("status")).toContainText("Reflection saved");

@@ -4,6 +4,7 @@ import { useId, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { Check, Minus, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { InlineFeedback } from "@/components/presentation/inline-feedback";
 import { controlClass } from "@/components/tracking/form-field";
 import { logHabit } from "@/features/tracking/actions";
 import type { HabitLog } from "@/features/tracking/types";
@@ -55,7 +56,7 @@ function HabitLoggerState({ habitId, date, name, count, status, revision, requir
       </div>
     </div>
     {!hideNotes && <details className="mt-2 pl-14"><summary className="min-h-8 cursor-pointer text-xs text-muted-foreground">Notes</summary><label htmlFor={notesId} className="sr-only">Notes for {name}</label><textarea id={notesId} value={note} onChange={(event) => { setNote(event.target.value); setNoteEdited(true); }} className={`${controlClass} mt-2 min-h-20`} maxLength={2000} disabled={disabled || pending} /><Button type="button" variant="outline" className="mt-2 min-h-11 px-3" disabled={disabled || pending || !noteEdited} onClick={() => save(logged.status ?? "completed", logged.status ? logged.count : requiredCount)}>Save notes{!logged.status ? " and complete" : ""}</Button></details>}
-    {feedback && <p role={feedback.error ? "alert" : "status"} className={`mt-2 text-xs ${feedback.error ? "text-destructive" : "text-muted-foreground"}`}>{feedback.message}</p>}
+    {feedback && <InlineFeedback message={feedback.message} tone={feedback.error ? "error" : "success"} className="mt-2 text-xs" />}
     {feedback?.error && <Button type="button" variant="ghost" className="mt-2 min-h-11 px-3" disabled={pending} onClick={() => router.refresh()}>Refresh saved entry</Button>}
   </div>;
 }

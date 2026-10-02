@@ -35,13 +35,15 @@ export function AuthForm({ kind, configured, notice }: { kind: Kind; configured:
       <fieldset disabled={pending || !configured} className="space-y-5 disabled:opacity-60">
         {fields.map((field) => {
           const errors = state.fieldErrors?.[field.name];
+          const hint = field.name === "password" && kind !== "login" ? "Use at least 12 characters." : null;
           return <div key={field.name} className="space-y-2">
             <Label htmlFor={field.name} className="text-sm">{field.label}</Label>
-            <Input id={field.name} name={field.name} type={field.type} autoComplete={field.autoComplete} placeholder={field.placeholder} required maxLength={field.name === "email" ? 254 : field.name === "displayName" ? 80 : 128} aria-invalid={Boolean(errors?.length)} aria-describedby={errors?.length ? `${field.name}-error` : undefined} className="h-11 bg-card px-3 text-sm" />
+            <Input id={field.name} name={field.name} type={field.type} autoComplete={field.autoComplete} placeholder={field.placeholder} required maxLength={field.name === "email" ? 254 : field.name === "displayName" ? 80 : 128} aria-invalid={Boolean(errors?.length)} aria-describedby={[hint && `${field.name}-hint`, errors?.length && `${field.name}-error`].filter(Boolean).join(" ") || undefined} className="h-11 bg-card px-3 text-base md:text-sm" />
+            {hint && <p id={`${field.name}-hint`} className="text-xs text-muted-foreground">{hint}</p>}
             {errors?.length && <p id={`${field.name}-error`} className="text-sm text-destructive">{errors[0]}</p>}
           </div>;
         })}
-        {kind === "login" && <div className="text-right"><Link href="/forgot-password" className="text-sm text-primary hover:underline">Forgot password?</Link></div>}
+        {kind === "login" && <div className="text-right"><Link href="/forgot-password" className="inline-flex min-h-11 items-center text-sm text-primary hover:underline">Forgot password?</Link></div>}
         <Button type="submit" className="h-11 w-full text-sm font-medium" disabled={pending || !configured}>
           {pending ? <><LoaderCircle className="size-4 animate-spin" aria-hidden="true" />Please wait</> : <>{details.submit}<ArrowRight className="ml-auto size-4" aria-hidden="true" /></>}
         </Button>
