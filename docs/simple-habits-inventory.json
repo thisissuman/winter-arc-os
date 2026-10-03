@@ -1,0 +1,423 @@
+{
+  "status": "implemented_and_verified_in_development",
+  "captured_on": "2026-10-03",
+  "schema_source": "local_preserved_migrations_and_verified_matching_hosted_catalog",
+  "counts": {
+    "target_public_tables": 5,
+    "retire_public_tables": 31,
+    "former_public_tables": 36,
+    "current_public_tables": 5
+  },
+  "keep_or_rebuild_tables": [
+    "habit_logs",
+    "habit_schedules",
+    "habits",
+    "profiles",
+    "user_preferences"
+  ],
+  "retire_tables": [
+    {
+      "name": "categories",
+      "introduced_in": "supabase/migrations/20260930180649_foundation.sql"
+    },
+    {
+      "name": "challenge_habits",
+      "introduced_in": "supabase/migrations/20261001004511_core_tracking.sql"
+    },
+    {
+      "name": "challenge_metrics",
+      "introduced_in": "supabase/migrations/20261001004511_core_tracking.sql"
+    },
+    {
+      "name": "challenge_targets",
+      "introduced_in": "supabase/migrations/20261001004511_core_tracking.sql"
+    },
+    {
+      "name": "challenges",
+      "introduced_in": "supabase/migrations/20261001004511_core_tracking.sql"
+    },
+    {
+      "name": "exercises",
+      "introduced_in": "supabase/migrations/20261001044053_fitness.sql"
+    },
+    {
+      "name": "focus_timers",
+      "introduced_in": "supabase/migrations/20261001052104_career.sql"
+    },
+    {
+      "name": "frequency_target_rules",
+      "introduced_in": "supabase/migrations/20261001004511_core_tracking.sql"
+    },
+    {
+      "name": "frequency_targets",
+      "introduced_in": "supabase/migrations/20261001004511_core_tracking.sql"
+    },
+    {
+      "name": "goal_milestones",
+      "introduced_in": "supabase/migrations/20261001104654_planning.sql"
+    },
+    {
+      "name": "goals",
+      "introduced_in": "supabase/migrations/20261001104654_planning.sql"
+    },
+    {
+      "name": "life_areas",
+      "introduced_in": "supabase/migrations/20260930180649_foundation.sql"
+    },
+    {
+      "name": "metric_definitions",
+      "introduced_in": "supabase/migrations/20261001004511_core_tracking.sql"
+    },
+    {
+      "name": "metric_logs",
+      "introduced_in": "supabase/migrations/20261001004511_core_tracking.sql"
+    },
+    {
+      "name": "metric_targets",
+      "introduced_in": "supabase/migrations/20261001004511_core_tracking.sql"
+    },
+    {
+      "name": "monthly_reflections",
+      "introduced_in": "supabase/migrations/20261001160428_reflection.sql"
+    },
+    {
+      "name": "score_categories",
+      "introduced_in": "supabase/migrations/20261001004511_core_tracking.sql"
+    },
+    {
+      "name": "score_category_weights",
+      "introduced_in": "supabase/migrations/20261001004511_core_tracking.sql"
+    },
+    {
+      "name": "score_items",
+      "introduced_in": "supabase/migrations/20261001004511_core_tracking.sql"
+    },
+    {
+      "name": "score_policies",
+      "introduced_in": "supabase/migrations/20261001004511_core_tracking.sql"
+    },
+    {
+      "name": "sleep_logs",
+      "introduced_in": "supabase/migrations/20261001044053_fitness.sql"
+    },
+    {
+      "name": "study_categories",
+      "introduced_in": "supabase/migrations/20261001052104_career.sql"
+    },
+    {
+      "name": "study_sessions",
+      "introduced_in": "supabase/migrations/20261001052104_career.sql"
+    },
+    {
+      "name": "task_carry_operations",
+      "introduced_in": "supabase/migrations/20261001104654_planning.sql"
+    },
+    {
+      "name": "tasks",
+      "introduced_in": "supabase/migrations/20261001104654_planning.sql"
+    },
+    {
+      "name": "tracking_operations",
+      "introduced_in": "supabase/migrations/20261001004511_core_tracking.sql"
+    },
+    {
+      "name": "weekly_reviews",
+      "introduced_in": "supabase/migrations/20261001160428_reflection.sql"
+    },
+    {
+      "name": "workout_exercises",
+      "introduced_in": "supabase/migrations/20261001044053_fitness.sql"
+    },
+    {
+      "name": "workout_operations",
+      "introduced_in": "supabase/migrations/20261001044053_fitness.sql"
+    },
+    {
+      "name": "workout_sets",
+      "introduced_in": "supabase/migrations/20261001044053_fitness.sql"
+    },
+    {
+      "name": "workouts",
+      "introduced_in": "supabase/migrations/20261001044053_fitness.sql"
+    }
+  ],
+  "retire_routines": [
+    {
+      "name": "private.fitness_revision",
+      "last_defined_in": "supabase/migrations/20261001044053_fitness.sql"
+    },
+    {
+      "name": "private.tracking_associations",
+      "last_defined_in": "supabase/migrations/20261001004511_core_tracking.sql"
+    },
+    {
+      "name": "private.tracking_log_revision",
+      "last_defined_in": "supabase/migrations/20261001004511_core_tracking.sql"
+    },
+    {
+      "name": "private.tracking_next_boundary",
+      "last_defined_in": "supabase/migrations/20261001004511_core_tracking.sql"
+    },
+    {
+      "name": "private.tracking_no_overlap",
+      "last_defined_in": "supabase/migrations/20261001004511_core_tracking.sql"
+    },
+    {
+      "name": "private.tracking_owner",
+      "last_defined_in": "supabase/migrations/20261001004511_core_tracking.sql"
+    },
+    {
+      "name": "public.archive_tracking_definition",
+      "last_defined_in": "supabase/migrations/20261001004511_core_tracking.sql"
+    },
+    {
+      "name": "public.associate_tracking_challenge",
+      "last_defined_in": "supabase/migrations/20261001004511_core_tracking.sql"
+    },
+    {
+      "name": "public.carry_planning_tasks",
+      "last_defined_in": "supabase/migrations/20261001105141_planning_copy_reset.sql"
+    },
+    {
+      "name": "public.complete_tracking_onboarding",
+      "last_defined_in": "supabase/migrations/20261001004511_core_tracking.sql"
+    },
+    {
+      "name": "public.control_focus_timer",
+      "last_defined_in": "supabase/migrations/20261001052104_career.sql"
+    },
+    {
+      "name": "public.copy_fitness_workout",
+      "last_defined_in": "supabase/migrations/20261001044053_fitness.sql"
+    },
+    {
+      "name": "public.delete_fitness_workout",
+      "last_defined_in": "supabase/migrations/20261001044053_fitness.sql"
+    },
+    {
+      "name": "public.delete_tracking_definition",
+      "last_defined_in": "supabase/migrations/20261001004511_core_tracking.sql"
+    },
+    {
+      "name": "public.increment_tracking_metric",
+      "last_defined_in": "supabase/migrations/20261001004511_core_tracking.sql"
+    },
+    {
+      "name": "public.move_planning_task",
+      "last_defined_in": "supabase/migrations/20261001104654_planning.sql"
+    },
+    {
+      "name": "public.save_fitness_exercise",
+      "last_defined_in": "supabase/migrations/20261001044053_fitness.sql"
+    },
+    {
+      "name": "public.save_fitness_sleep",
+      "last_defined_in": "supabase/migrations/20261001044053_fitness.sql"
+    },
+    {
+      "name": "public.save_fitness_workout",
+      "last_defined_in": "supabase/migrations/20261001050228_workout_payload_guard.sql"
+    },
+    {
+      "name": "public.save_goal_milestone",
+      "last_defined_in": "supabase/migrations/20261001104654_planning.sql"
+    },
+    {
+      "name": "public.save_monthly_reflection",
+      "last_defined_in": "supabase/migrations/20261001160428_reflection.sql"
+    },
+    {
+      "name": "public.save_planning_goal",
+      "last_defined_in": "supabase/migrations/20261001104654_planning.sql"
+    },
+    {
+      "name": "public.save_planning_task",
+      "last_defined_in": "supabase/migrations/20261001104654_planning.sql"
+    },
+    {
+      "name": "public.save_study_category",
+      "last_defined_in": "supabase/migrations/20261001052104_career.sql"
+    },
+    {
+      "name": "public.save_study_session",
+      "last_defined_in": "supabase/migrations/20261001052104_career.sql"
+    },
+    {
+      "name": "public.save_tracking_challenge",
+      "last_defined_in": "supabase/migrations/20261001004511_core_tracking.sql"
+    },
+    {
+      "name": "public.save_tracking_frequency",
+      "last_defined_in": "supabase/migrations/20261001004511_core_tracking.sql"
+    },
+    {
+      "name": "public.save_tracking_habit",
+      "last_defined_in": "supabase/migrations/20261001004511_core_tracking.sql"
+    },
+    {
+      "name": "public.save_tracking_metric",
+      "last_defined_in": "supabase/migrations/20261001004511_core_tracking.sql"
+    },
+    {
+      "name": "public.save_tracking_score_category",
+      "last_defined_in": "supabase/migrations/20261001004511_core_tracking.sql"
+    },
+    {
+      "name": "public.save_tracking_score_policy",
+      "last_defined_in": "supabase/migrations/20261001004511_core_tracking.sql"
+    },
+    {
+      "name": "public.save_weekly_review",
+      "last_defined_in": "supabase/migrations/20261001160428_reflection.sql"
+    },
+    {
+      "name": "public.set_planning_task_status",
+      "last_defined_in": "supabase/migrations/20261001104654_planning.sql"
+    },
+    {
+      "name": "public.setup_career",
+      "last_defined_in": "supabase/migrations/20261001052104_career.sql"
+    },
+    {
+      "name": "public.setup_fitness",
+      "last_defined_in": "supabase/migrations/20261001044053_fitness.sql"
+    },
+    {
+      "name": "public.start_focus_timer",
+      "last_defined_in": "supabase/migrations/20261001052104_career.sql"
+    },
+    {
+      "name": "public.write_tracking_habit_log",
+      "last_defined_in": "supabase/migrations/20261001004511_core_tracking.sql"
+    },
+    {
+      "name": "public.write_tracking_metric_log",
+      "last_defined_in": "supabase/migrations/20261001004511_core_tracking.sql"
+    }
+  ],
+  "retain_or_rewrite_routines": [
+    "private.before_account_delete",
+    "private.clear_workspace",
+    "private.initialize_user",
+    "private.touch_updated_at",
+    "private.validate_timezone",
+    "public.delete_workspace_data",
+    "public.export_workspace_data"
+  ],
+  "retire_feature_directories": [
+    "src/features/career",
+    "src/features/challenges",
+    "src/features/fitness",
+    "src/features/insights",
+    "src/features/metrics",
+    "src/features/onboarding",
+    "src/features/planning",
+    "src/features/reflection",
+    "src/features/tracking-settings"
+  ],
+  "retire_route_directories": [
+    "src/app/(workspace)/career",
+    "src/app/(workspace)/challenges",
+    "src/app/(workspace)/fitness",
+    "src/app/(workspace)/goals",
+    "src/app/(workspace)/insights",
+    "src/app/(workspace)/metrics",
+    "src/app/(workspace)/more",
+    "src/app/(workspace)/onboarding",
+    "src/app/(workspace)/plan",
+    "src/app/(workspace)/reflection",
+    "src/app/(workspace)/tasks",
+    "src/app/(workspace)/track",
+    "src/app/(workspace)/settings/organization",
+    "src/app/(workspace)/settings/tracking"
+  ],
+  "retire_files": [
+    "src/features/today/challenge-switcher.tsx",
+    "src/features/today/metric-logger.tsx",
+    "src/features/today/score-panel.tsx",
+    "src/features/settings/organization-actions.ts",
+    "src/features/settings/organization-forms.tsx",
+    "src/features/settings/organization-queries.ts",
+    "src/components/tracking/definition-actions.tsx",
+    "src/components/presentation/stat-summary.tsx",
+    "components.json"
+  ],
+  "retire_test_files": [
+    "tests/e2e/career.spec.ts",
+    "tests/e2e/fitness.spec.ts",
+    "tests/e2e/insights.spec.ts",
+    "tests/e2e/planning.spec.ts",
+    "tests/e2e/reflection.spec.ts",
+    "supabase/tests/career.test.ts",
+    "supabase/tests/hosted-career.test.ts",
+    "supabase/tests/hosted-career.sql",
+    "supabase/tests/fitness.test.ts",
+    "supabase/tests/hosted-fitness.test.ts",
+    "supabase/tests/hosted-fitness.sql",
+    "supabase/tests/planning.test.ts",
+    "supabase/tests/hosted-planning.test.ts",
+    "supabase/tests/hosted-planning.sql",
+    "supabase/tests/reflection.test.ts",
+    "supabase/tests/hosted-reflection.test.ts",
+    "supabase/tests/hosted-reflection.sql"
+  ],
+  "remove_packages": [
+    "recharts",
+    "react-is",
+    "shadcn",
+    "tw-animate-css"
+  ],
+  "rewrite_test_files": [
+    "src/features/tracking/domain.test.ts",
+    "supabase/tests/foundation.test.ts",
+    "supabase/tests/tracking.test.ts",
+    "supabase/tests/hosted-foundation.sql",
+    "supabase/tests/hosted-foundation.test.ts",
+    "supabase/tests/hosted-tracking.sql",
+    "supabase/tests/hosted-tracking.test.ts",
+    "supabase/tests/data-controls.test.ts",
+    "supabase/tests/hosted-data-controls.sql",
+    "supabase/tests/hosted-data-controls.test.ts",
+    "tests/e2e/foundation.spec.ts",
+    "tests/e2e/tracking.spec.ts",
+    "tests/e2e/settings.spec.ts",
+    "tests/e2e/ui-refinement.spec.ts"
+  ],
+  "preserve_migrations": [
+    "supabase/migrations/20260930180649_foundation.sql",
+    "supabase/migrations/20260930181434_categories_parent_index.sql",
+    "supabase/migrations/20261001004511_core_tracking.sql",
+    "supabase/migrations/20261001004734_score_items_policy_category_index.sql",
+    "supabase/migrations/20261001044053_fitness.sql",
+    "supabase/migrations/20261001044323_fitness_owner_indexes.sql",
+    "supabase/migrations/20261001044532_workout_edit_fix.sql",
+    "supabase/migrations/20261001050228_workout_payload_guard.sql",
+    "supabase/migrations/20261001052104_career.sql",
+    "supabase/migrations/20261001104654_planning.sql",
+    "supabase/migrations/20261001104905_planning_goal_owner_index.sql",
+    "supabase/migrations/20261001105141_planning_copy_reset.sql",
+    "supabase/migrations/20261001160428_reflection.sql",
+    "supabase/migrations/20261002004151_data_controls.sql"
+  ],
+  "forward_migrations": [
+    "supabase/migrations/20261003090000_simple_habits.sql",
+    "supabase/migrations/20261003103000_habit_conflict_response.sql"
+  ],
+  "retained_renamed_primitives": {
+    "src/components/tracking": "src/components/forms",
+    "src/features/tracking/dates.ts": "src/lib/dates.ts"
+  },
+  "remove_packages_completed": true,
+  "verification": {
+    "unit_cases": 22,
+    "database_cases": 23,
+    "real_auth_browser_cases": 26,
+    "hosted_public_tables": 5,
+    "hosted_public_rpcs": 6,
+    "remaining_release_checks": [
+      "SMTP email delivery",
+      "physical devices and screen readers",
+      "release configuration and dependency/Auth advisories"
+    ]
+  }
+}

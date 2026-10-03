@@ -1,29 +1,23 @@
 # Winter Arc OS
 
-A personal performance application for habits, fitness, career preparation, planning, and reflection. Built incrementally with Next.js and Supabase.
+A private habit app you can use in under a minute: open Today, check off your habits, and leave. Three sections: Today, Habits, Settings. Built with Next.js, React, Tailwind, Supabase, Zod, Geist, Lucide, and small local primitives.
 
-## Current delivery
-
-**Phases 1–8 are implemented and verified in the configured development project.** Phase 8 adds organization/calendar settings, private exports, data/account deletion, and a public offline shell. Reflection includes weekly reviews, monthly reflections, and adjacent statistics calculated by Insights. Desktop navigation includes Reflection; mobile uses a five-link bottom bar with More for Reflection, Challenges, and Settings. Phase 7 adds one owned database migration. See [ROADMAP](docs/ROADMAP.md) and [QA](docs/QA.md) for exact verification and release gates.
-
-The MCP URL matches `.env.local`. The confirmed test account supports real login, session refresh, and browser checks. Hosted RLS scripts use rollback-only fixtures; Reflection browser flows cover save/reopen/edit, statistics parity, private access, Privacy Mode, accessibility, and mobile layout. The user deferred signup/confirmation/recovery email delivery tests until custom SMTP is configured before production. The supplied confirmed test account uses an example-domain address.
+The user approved the simple product and all five [desktop/phone design boards](docs/DESIGN_REVIEW.md) October 3, 2026. The replacement is implemented and verified in development; [QA](docs/QA.md) records actual outcomes. No deployment, push, or merge is included. The old roadmap/specification and verification history remain [archived](docs/history/2026-10-03-pre-simplification/README.md).
 
 ## Documentation
 
-| Source of truth | Contents |
-| --- | --- |
-| [AGENTS.md](AGENTS.md) | Operating rules and phase workflow |
-| [PRODUCT.md](PRODUCT.md) | Requirements, terminology, defaults, exclusions |
-| [ARCHITECTURE.md](docs/ARCHITECTURE.md) | Boundaries, schema, routes, security, decisions |
-| [SCORING.md](docs/SCORING.md) | Schedules, formulas, streaks, examples |
-| [DESIGN.md](DESIGN.md) | Implemented tokens and interface conventions |
-| [ROADMAP.md](docs/ROADMAP.md) | Phase checklists and acceptance gates |
-| [QA.md](docs/QA.md) | Test strategy and verified results |
-| [MASTER_SPEC.md](docs/MASTER_SPEC.md) | Unchanged historical specification |
+- [PRODUCT](PRODUCT.md): accepted behavior and exclusions.
+- [Architecture](docs/ARCHITECTURE.md): routes, five tables, authentication and security.
+- [History rules](docs/SCORING.md): dated schedules, corrections, closed-week counts.
+- [DESIGN](DESIGN.md): approved compositions and implemented conventions.
+- [Roadmap](docs/ROADMAP.md) and [QA](docs/QA.md): delivery gates and evidence.
+- [Cleanup/reset](docs/SIMPLIFICATION.md): retirement inventory and verified development scope.
+- [AGENTS](AGENTS.md): durable operating instructions.
+- [Original specification](docs/MASTER_SPEC.md): unchanged historical reference.
 
 ## Install and run
 
-Use Node.js 22.15 or newer within version 22 (`.nvmrc`) and npm. The committed lockfile fixes the actual dependency versions.
+Use Node.js 22.15 or newer within version 22 (`.nvmrc`) and npm. The lockfile pins the actual versions.
 
 ```sh
 npm ci
@@ -31,114 +25,65 @@ cp .env.example .env.local
 npm run dev
 ```
 
-Before starting, replace the example Supabase URL/public key and set `APP_ORIGIN` to `http://localhost:3000`. Open that address after starting the server. Apply the foundation migration to the same project first; auth alone cannot supply the missing application tables. Missing credentials disable submission with a setup notice.
+Set the project's public Supabase URL/key and `APP_ORIGIN=http://localhost:3000`. Apply the full migration chain to that same project first. New accounts begin empty; no onboarding or starter package. Daily habit creation requires only a name. Selected days are optional. History and the editor live inside Habits; data controls live inside Settings.
 
-Apply all migrations in `supabase/migrations` to the same project before using tracking and reflection pages. The hosted development project has the applied versions listed below; local filenames match its ledger. An empty account can use personal tracking immediately, opt into full starters during onboarding, or set up fitness/Career definitions from their pages.
-
-| Environment variable | Purpose |
+| Variable | Meaning |
 | --- | --- |
-| `NEXT_PUBLIC_SUPABASE_URL` | Local or hosted project's API URL |
-| `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | Publishable key (or legacy anon key); never an administrative key |
-| `APP_ORIGIN` | Trusted application origin for confirmation/recovery links and account-deletion requests |
-| `SUPABASE_SECRET_KEY` | Server-only secret key from the same project; required for verified account deletion and disposable Phase 8 browser fixtures |
-| `E2E_AUTH_EMAIL`, `E2E_AUTH_PASSWORD` | Optional dedicated confirmed test-account credentials; enable hosted browser tests |
+| NEXT_PUBLIC_SUPABASE_URL | Supabase API URL |
+| NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY | Public key, never an administrative key |
+| APP_ORIGIN | Trusted origin for Auth callbacks and account deletion |
+| SUPABASE_SECRET_KEY | Server-only same-project key, used for verified self-account deletion and disposable development test accounts |
+| SUPABASE_URL | Optional server URL; must equal the public URL |
+| E2E_AUTH_EMAIL / E2E_AUTH_PASSWORD | Dedicated confirmed account for login/refresh regression tests |
 
-Keep `.env.local` out of Git. Never paste credentials into documentation or chat. Keep the administrative secret exclusively in the server environment; it must never use a `NEXT_PUBLIC_` prefix. Without it, account deletion shows an unavailable state. The rest of the app uses the publishable key and caller identity. If `SUPABASE_URL` is also supplied, it must equal `NEXT_PUBLIC_SUPABASE_URL`.
+Keep `.env.local`, exports, credentials and browser traces out of Git. No secret uses a NEXT_PUBLIC prefix. Ordinary product queries and mutations use the caller's identity. Account deletion visibly remains unavailable without the server key.
 
 ## Commands
 
 | Command | Meaning |
 | --- | --- |
-| `npm ci` | Reproduce the locked dependency installation |
-| `npm run dev` | Start Next.js development on port 3000 |
-| `npm run lint` | Check code with ESLint |
-| `npm run typecheck` | Generate route declarations and check TypeScript |
-| `npm run test` | Run auth, tracking, fitness, study, planning, and Insights domain unit tests; Reflection period/security checks live in `test:db` |
-| `npm run test:db` | Replay migrations in isolated PostgreSQL and verify RLS/constraints; no Docker or remote changes |
-| `npm run test:e2e` | Build production, start port 3100, and run desktop/mobile browser tests |
-| `npm run build` | Compile a production application |
-| `npm run start` | Serve an existing production build |
-| `npm run db:start` | Start the local Supabase stack; requires a running Docker-compatible runtime |
-| `npm run db:reset` | Rebuild the disposable local Supabase database from migrations; erases local data |
+| npm ci | Reproduce the locked clean installation |
+| npm run dev | Development server on port 3000 |
+| npm run lint | ESLint checks |
+| npm run typecheck | Generate route declarations and check TypeScript |
+| npm run test | Auth validation, habit/history/calendar and accessible field unit tests |
+| npm run test:db | Replay all historical SQL plus the forward migrations in isolated PGlite PostgreSQL; verify catalog, RLS, constraints, conflicts, export and deletion |
+| npm run test:e2e | Build production and run actual Auth desktop/mobile browser checks on port 3100 |
+| npm run build | Production compilation |
+| npm run start | Serve the existing production build |
+| npm run db:start | Full local Supabase stack; requires Docker-compatible runtime |
+| npm run db:reset | Reset disposable local Supabase from migrations; destroys local data only |
 
-Run `npm run typecheck` and `npm run build` one after the other; both write generated files under `.next/types`, so running them at the same time can cause a false missing-file error.
+Run typecheck and build sequentially; both write `.next/types`. After route retirement, remove stale generated `.next` files once before typecheck. Local fonts and explicit Webpack keep builds reproducible. ESLint uses `@eslint/compat`; the bundled plugins report older peer ranges, while the standard locked installation/lint pass. Vite 8.3.1, formerly supplied indirectly through shadcn, is now an explicit Vitest development dependency. No legacy-peer flag is needed for npm ci.
 
-Install Playwright's browser once with `npx playwright install chromium`. Existing browser tests skip authenticated flows unless dedicated test credentials are supplied. Phase 8 data/PWA/privacy checks require the development server key; they create confirmed disposable accounts and delete them in `finally`. Never run these fixtures against a production project. They do not mock Supabase or manufacture successful authentication.
+## Database workflow
 
-The application uses Next.js 16.3.8, React 19.2.8, Tailwind 4, shadcn/ui, Lucide, Geist, Zod, Supabase SSR, and Recharts 3.10.1 for bounded fitness charts. React Hook Form remains optional for later complex forms. Fonts ship locally, so builds do not fetch Google Fonts.
+There are exactly five public application tables: profiles, user_preferences, habits, habit_schedules, habit_logs. Writes to the habit tables use owned RPCs; ordinary clients cannot directly overwrite dates, revisions or history. Definition edits and archive cutoffs begin tomorrow; past scheduled corrections remain available. Completion sends a desired boolean and expected revision; false undo rows retain the revision.
 
-Webpack is selected explicitly for development/build because the available environment rejected Turbopack's process/port initialization. ESLint 10 uses the official `@eslint/compat` adapter for bundled Next.js plugins. npm reports their older peer ranges; the locked installation and actual lint checks succeed without legacy-peer installation flags. Re-evaluate this compatibility bridge when updating Next.js/plugins.
+Preserve all 14 historical migration files. The replacement is `20261003090000_simple_habits.sql`; `20261003103000_habit_conflict_response.sql` repairs business-conflict responses without rewriting the applied reset. The reviewed development project is `trdizdsjivorkffjjywe`; its configured URL/catalog/ledger and exact affected counts are recorded in SIMPLIFICATION. The fresh start deliberately discards all product history and retains Auth/profile/essential preferences. Never use a remote reset. Schema deployment requires an explicitly matching authorized target, local validation, stopped incompatible builds, and complete type regeneration afterward.
 
-## Local Supabase
+Use the project CLI for read-only preflight, SQL application, type generation and advisors. When executing a migration through `db query`, record its version/name/statements in the migration ledger **in the same transaction**; do not leave an unrecorded application for a later push to repeat. CLI queries can use `--linked --project-ref` even without a local link file; type generation uses `--project-id`. Keep application/cutover commands in repository scripts where repeated.
 
-Configuration already exists in `supabase/config.toml`; do not reinitialize it. The CLI is a locked project development dependency.
+`supabase/tests/hosted-tracking.sql` is the consolidated rollback-only ownership/export/deletion fixture. `test:db` validates it locally before the authorized development SQL run. PGlite supplies test-only Auth roles and tables; it does not verify GoTrue, email, PostgREST or a full container stack. No fixture setup belongs in deployed migrations.
 
-```sh
-npm run db:start
-npx supabase status
-npm run db:reset
-```
+## Browser verification
 
-Copy the local API URL and **public** key into `.env.local`; do not publish the full status output. Inspect the local inbox URL reported by the CLI to test confirmation/recovery emails. Local config enables email confirmation, minimum 12-character passwords, and the committed email templates. Starter definitions are applied only when a user opts in during onboarding.
+Install Chromium once with `npx playwright install chromium`. Supply dedicated confirmed-account credentials for the foundation refresh test and the same development server key for disposable habit/settings/privacy/PWA tests. Fixtures are pinned to the development hostname, create real confirmed accounts, and delete them in finally. Never use a personal account for deletion. For an interrupted run, `node scripts/cleanup-browser-fixtures.mjs <ISO-timestamp>` inspects only marked disposable accounts created since that time in the pinned development project; append `--apply` to remove them through Auth. Run only after the test runner stops. Password-verification traces are disabled; other traces stay ignored. Foundation restores profile/theme through owner-scoped requests.
 
-The isolated `test:db` runner executes real PostgreSQL through PGlite and supplies minimal test-only `auth.users`, roles, and `auth.uid()`. It verifies SQL/RLS without a container, but it does not run GoTrue, PostgREST, email delivery, or a full Supabase reset. Full local-stack checks remain unverified on this machine because no Docker daemon is running.
+The refresh test expires cookie metadata while preserving real issued credentials, then checks actual refresh-token rotation. It does not fabricate a JWT or claim signed-JWT expiration coverage. Emulation/axe do not establish physical-device or actual screen-reader checks.
 
-## Migrations and generated types
+## Auth and email setup
 
-Add incremental SQL under `supabase/migrations`, using `npx supabase migration new <name>`. Never edit a migration after deploying it. The foundation creates account/organization tables; Phase 2 adds core tracking; Phase 3 adds fitness; Phase 4 adds study sessions and the persisted timer; Phase 5 adds tasks, goals, milestones, and retry-safe carry operations; Phase 7 adds weekly and monthly reflection tables; Phase 8 adds export/deletion routines and an ordered Auth deletion trigger without new tables. Applied versions are `20260930180649_foundation`, `20260930181434_categories_parent_index`, `20261001004511_core_tracking`, `20261001004734_score_items_policy_category_index`, `20261001044053_fitness`, `20261001044323_fitness_owner_indexes`, `20261001044532_workout_edit_fix`, `20261001050228_workout_payload_guard`, `20261001052104_career`, `20261001104654_planning`, `20261001104905_planning_goal_owner_index`, `20261001105141_planning_copy_reset`, `20261001160428_reflection`, and `20261002004151_data_controls`. Local filenames match the hosted ledger.
+Keep `src/proxy.ts` cookie refresh, independent page/action identity checks, private/no-store headers, validated APP_ORIGIN and local redirect allowlists. Callback no-referrer is configured globally as well as in its handler. Auth confirmation supports token hashes and provider-default PKCE codes; PKCE links must open in the browser that initiated the request.
 
-Regenerate complete public database types after schema changes with Supabase's generator. With a full local stack:
+Hosted Auth configuration is separate from migrations/local config. The verified development Site URL is `http://localhost:3000` with exact confirmation/recovery callbacks and default provider templates. Before production, configure [custom SMTP](https://supabase.com/docs/guides/auth/auth-smtp) and test signup/confirmation/recovery against a real inbox. Current email delivery remains **explicitly unverified**. Manual confirmation of a disposable account verifies login, not SMTP. The free dashboard restricts custom templates without SMTP; repository confirmation/recovery templates can be applied after SMTP setup. Do not print passwords or email links.
 
-```sh
-npx supabase gen types typescript --local --schema public > src/types/database.ts
-```
+## Data and offline controls
 
-`src/types/database.ts` was regenerated through the matching hosted MCP after Phase 8 deployment. The old isolated generator was removed because it could overwrite complete types with an incomplete schema. Review generated types with every migration. Hosted MCP regeneration is the verified path when a local Docker-compatible runtime is unavailable.
+Settings exports private format-version-2 JSON containing the five complete owned tables, including original names while Privacy Mode is enabled. Export aggregation has no REST page limit. There is no import/restore interface. Clearing habit data verifies the current password and DELETE MY DATA; Auth/profile/preferences survive. Account deletion verifies the current password and DELETE MY ACCOUNT in the same-origin request, deletes only the caller, runs transactional database cleanup, and clears session cookies. Arbitrary target IDs are rejected.
 
-## Hosted configuration
+The manifest/icons support installation on HTTPS/localhost. Offer the install button only when the browser supplies a real prompt. The service worker caches only the public offline document and three icons; never cache private routes, Auth, API, RSC, export or mutations. Offline saves are not queued. Controlled fields retain unsaved Settings input on failure. Bump the worker cache version when public offline assets change.
 
-1. Choose a development/test project. Ensure its URL matches `.env.local` and any connected MCP before inspecting or changing schema. A connection configured with `read_only=true` supports inspection but cannot apply migrations; enable write access only for the intended development project before deployment.
-2. Inspect existing tables and migration history. Apply the tested foundation SQL using the authorized MCP migration tool, or link the CLI with `npx supabase link --project-ref <reference>` and deploy using `npx supabase db push`.
-3. When MCP assigns a migration timestamp, align the local migration filename with its recorded version to prevent a later CLI push from replaying it.
-4. Configure Supabase Auth Site URL to `APP_ORIGIN`, enable email confirmations, and add the application confirmation URL to allowed redirects. Configure production-like email delivery independently.
-5. With custom SMTP configured, copy `supabase/templates/confirmation.html` and `recovery.html` into hosted Auth email templates for direct token-hash verification. The current free dashboard locks template editing without SMTP. Default templates can instead use the existing SSR PKCE flow: `/auth/confirm` exchanges the returned `code` using the verifier cookie. Open the email link in the same browser/device that requested it; another browser cannot supply that verifier. See the [PKCE flow guide](https://supabase.com/docs/guides/auth/sessions/pkce-flow).
-6. Create a dedicated account in Supabase Auth → Users and confirm its email. Add `E2E_AUTH_EMAIL` and `E2E_AUTH_PASSWORD` to ignored `.env.local`, then run `npm run test:e2e`. This exercises real login, reload persistence, refresh-token rotation, settings, theme changes, keyboard access, and logout. Use a test account because these checks temporarily change its name/theme; ordinary owner-scoped API cleanup restores both in `finally` even on assertion failure. Traces can contain test credentials and remain ignored; never publish them.
-7. Separately exercise signup and confirmation/recovery emails against a real inbox. The default email service sends only to pre-authorized organization team addresses and has restrictive limits; configure [custom SMTP](https://supabase.com/docs/guides/auth/auth-smtp) for other recipients. A manually confirmed example-domain test account establishes login, not email delivery. After resetting a dedicated fixture password, update its ignored E2E password locally before rerunning tests. Never send passwords or email links in chat.
+## Git and release
 
-Hosted PostgreSQL isolation is verified by the rollback-only `supabase/tests/hosted-*.sql` scripts for foundation, tracking, fitness, Career, Planning, Reflection, and data controls. Validate them locally with `npm run test:db` before executing through the authorized development-project MCP. They use temporary fixtures inside transactions that always roll back. They do not create a usable Auth API test account or send email.
-
-The current hosted Site URL is `http://localhost:3000`. Exact allowed callbacks are `http://localhost:3000/auth/confirm` and `http://localhost:3000/auth/confirm?next=/reset-password`; no wildcard was added. Hosted templates remain the provider defaults. These are development settings, not a deployed release.
-
-The browser refresh test changes only cookie `expires_at` metadata to a past value, preserving server-issued tokens, then verifies a real Auth refresh and rotated refresh token. It does not wait for or manufacture an expired signed JWT.
-
-Local `config.toml` does not automatically configure hosted Auth settings. MCP migration deployment does not change email templates or redirect allowlists. Do not reset a hosted project to test migrations. Follow the [Supabase migration workflow](https://supabase.com/docs/guides/local-development/database-migrations); the historical `supabase db commit` example is superseded.
-
-## Repository branches
-
-[`master`](https://github.com/thisissuman/winter-arc-os/tree/master) is the default integration branch and contains the complete Phase 0–4 commit history. The `feature/phase-0-docs`, `feature/phase-1-foundation`, `feature/phase-2-core-tracking`, `feature/phase-3-fitness`, and `feature/phase-4-career` branches mark the verified phase checkpoints. Each later branch includes earlier commits; they are not separate copies of the app. Create future work on `feature/` branches and merge through a reviewed pull request. This branch organization is not a production release.
-
-## Vercel and recovery
-
-The Git remote is [`origin`](https://github.com/thisissuman/winter-arc-os). No Vercel deployment has been configured. For an authorized release, use separate staging/production projects and environment values, apply tested migrations, configure Auth/email URLs for the deployed origin, then run the [release checklist](docs/QA.md). Preview deployments must not share production personal data.
-
-For a migration failure, stop subsequent deployment, inspect migration history, and correct the schema with an incremental repair migration. Do not rewrite an already-applied file or use remote reset. Confirm provider backup/PITR availability and rehearse restoration on a separate project before release; actual recovery identifiers belong in QA when configured.
-
-## Data controls and recovery
-
-`/settings/organization` edits, archives, and restores life areas/categories without removing linked history. `/settings` edits calendar preferences prospectively; tracker/target editors remain in their delivered feature pages and `/settings/tracking`.
-
-`/settings/data` downloads a private format-version-1 JSON snapshot containing all 33 owned product tables, including archived/private records and active timer timestamps. Three internal operation-receipt tables are excluded. The database function uses one statement snapshot and has no PostgREST row cap. Store exports privately; there is no import/restore interface in V1. Future schema changes must update the export/clear allowlists and their catalog tests together.
-
-Deleting workspace data requires the current password and `DELETE MY DATA`. It removes organization, definitions, logs, sessions/timers, challenges, planning, and reviews while retaining sign-in, profile, calendar, appearance, and privacy preferences. Setup and challenge selection reset. Deleting the account requires the current password and `DELETE MY ACCOUNT`; a same-origin request deletes the authenticated identity and every owned record. Password verification occurs in the same request. The private Auth trigger removes restrictive children inside the deletion transaction; the server clears local session cookies afterward. Account deletion has no arbitrary target ID and uses the [server-only Supabase secret key](https://supabase.com/docs/guides/api/api-keys) for [Auth deletion](https://supabase.com/docs/reference/javascript/auth-admin-deleteuser).
-
-Deletion is irreversible within the app. JSON is a portable record, not an automatic backup restoration. Operational recovery requires a provider backup/PITR plan and a restoration rehearsal in a separate project before release.
-
-## Installation and offline behavior
-
-The Next.js manifest and local PNG icons support installation over HTTPS or localhost. Settings shows an install button only when the browser supplies a real installation prompt; otherwise it gives browser-menu and Safari home-screen instructions. Browser eligibility is checked in Chromium; actual device installation remains part of the Phase 9 release review. See [Next.js PWA guidance](https://nextjs.org/docs/app/guides/progressive-web-apps).
-
-The service worker caches only `/offline.html` and three PNG icons. Workspace, Auth, API, export, RSC, and mutation responses are not cached. Failed offline navigations show a public reconnect document with no personal data. Open pages show connection feedback; settings preserve entered text after an offline save attempt. Offline writes are neither saved nor queued, and full offline synchronization is outside V1. Changing public offline assets requires incrementing the worker cache version; do not add private paths to its allowlist.
-
-## Later features
-
-AI, wearables, OAuth, Pomodoro, freeze tokens, CSV import, full offline synchronization, and advanced drag-and-drop remain excluded from V1.
+Use feature/* branches and reviewed pull requests into master; preserve unrelated work. Origin is [winter-arc-os](https://github.com/thisissuman/winter-arc-os). No push, merge, Vercel configuration or deployment is included. Production requires separate environment/project settings, SMTP testing, remaining device/accessibility checks and provider backup/recovery rehearsal. The development fresh start has no old-history import.

@@ -1,0 +1,633 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-10-03T08:26:57.111Z",
+  "title": "Design System: Winter Arc OS",
+  "extensions": {
+    "colorMeta": {
+      "primary-dark": {
+        "role": "primary",
+        "displayName": "Primary Dark",
+        "tonalRamp": [
+          "oklch(15.00% 0.12729 290.11)",
+          "oklch(26.43% 0.12729 290.11)",
+          "oklch(37.86% 0.12729 290.11)",
+          "oklch(49.29% 0.12729 290.11)",
+          "oklch(60.71% 0.12729 290.11)",
+          "oklch(72.14% 0.12729 290.11)",
+          "oklch(83.57% 0.12729 290.11)",
+          "oklch(95.00% 0.12729 290.11)"
+        ]
+      },
+      "primary-light": {
+        "role": "primary",
+        "displayName": "Primary Light",
+        "tonalRamp": [
+          "oklch(15.00% 0.19366 285.44)",
+          "oklch(26.43% 0.19366 285.44)",
+          "oklch(37.86% 0.19366 285.44)",
+          "oklch(49.29% 0.19366 285.44)",
+          "oklch(60.71% 0.19366 285.44)",
+          "oklch(72.14% 0.19366 285.44)",
+          "oklch(83.57% 0.19366 285.44)",
+          "oklch(95.00% 0.19366 285.44)"
+        ]
+      },
+      "primary-hover-dark": {
+        "role": "primary",
+        "displayName": "Primary Hover Dark",
+        "tonalRamp": [
+          "oklch(15.00% 0.10480 291.20)",
+          "oklch(26.43% 0.10480 291.20)",
+          "oklch(37.86% 0.10480 291.20)",
+          "oklch(49.29% 0.10480 291.20)",
+          "oklch(60.71% 0.10480 291.20)",
+          "oklch(72.14% 0.10480 291.20)",
+          "oklch(83.57% 0.10480 291.20)",
+          "oklch(95.00% 0.10480 291.20)"
+        ]
+      },
+      "primary-hover-light": {
+        "role": "primary",
+        "displayName": "Primary Hover Light",
+        "tonalRamp": [
+          "oklch(15.00% 0.19498 284.11)",
+          "oklch(26.43% 0.19498 284.11)",
+          "oklch(37.86% 0.19498 284.11)",
+          "oklch(49.29% 0.19498 284.11)",
+          "oklch(60.71% 0.19498 284.11)",
+          "oklch(72.14% 0.19498 284.11)",
+          "oklch(83.57% 0.19498 284.11)",
+          "oklch(95.00% 0.19498 284.11)"
+        ]
+      },
+      "primary-ink-dark": {
+        "role": "primary",
+        "displayName": "Primary Ink Dark",
+        "tonalRamp": [
+          "oklch(15.00% 0.03024 298.98)",
+          "oklch(26.43% 0.03024 298.98)",
+          "oklch(37.86% 0.03024 298.98)",
+          "oklch(49.29% 0.03024 298.98)",
+          "oklch(60.71% 0.03024 298.98)",
+          "oklch(72.14% 0.03024 298.98)",
+          "oklch(83.57% 0.03024 298.98)",
+          "oklch(95.00% 0.03024 298.98)"
+        ]
+      },
+      "primary-ink-light": {
+        "role": "primary",
+        "displayName": "Primary Ink Light",
+        "tonalRamp": [
+          "oklch(15.00% 0.00000 89.88)",
+          "oklch(26.43% 0.00000 89.88)",
+          "oklch(37.86% 0.00000 89.88)",
+          "oklch(49.29% 0.00000 89.88)",
+          "oklch(60.71% 0.00000 89.88)",
+          "oklch(72.14% 0.00000 89.88)",
+          "oklch(83.57% 0.00000 89.88)",
+          "oklch(95.00% 0.00000 89.88)"
+        ]
+      },
+      "background-dark": {
+        "role": "neutral",
+        "displayName": "Background Dark",
+        "tonalRamp": [
+          "oklch(15.00% 0.00837 274.41)",
+          "oklch(26.43% 0.00837 274.41)",
+          "oklch(37.86% 0.00837 274.41)",
+          "oklch(49.29% 0.00837 274.41)",
+          "oklch(60.71% 0.00837 274.41)",
+          "oklch(72.14% 0.00837 274.41)",
+          "oklch(83.57% 0.00837 274.41)",
+          "oklch(95.00% 0.00837 274.41)"
+        ]
+      },
+      "background-light": {
+        "role": "neutral",
+        "displayName": "Background Light",
+        "tonalRamp": [
+          "oklch(15.00% 0.00397 286.33)",
+          "oklch(26.43% 0.00397 286.33)",
+          "oklch(37.86% 0.00397 286.33)",
+          "oklch(49.29% 0.00397 286.33)",
+          "oklch(60.71% 0.00397 286.33)",
+          "oklch(72.14% 0.00397 286.33)",
+          "oklch(83.57% 0.00397 286.33)",
+          "oklch(95.00% 0.00397 286.33)"
+        ]
+      },
+      "foreground-dark": {
+        "role": "neutral",
+        "displayName": "Foreground Dark",
+        "tonalRamp": [
+          "oklch(15.00% 0.00667 286.27)",
+          "oklch(26.43% 0.00667 286.27)",
+          "oklch(37.86% 0.00667 286.27)",
+          "oklch(49.29% 0.00667 286.27)",
+          "oklch(60.71% 0.00667 286.27)",
+          "oklch(72.14% 0.00667 286.27)",
+          "oklch(83.57% 0.00667 286.27)",
+          "oklch(95.00% 0.00667 286.27)"
+        ]
+      },
+      "foreground-light": {
+        "role": "neutral",
+        "displayName": "Foreground Light",
+        "tonalRamp": [
+          "oklch(15.00% 0.01516 279.63)",
+          "oklch(26.43% 0.01516 279.63)",
+          "oklch(37.86% 0.01516 279.63)",
+          "oklch(49.29% 0.01516 279.63)",
+          "oklch(60.71% 0.01516 279.63)",
+          "oklch(72.14% 0.01516 279.63)",
+          "oklch(83.57% 0.01516 279.63)",
+          "oklch(95.00% 0.01516 279.63)"
+        ]
+      },
+      "sidebar-dark": {
+        "role": "neutral",
+        "displayName": "Sidebar Dark",
+        "tonalRamp": [
+          "oklch(15.00% 0.01008 276.52)",
+          "oklch(26.43% 0.01008 276.52)",
+          "oklch(37.86% 0.01008 276.52)",
+          "oklch(49.29% 0.01008 276.52)",
+          "oklch(60.71% 0.01008 276.52)",
+          "oklch(72.14% 0.01008 276.52)",
+          "oklch(83.57% 0.01008 276.52)",
+          "oklch(95.00% 0.01008 276.52)"
+        ]
+      },
+      "sidebar-light": {
+        "role": "neutral",
+        "displayName": "Sidebar Light",
+        "tonalRamp": [
+          "oklch(15.00% 0.00666 286.27)",
+          "oklch(26.43% 0.00666 286.27)",
+          "oklch(37.86% 0.00666 286.27)",
+          "oklch(49.29% 0.00666 286.27)",
+          "oklch(60.71% 0.00666 286.27)",
+          "oklch(72.14% 0.00666 286.27)",
+          "oklch(83.57% 0.00666 286.27)",
+          "oklch(95.00% 0.00666 286.27)"
+        ]
+      },
+      "surface-dark": {
+        "role": "neutral",
+        "displayName": "Surface Dark",
+        "tonalRamp": [
+          "oklch(15.00% 0.01215 270.81)",
+          "oklch(26.43% 0.01215 270.81)",
+          "oklch(37.86% 0.01215 270.81)",
+          "oklch(49.29% 0.01215 270.81)",
+          "oklch(60.71% 0.01215 270.81)",
+          "oklch(72.14% 0.01215 270.81)",
+          "oklch(83.57% 0.01215 270.81)",
+          "oklch(95.00% 0.01215 270.81)"
+        ]
+      },
+      "surface-light": {
+        "role": "neutral",
+        "displayName": "Surface Light",
+        "tonalRamp": [
+          "oklch(15.00% 0.00000 89.88)",
+          "oklch(26.43% 0.00000 89.88)",
+          "oklch(37.86% 0.00000 89.88)",
+          "oklch(49.29% 0.00000 89.88)",
+          "oklch(60.71% 0.00000 89.88)",
+          "oklch(72.14% 0.00000 89.88)",
+          "oklch(83.57% 0.00000 89.88)",
+          "oklch(95.00% 0.00000 89.88)"
+        ]
+      },
+      "raised-dark": {
+        "role": "neutral",
+        "displayName": "Raised Dark",
+        "tonalRamp": [
+          "oklch(15.00% 0.01410 266.99)",
+          "oklch(26.43% 0.01410 266.99)",
+          "oklch(37.86% 0.01410 266.99)",
+          "oklch(49.29% 0.01410 266.99)",
+          "oklch(60.71% 0.01410 266.99)",
+          "oklch(72.14% 0.01410 266.99)",
+          "oklch(83.57% 0.01410 266.99)",
+          "oklch(95.00% 0.01410 266.99)"
+        ]
+      },
+      "inset-dark": {
+        "role": "neutral",
+        "displayName": "Inset Dark",
+        "tonalRamp": [
+          "oklch(15.00% 0.01068 268.11)",
+          "oklch(26.43% 0.01068 268.11)",
+          "oklch(37.86% 0.01068 268.11)",
+          "oklch(49.29% 0.01068 268.11)",
+          "oklch(60.71% 0.01068 268.11)",
+          "oklch(72.14% 0.01068 268.11)",
+          "oklch(83.57% 0.01068 268.11)",
+          "oklch(95.00% 0.01068 268.11)"
+        ]
+      },
+      "inset-light": {
+        "role": "neutral",
+        "displayName": "Inset Light",
+        "tonalRamp": [
+          "oklch(15.00% 0.00398 286.33)",
+          "oklch(26.43% 0.00398 286.33)",
+          "oklch(37.86% 0.00398 286.33)",
+          "oklch(49.29% 0.00398 286.33)",
+          "oklch(60.71% 0.00398 286.33)",
+          "oklch(72.14% 0.00398 286.33)",
+          "oklch(83.57% 0.00398 286.33)",
+          "oklch(95.00% 0.00398 286.33)"
+        ]
+      },
+      "secondary-dark": {
+        "role": "neutral",
+        "displayName": "Secondary Dark",
+        "tonalRamp": [
+          "oklch(15.00% 0.01525 274.24)",
+          "oklch(26.43% 0.01525 274.24)",
+          "oklch(37.86% 0.01525 274.24)",
+          "oklch(49.29% 0.01525 274.24)",
+          "oklch(60.71% 0.01525 274.24)",
+          "oklch(72.14% 0.01525 274.24)",
+          "oklch(83.57% 0.01525 274.24)",
+          "oklch(95.00% 0.01525 274.24)"
+        ]
+      },
+      "secondary-light": {
+        "role": "neutral",
+        "displayName": "Secondary Light",
+        "tonalRamp": [
+          "oklch(15.00% 0.00806 293.91)",
+          "oklch(26.43% 0.00806 293.91)",
+          "oklch(37.86% 0.00806 293.91)",
+          "oklch(49.29% 0.00806 293.91)",
+          "oklch(60.71% 0.00806 293.91)",
+          "oklch(72.14% 0.00806 293.91)",
+          "oklch(83.57% 0.00806 293.91)",
+          "oklch(95.00% 0.00806 293.91)"
+        ]
+      },
+      "selected-dark": {
+        "role": "neutral",
+        "displayName": "Selected Dark",
+        "tonalRamp": [
+          "oklch(15.00% 0.04215 291.36)",
+          "oklch(26.43% 0.04215 291.36)",
+          "oklch(37.86% 0.04215 291.36)",
+          "oklch(49.29% 0.04215 291.36)",
+          "oklch(60.71% 0.04215 291.36)",
+          "oklch(72.14% 0.04215 291.36)",
+          "oklch(83.57% 0.04215 291.36)",
+          "oklch(95.00% 0.04215 291.36)"
+        ]
+      },
+      "selected-light": {
+        "role": "neutral",
+        "displayName": "Selected Light",
+        "tonalRamp": [
+          "oklch(15.00% 0.02850 294.58)",
+          "oklch(26.43% 0.02850 294.58)",
+          "oklch(37.86% 0.02850 294.58)",
+          "oklch(49.29% 0.02850 294.58)",
+          "oklch(60.71% 0.02850 294.58)",
+          "oklch(72.14% 0.02850 294.58)",
+          "oklch(83.57% 0.02850 294.58)",
+          "oklch(95.00% 0.02850 294.58)"
+        ]
+      },
+      "muted-dark": {
+        "role": "neutral",
+        "displayName": "Muted Dark",
+        "tonalRamp": [
+          "oklch(15.00% 0.01594 277.76)",
+          "oklch(26.43% 0.01594 277.76)",
+          "oklch(37.86% 0.01594 277.76)",
+          "oklch(49.29% 0.01594 277.76)",
+          "oklch(60.71% 0.01594 277.76)",
+          "oklch(72.14% 0.01594 277.76)",
+          "oklch(83.57% 0.01594 277.76)",
+          "oklch(95.00% 0.01594 277.76)"
+        ]
+      },
+      "muted-light": {
+        "role": "neutral",
+        "displayName": "Muted Light",
+        "tonalRamp": [
+          "oklch(15.00% 0.02182 265.84)",
+          "oklch(26.43% 0.02182 265.84)",
+          "oklch(37.86% 0.02182 265.84)",
+          "oklch(49.29% 0.02182 265.84)",
+          "oklch(60.71% 0.02182 265.84)",
+          "oklch(72.14% 0.02182 265.84)",
+          "oklch(83.57% 0.02182 265.84)",
+          "oklch(95.00% 0.02182 265.84)"
+        ]
+      },
+      "divider-dark": {
+        "role": "neutral",
+        "displayName": "Divider Dark",
+        "tonalRamp": [
+          "oklch(15.00% 0.01651 275.47)",
+          "oklch(26.43% 0.01651 275.47)",
+          "oklch(37.86% 0.01651 275.47)",
+          "oklch(49.29% 0.01651 275.47)",
+          "oklch(60.71% 0.01651 275.47)",
+          "oklch(72.14% 0.01651 275.47)",
+          "oklch(83.57% 0.01651 275.47)",
+          "oklch(95.00% 0.01651 275.47)"
+        ]
+      },
+      "divider-light": {
+        "role": "neutral",
+        "displayName": "Divider Light",
+        "tonalRamp": [
+          "oklch(15.00% 0.01083 286.18)",
+          "oklch(26.43% 0.01083 286.18)",
+          "oklch(37.86% 0.01083 286.18)",
+          "oklch(49.29% 0.01083 286.18)",
+          "oklch(60.71% 0.01083 286.18)",
+          "oklch(72.14% 0.01083 286.18)",
+          "oklch(83.57% 0.01083 286.18)",
+          "oklch(95.00% 0.01083 286.18)"
+        ]
+      },
+      "control-border-dark": {
+        "role": "neutral",
+        "displayName": "Control Border Dark",
+        "tonalRamp": [
+          "oklch(15.00% 0.02212 272.99)",
+          "oklch(26.43% 0.02212 272.99)",
+          "oklch(37.86% 0.02212 272.99)",
+          "oklch(49.29% 0.02212 272.99)",
+          "oklch(60.71% 0.02212 272.99)",
+          "oklch(72.14% 0.02212 272.99)",
+          "oklch(83.57% 0.02212 272.99)",
+          "oklch(95.00% 0.02212 272.99)"
+        ]
+      },
+      "control-border-light": {
+        "role": "neutral",
+        "displayName": "Control Border Light",
+        "tonalRamp": [
+          "oklch(15.00% 0.02030 268.97)",
+          "oklch(26.43% 0.02030 268.97)",
+          "oklch(37.86% 0.02030 268.97)",
+          "oklch(49.29% 0.02030 268.97)",
+          "oklch(60.71% 0.02030 268.97)",
+          "oklch(72.14% 0.02030 268.97)",
+          "oklch(83.57% 0.02030 268.97)",
+          "oklch(95.00% 0.02030 268.97)"
+        ]
+      },
+      "success-dark": {
+        "role": "semantic",
+        "displayName": "Success Dark",
+        "tonalRamp": [
+          "oklch(15.00% 0.10430 155.69)",
+          "oklch(26.43% 0.10430 155.69)",
+          "oklch(37.86% 0.10430 155.69)",
+          "oklch(49.29% 0.10430 155.69)",
+          "oklch(60.71% 0.10430 155.69)",
+          "oklch(72.14% 0.10430 155.69)",
+          "oklch(83.57% 0.10430 155.69)",
+          "oklch(95.00% 0.10430 155.69)"
+        ]
+      },
+      "success-light": {
+        "role": "semantic",
+        "displayName": "Success Light",
+        "tonalRamp": [
+          "oklch(15.00% 0.11477 152.45)",
+          "oklch(26.43% 0.11477 152.45)",
+          "oklch(37.86% 0.11477 152.45)",
+          "oklch(49.29% 0.11477 152.45)",
+          "oklch(60.71% 0.11477 152.45)",
+          "oklch(72.14% 0.11477 152.45)",
+          "oklch(83.57% 0.11477 152.45)",
+          "oklch(95.00% 0.11477 152.45)"
+        ]
+      },
+      "destructive-dark": {
+        "role": "semantic",
+        "displayName": "Destructive Dark",
+        "tonalRamp": [
+          "oklch(15.00% 0.08908 26.76)",
+          "oklch(26.43% 0.08908 26.76)",
+          "oklch(37.86% 0.08908 26.76)",
+          "oklch(49.29% 0.08908 26.76)",
+          "oklch(60.71% 0.08908 26.76)",
+          "oklch(72.14% 0.08908 26.76)",
+          "oklch(83.57% 0.08908 26.76)",
+          "oklch(95.00% 0.08908 26.76)"
+        ]
+      },
+      "destructive-light": {
+        "role": "semantic",
+        "displayName": "Destructive Light",
+        "tonalRamp": [
+          "oklch(15.00% 0.18205 29.51)",
+          "oklch(26.43% 0.18205 29.51)",
+          "oklch(37.86% 0.18205 29.51)",
+          "oklch(49.29% 0.18205 29.51)",
+          "oklch(60.71% 0.18205 29.51)",
+          "oklch(72.14% 0.18205 29.51)",
+          "oklch(83.57% 0.18205 29.51)",
+          "oklch(95.00% 0.18205 29.51)"
+        ]
+      }
+    },
+    "typographyMeta": {
+      "headline": {
+        "displayName": "Page Headline",
+        "purpose": "Today, Habits and Settings titles."
+      },
+      "section": {
+        "displayName": "Section",
+        "purpose": "Editor titles and substantial empty states."
+      },
+      "body": {
+        "displayName": "Body",
+        "purpose": "Supporting copy, schedule descriptions and compact controls."
+      },
+      "task": {
+        "displayName": "Task",
+        "purpose": "Habit names, dates and phone control text."
+      },
+      "label": {
+        "displayName": "Label",
+        "purpose": "Visible form labels and medium-weight actions."
+      },
+      "caption": {
+        "displayName": "Caption",
+        "purpose": "Helpers, calendar weekdays and status explanations."
+      }
+    },
+    "shadows": [
+      {
+        "name": "float-dark",
+        "value": "0 18px 48px rgb(0 0 0 / 40%)",
+        "purpose": "Dark editor and routine menu overlays."
+      },
+      {
+        "name": "float-light",
+        "value": "0 14px 36px rgb(27 28 40 / 12%)",
+        "purpose": "Light editor and routine menu overlays."
+      }
+    ],
+    "motion": [
+      {
+        "name": "control-duration",
+        "value": "150ms",
+        "purpose": "Shared Button color-state transition."
+      },
+      {
+        "name": "ease-out",
+        "value": "cubic-bezier(0, 0, 0.2, 1)",
+        "purpose": "Shared Button color-state easing."
+      },
+      {
+        "name": "reduced-motion",
+        "value": "none",
+        "purpose": "prefers-reduced-motion removes all animations/transitions and uses auto scrolling."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "sheet-to-dialog",
+        "value": "640px"
+      },
+      {
+        "name": "sidebar",
+        "value": "768px"
+      },
+      {
+        "name": "wide-gutters",
+        "value": "1024px"
+      }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary-dark",
+      "description": "Primary Button using the live semantic theme roles and the standard touch minimum.",
+      "html": "<button type=\"button\" class=\"ds-button-primary\">Create habit</button>",
+      "css": ".ds-button-primary{display:inline-flex;align-items:center;justify-content:center;min-height:44px;box-sizing:border-box;padding:0 12px;gap:8px;border:1px solid transparent;border-radius:8px;font-size:14px;line-height:21px;font-weight:500;cursor:pointer;font-family:var(--font-geist-sans,Geist,sans-serif);transition:background-color 150ms cubic-bezier(0,0,.2,1),color 150ms cubic-bezier(0,0,.2,1),border-color 150ms cubic-bezier(0,0,.2,1);background:var(--primary,#a89af3);color:var(--primary-foreground,#181322);}.ds-button-primary:hover{background:var(--primary-hover,#b7abf5);}.ds-button-primary:focus-visible{border-color:var(--ring,#a89af3);box-shadow:0 0 0 3px color-mix(in srgb,var(--ring,#a89af3) 50%,transparent);outline:none;}.ds-button-primary:active{transform:translateY(1px)}.ds-button-primary:disabled{opacity:.5;pointer-events:none}@media(prefers-reduced-motion:reduce){.ds-button-primary{transition:none}}"
+    },
+    {
+      "name": "Outline Button",
+      "kind": "button",
+      "refersTo": "button-outline-dark",
+      "description": "Outline Button using the live semantic theme roles and the standard touch minimum.",
+      "html": "<button type=\"button\" class=\"ds-button-outline\">Cancel</button>",
+      "css": ".ds-button-outline{display:inline-flex;align-items:center;justify-content:center;min-height:44px;box-sizing:border-box;padding:0 12px;gap:8px;border:1px solid transparent;border-radius:8px;font-size:14px;line-height:21px;font-weight:500;cursor:pointer;font-family:var(--font-geist-sans,Geist,sans-serif);transition:background-color 150ms cubic-bezier(0,0,.2,1),color 150ms cubic-bezier(0,0,.2,1),border-color 150ms cubic-bezier(0,0,.2,1);background:var(--surface-inset,#111318);color:var(--foreground,#ededf2);border-color:var(--control-border,#707482);}.ds-button-outline:hover{background:var(--secondary,#22242c);}.ds-button-outline:focus-visible{border-color:var(--ring,#a89af3);box-shadow:0 0 0 3px color-mix(in srgb,var(--ring,#a89af3) 50%,transparent);outline:none;}.ds-button-outline:active{transform:translateY(1px)}.ds-button-outline:disabled{opacity:.5;pointer-events:none}@media(prefers-reduced-motion:reduce){.ds-button-outline{transition:none}}"
+    },
+    {
+      "name": "Ghost Button",
+      "kind": "button",
+      "refersTo": "button-ghost",
+      "description": "Ghost Button using the live semantic theme roles and the standard touch minimum.",
+      "html": "<button type=\"button\" class=\"ds-button-ghost\">Add a habit</button>",
+      "css": ".ds-button-ghost{display:inline-flex;align-items:center;justify-content:center;min-height:44px;box-sizing:border-box;padding:0 12px;gap:8px;border:1px solid transparent;border-radius:8px;font-size:14px;line-height:21px;font-weight:500;cursor:pointer;font-family:var(--font-geist-sans,Geist,sans-serif);transition:background-color 150ms cubic-bezier(0,0,.2,1),color 150ms cubic-bezier(0,0,.2,1),border-color 150ms cubic-bezier(0,0,.2,1);background:transparent;color:var(--primary,#a89af3);}.ds-button-ghost:hover{background:var(--secondary,#22242c);}.ds-button-ghost:focus-visible{border-color:var(--ring,#a89af3);box-shadow:0 0 0 3px color-mix(in srgb,var(--ring,#a89af3) 50%,transparent);outline:none;}.ds-button-ghost:active{transform:translateY(1px)}.ds-button-ghost:disabled{opacity:.5;pointer-events:none}@media(prefers-reduced-motion:reduce){.ds-button-ghost{transition:none}}"
+    },
+    {
+      "name": "Destructive Button",
+      "kind": "button",
+      "refersTo": "button-destructive-dark",
+      "description": "Destructive Button using the live semantic theme roles and the standard touch minimum.",
+      "html": "<button type=\"button\" class=\"ds-button-destructive\">Delete habit and history</button>",
+      "css": ".ds-button-destructive{display:inline-flex;align-items:center;justify-content:center;min-height:44px;box-sizing:border-box;padding:0 12px;gap:8px;border:1px solid transparent;border-radius:8px;font-size:14px;line-height:21px;font-weight:500;cursor:pointer;font-family:var(--font-geist-sans,Geist,sans-serif);transition:background-color 150ms cubic-bezier(0,0,.2,1),color 150ms cubic-bezier(0,0,.2,1),border-color 150ms cubic-bezier(0,0,.2,1);background:color-mix(in srgb,var(--destructive,#ffb4ab) 20%,transparent);color:var(--destructive,#ffb4ab);}.ds-button-destructive:hover{background:color-mix(in srgb,var(--destructive,#ffb4ab) 30%,transparent);}.ds-button-destructive:focus-visible{border-color:var(--ring,#a89af3);box-shadow:0 0 0 3px color-mix(in srgb,var(--ring,#a89af3) 50%,transparent);outline:none;}.ds-button-destructive:active{transform:translateY(1px)}.ds-button-destructive:disabled{opacity:.5;pointer-events:none}@media(prefers-reduced-motion:reduce){.ds-button-destructive{transition:none}}"
+    },
+    {
+      "name": "Habit Name Field",
+      "kind": "input",
+      "refersTo": "field",
+      "description": "Visible label, strong field stroke and task-sized text on a phone.",
+      "html": "<label class=\"ds-field-label\" for=\"ds-habit-name\">Habit name</label><input class=\"ds-field\" id=\"ds-habit-name\" placeholder=\"e.g. Read\" maxlength=\"80\">",
+      "css": ".ds-field-label{display:block;margin-bottom:8px;color:var(--foreground,#ededf2);font-size:14px;line-height:20px;font-weight:500;font-family:var(--font-geist-sans,Geist,sans-serif);}.ds-field{display:block;min-height:44px;box-sizing:border-box;width:100%;padding:8px 12px;border:1px solid var(--control-border,#707482);border-radius:8px;background:var(--surface-inset,#111318);color:var(--foreground,#ededf2);font-size:16px;line-height:24px;font-family:var(--font-geist-sans,Geist,sans-serif);transition:background-color 150ms cubic-bezier(0,0,.2,1),color 150ms cubic-bezier(0,0,.2,1),border-color 150ms cubic-bezier(0,0,.2,1);}.ds-field::placeholder{color:var(--muted-foreground,#a5a7b2)}.ds-field:focus-visible{outline:2px solid var(--ring,#a89af3);outline-offset:4px;}.ds-field:disabled{opacity:.6}.ds-field[aria-invalid=true]{border-color:var(--destructive,#ffb4ab)}@media(min-width:768px){.ds-field{font-size:14px;line-height:20px}}@media(prefers-reduced-motion:reduce){.ds-field{transition:none}}"
+    },
+    {
+      "name": "Navigation Link",
+      "kind": "nav",
+      "refersTo": "navigation-link",
+      "description": "Current destination with selected tonal fill; the mobile dock stacks icon and label.",
+      "html": "<nav aria-label=\"Main navigation\"><a class=\"ds-nav-link\" href=\"#today\" aria-current=\"page\"><svg width=\"20\" height=\"20\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.7\" aria-hidden=\"true\"><rect x=\"3\" y=\"5\" width=\"18\" height=\"16\" rx=\"2\"/><path d=\"M16 3v4M8 3v4M3 11h18\"/></svg>Today</a></nav>",
+      "css": ".ds-nav-link{display:flex;min-height:44px;align-items:center;gap:12px;padding:0 12px;border-radius:8px;color:var(--muted-foreground,#a5a7b2);text-decoration:none;font-size:14px;line-height:20px;font-weight:500;font-family:var(--font-geist-sans,Geist,sans-serif);transition:background-color 150ms cubic-bezier(0,0,.2,1),color 150ms cubic-bezier(0,0,.2,1),border-color 150ms cubic-bezier(0,0,.2,1);}.ds-nav-link[aria-current=page]{background:var(--selected,#28243b);color:var(--selected-foreground,#ededf2)}.ds-nav-link:hover{background:var(--secondary,#22242c);color:var(--foreground,#ededf2)}.ds-nav-link:focus-visible{outline:2px solid var(--ring,#a89af3);outline-offset:4px;}@media(prefers-reduced-motion:reduce){.ds-nav-link{transition:none}}"
+    },
+    {
+      "name": "Schedule Choice",
+      "kind": "chip",
+      "description": "A native radio in a generous selected-day choice; selection is conveyed by the input and outline.",
+      "html": "<label class=\"ds-schedule-choice\"><input type=\"radio\" name=\"ds-schedule\" checked>Daily</label>",
+      "css": ".ds-schedule-choice{display:inline-flex;min-height:44px;align-items:center;gap:8px;padding:0 16px;border:1px solid var(--control-border,#707482);border-radius:8px;color:var(--foreground,#ededf2);font-size:14px;line-height:20px;cursor:pointer;font-family:var(--font-geist-sans,Geist,sans-serif);}.ds-schedule-choice:has(input:checked){background:var(--selected,#28243b);border-color:var(--primary,#a89af3)}.ds-schedule-choice:has(input:focus-visible){outline:2px solid var(--ring,#a89af3);outline-offset:4px;}.ds-schedule-choice:hover{border-color:var(--primary,#a89af3)}"
+    },
+    {
+      "name": "Calendar Container",
+      "kind": "card",
+      "refersTo": "calendar-container",
+      "description": "A framed tonal calendar with symbolic date states and primary date selection.",
+      "html": "<div class=\"ds-calendar\"><div class=\"ds-calendar-grid\"><a class=\"ds-calendar-date ds-calendar-completed\" href=\"#date-1\" aria-label=\"2026-10-01: completed\">1<svg width=\"20\" height=\"20\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.5\" aria-hidden=\"true\"><path d=\"m5 12 4 4L19 6\"/></svg></a><a class=\"ds-calendar-date ds-calendar-selected\" href=\"#date-2\" aria-current=\"date\" aria-label=\"2026-10-02: not completed\">2<span aria-hidden=\"true\">×</span></a><a class=\"ds-calendar-date\" href=\"#date-3\" aria-label=\"2026-10-03: pending today\">3<span aria-hidden=\"true\">○</span></a></div></div>",
+      "css": ".ds-calendar{padding:8px;border:1px solid var(--border,#2b2d36);border-radius:16px;background:var(--card,#181a20);font-family:var(--font-geist-sans,Geist,sans-serif);}.ds-calendar-grid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:4px}.ds-calendar-date{display:flex;min-height:56px;box-sizing:border-box;flex-direction:column;align-items:center;justify-content:center;gap:4px;border:1px solid var(--border,#2b2d36);border-radius:8px;font-size:14px;line-height:20px;text-decoration:none;color:var(--foreground,#ededf2)}.ds-calendar-date:hover{background:var(--secondary,#22242c)}.ds-calendar-date:focus-visible{outline:2px solid var(--ring,#a89af3);outline-offset:4px;}.ds-calendar-selected{border-color:var(--primary,#a89af3);background:var(--selected,#28243b)}@media(min-width:640px){.ds-calendar{padding:16px}.ds-calendar-grid{gap:8px}} .ds-calendar-completed{color:var(--success,#87d5a4)}"
+    },
+    {
+      "name": "Completion Row",
+      "kind": "custom",
+      "refersTo": "completion-row",
+      "description": "One accessible full-row checkbox, readable name and confirmed non-color check.",
+      "html": "<div class=\"ds-completion-divider\"><button class=\"ds-completion\" type=\"button\" role=\"checkbox\" aria-checked=\"true\" aria-label=\"Read on 2026-10-03\"><span class=\"ds-completion-mark\"><svg width=\"20\" height=\"20\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.5\" aria-hidden=\"true\"><path d=\"m5 12 4 4L19 6\"/></svg></span><span class=\"ds-completion-name\">Read</span></button></div>",
+      "css": ".ds-completion-divider{border-bottom:1px solid var(--border,#2b2d36)}.ds-completion{display:flex;width:100%;min-height:64px;align-items:center;gap:16px;padding:16px 8px;border:0;border-radius:8px;background:transparent;color:var(--foreground,#ededf2);text-align:left;font-size:16px;line-height:24px;cursor:pointer;font-family:var(--font-geist-sans,Geist,sans-serif);transition:background-color 150ms cubic-bezier(0,0,.2,1),color 150ms cubic-bezier(0,0,.2,1),border-color 150ms cubic-bezier(0,0,.2,1);}.ds-completion:hover{background:var(--secondary,#22242c)}.ds-completion:focus-visible{outline:2px solid var(--ring,#a89af3);outline-offset:4px;}.ds-completion-mark{display:flex;width:36px;height:36px;box-sizing:border-box;flex-shrink:0;align-items:center;justify-content:center;border:2px solid var(--control-border,#707482);border-radius:50%}.ds-completion-name{min-width:0;overflow-wrap:anywhere}.ds-completion[aria-checked=true]{color:var(--muted-foreground,#a5a7b2)}.ds-completion[aria-checked=true] .ds-completion-mark{border-color:var(--success,#87d5a4);background:var(--success,#87d5a4);color:var(--background,#101115)}.ds-completion:disabled{opacity:.7;cursor:default}@media(prefers-reduced-motion:reduce){.ds-completion{transition:none}}"
+    }
+  ],
+  "narrative": {
+    "northStar": "A quiet daily checklist",
+    "overview": "Winter Arc OS is a private habit app designed to be used in under a minute. The approved charcoal/violet world gives ordinary routines a calm, readable setting: familiar controls, short labels, open space and prominent habit names. The identity is Winter Arc OS, with its existing snowflake mark and locally packaged Geist type.\n\nThis document records the implemented replacement, grounded in [the stylesheet](src/app/globals.css), [shared controls](src/components/ui), and Today/Habits/Settings. The five [desktop/phone boards](docs/DESIGN_REVIEW.md) were approved October 3, 2026; they are direction references rather than synchronized user data. The earlier broad-product concepts are superseded. The final real-auth desktop/mobile suite passed all 26 checks; hosted rollback-only security checks also passed. Detailed evidence and remaining actual-device, screen-reader and SMTP limitations belong to [QA](docs/QA.md). This design record does not claim those manual or email checks.",
+    "keyCharacteristics": [
+      "Solid charcoal and cool paper surfaces with a restrained violet accent.",
+      "Narrow task columns, divider rows and a three-destination shell.",
+      "Readable completed states, visible focus and large touch controls.",
+      "A name-and-schedule editor with quiet, literal save feedback.",
+      "Complete dark/light roles, without ornamental gradients, neon, glass or decorative imagery."
+    ],
+    "rules": [
+      {
+        "name": "The Meaningful Accent Rule",
+        "body": "Use violet for an available action, selection or focus. Keep ordinary rows and section backgrounds neutral.",
+        "section": "colors"
+      },
+      {
+        "name": "The Literal Label Rule",
+        "body": "Use sentence case and the name of the action or state. Keep visible labels and full accessible names; abbreviated weekdays still announce their full names.",
+        "section": "typography"
+      },
+      {
+        "name": "The Task Column Rule",
+        "body": "Preserve the readable centered column and let controls wrap on small screens. Extra screen width is breathing room, not a reason to add dashboard panels.",
+        "section": "layout"
+      },
+      {
+        "name": "The Flat Workspace Rule",
+        "body": "Keep ordinary routine rows and Settings sections unraised. Use floating depth for content that overlays the workspace.",
+        "section": "elevation"
+      }
+    ],
+    "dos": [
+      "**Do** use semantic theme roles, visible control strokes and consistent focus treatment.",
+      "**Do** keep habit names prominent, wrapping long content and preserving readable completed text.",
+      "**Do** keep touch targets large and reserve space for the phone dock and keyboard.",
+      "**Do** convey states with symbols or text as well as color.",
+      "**Do** mask habit names consistently in Privacy Mode, including editors and accessible labels.",
+      "**Do** use literal pending/error feedback and honor reduced motion."
+    ],
+    "donts": [
+      "**Don't** add ornamental gradients, neon, glass, decorative imagery or an animation library.",
+      "**Don't** turn Today into score cards, charts, streak rewards or a reporting dashboard.",
+      "**Don't** add navigation destinations or required setup fields beyond the accepted product.",
+      "**Don't** treat illustrative board labels/counts as saved user data or QA evidence.",
+      "**Don't** weaken a readable control or hide its failure state to make a screenshot cleaner."
+    ]
+  }
+}

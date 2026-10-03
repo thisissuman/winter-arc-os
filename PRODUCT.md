@@ -1,4 +1,4 @@
-# Winter Arc OS — product requirements
+# Winter Arc OS — simple habit product
 
 <!-- impeccable:product-schema 1 -->
 
@@ -8,120 +8,73 @@ web
 
 ## Status and authority
 
-Accepted product contract for V1; foundation, core tracking, fitness, Career, Planning, Insights, Reflection, and Settings/data controls are implemented and verified in the configured development project. Feature implementation continues one requested phase at a time. This document records the user's specification and confirmed planning decisions. The [original specification](docs/MASTER_SPEC.md) is preserved unchanged. Calculation details belong in [SCORING](docs/SCORING.md), implementation details in [ARCHITECTURE](docs/ARCHITECTURE.md), and delivery status in [ROADMAP](docs/ROADMAP.md).
+Accepted October 3, 2026 when the user requested implementation of the simple-habit plan. This contract supersedes the broader performance-app requirements. **The source and matching development database now implement the simple habit product.** Designs approved October 3, 2026; local and hosted verification is recorded in QA. Final real-auth desktop/mobile and visual review passed; see QA for results and remaining release checks.
 
-## Verification decision — October 1, 2026
+The previous product, architecture, design, scoring, roadmap, and QA records are preserved in [the historical snapshot](docs/history/2026-10-03-pre-simplification/README.md). The [original specification](docs/MASTER_SPEC.md) remains unchanged. [ROADMAP](docs/ROADMAP.md) records the active gates; [cleanup inventory](docs/SIMPLIFICATION.md) records removal scope.
 
-The user explicitly deferred signup-confirmation and password-recovery email delivery tests until custom SMTP is configured before production. Phase 1 may close after real confirmed-account login, session refresh, settings, logout, and all other foundation checks pass. Signup/recovery implementation remains in scope; successful email callbacks and delivery are unverified, not reported as passing. Restore these checks in the Phase 9 release gate before production. No email-confirmation protection is disabled to accommodate this deferral.
+## Purpose and users
 
-## Users
+A private habit app for someone who found the broader tracking app too complicated to keep using. Open Today, check off routines, and leave in under a minute. Phone check-ins and desktop review both matter. Keep the multi-account privacy boundary, without public profiles or social features.
 
-The initial user is a frontend engineer working from home, generally 11 AM–8 PM, training around four times weekly, focused on muscle gain and senior frontend/full-stack interview preparation. Approximate body weight is context only, not a measurement to insert into the database.
+## Positioning and operating context
 
-The application starts as a personal tool but must safely isolate multiple accounts. There is no public profile, social feed, or shared workspace in V1.
+Winter Arc is the identity, not a challenge or season configuration system. Three sections support one workflow: decide on a small routine, record whether it happened, and review dated history. Training, studying, and drinking water can be ordinary named habits. Recording quantities, sets, study time, scores, or goals is outside this product.
 
-## Product purpose
+## Three sections
 
-Answer “What should I do today?” and make logging fast enough for daily use. Track health, career preparation, habits, weekly tasks, goals, focus, and reflection. Provide meaningful progress from real measurements and explainable calculations.
-
-Support future seasons, challenges, and personal arcs. Winter Arc 2026 is optional starter content, spanning September 1–December 1, 2026 inclusively (92 days), not an application-wide date restriction.
-
-## Positioning
-
-One personal workflow connects daily behaviors, raw measurements, flexible quotas, study/workout sessions, planning, and reflection. Shared trackers can participate in multiple challenges without duplicate logging. Scores explain their inputs and expectations rather than treating everything as a checkbox.
-
-## Operating context
-
-Frequent phone logging and desktop review/planning are first-class workflows. Today prioritizes quick actions. Charts and comparisons help the user interpret consistency over weeks and months. Streaks are supporting information rather than the primary measure of success.
-
-## Terminology and confirmed decisions
-
-| Concept | Meaning |
+| Section | Required behavior |
 | --- | --- |
-| Habit | A scheduled behavior, binary or recurring |
-| Metric | A raw numerical measurement or derived numerical total |
-| Frequency target | A quota over a week/month, e.g. four completed workouts |
-| Goal | A longer outcome tracked manually, with milestones, or from a metric |
-| Challenge | A dated grouping of reusable trackers and goals |
-| Life area | An editable organizational area, not a fixed scoring category |
-| Daily score | Adherence to scheduled daily items only |
-| Weekly score | Due daily opportunities and weekly quotas, without duplicate contributions |
+| Today | Selected date, scheduled habits, one-tap completion/undo, “3 of 5 done,” and quiet empty/all-done feedback |
+| Habits | Routine creation/editing, schedules, archive/permanent deletion, per-habit calendar history, and a compact weekly consistency summary |
+| Settings | Account/profile, theme, timezone/week start, global Privacy Mode, private JSON export, data deletion, account deletion |
 
-Confirmed: daily and weekly scoring are separate; trackers are shared across challenges. Weekly progress appears on Today. Monthly quotas remain separate until monthly evaluation. Tracking remains usable without a selected challenge.
+Habits contains Routines and History views. History and the editor are not additional navigation destinations. Desktop and mobile expose only Today, Habits, Settings. Retired feature URLs return 404 after cleanup.
 
-## V1 capabilities
+## Habit definition and recording
 
-- Email/password signup, confirmation, login, logout, password recovery, persistent sessions, and private accounts.
-- Challenges with title/description, inclusive dates, status, optional color/icon, associations, and selected dashboard context.
-- Habits with editable descriptions/icons/categories, time of day, privacy, active range, archive state, effective-dated schedules, counts, and logs.
-- Daily, weekdays, selected weekdays, weekly/monthly quotas, and a bounded custom recurrence of every N days from an anchor date.
-- Monthly habit matrix with completed, missed, skipped, unscheduled, pending-today, and future states; scheduled-opportunity streaks and period consistency.
-- Manual raw metrics and configurable minimum/maximum targets; derived study/sleep totals; observation-only body weight.
-- Fitness: weight history and seven-day/weekly averages, protein, water quick-add/manual entry, creatine behavior/dosage, sleep hours or timestamps and optional quality, steps.
-- Lightweight workouts with date/name/duration/notes, reusable exercise identity, muscle group, ordered sets, load/reps/optional RPE, copying, and progression history.
-- Career: editable study categories, manual sessions, recoverable stopwatch, notes/topics, optional challenge, daily/weekly totals and category analytics.
-- Seven-day tasks with status/priority/category/notes, estimates/actual duration, reorder controls, move/copy unfinished tasks, and optional goal/challenge associations.
-- Goals with target dates, category/challenge/status, manual percentage, milestones, or metric-derived progress. Every goal may carry milestones.
-- Insights: truthful score/consistency trends, fitness and career summaries, heatmaps, strong/missed habit rankings, equal-coverage comparisons, and missing-data indicators.
-- Weekly reviews and monthly reflection with adjacent statistics and optional mindset ratings.
-- Settings for profile, appearance, timezone/week start, targets, tracker/challenge/organization management, privacy, JSON export, and personal data/account deletion.
-- Installable PWA with public offline shell; polished light/dark themes, accessible mobile/desktop flows, and visible loading/empty/error states.
+- Setup asks only for a name and schedule. Every day is the default. Selected weekdays includes weekday-only schedules without a separate recurrence type.
+- New habits begin on their creation business date. Daily and selected weekdays are the only schedules.
+- Completion is a boolean for one habit/date. Tap to complete; tap again to undo. Use the desired value rather than a blind toggle, with pending/error feedback and revision conflict handling.
+- No required description, note, icon, category, time-of-day group, dosage, unit, numerical value, count target, or private-item flag.
+- Past scheduled dates can be corrected. Future, unscheduled, pre-creation, and post-archive dates cannot be completed.
+- Name edits apply immediately. Schedule edits take effect tomorrow, retaining historical schedule versions. Multiple edits to the same tomorrow version replace that pending version.
+- Archive ends eligibility tomorrow and retains history. The initial simple version has no restore workflow. Archived routines are available in History; explicit permanent deletion removes that habit and its history after confirmation.
+- Start with no seeded habits or performance records. “Add your first habit” is the empty-state action. Suggest 3–5 habits without imposing a limit.
 
-## Optional starter definitions
+## History and consistency
 
-Apply only after the user chooses the starter setup. Keep every item editable/deletable and make repeated application idempotent. Never seed measurements, completions, workouts, study sessions, tasks presented as completed, or scores.
+Five user-facing date states: Completed, Not completed, Pending today, Not scheduled, Future. No skipped/missed entry form or partial count. Missing/false completion on a closed scheduled date is Not completed; an uncompleted scheduled date today is Pending today.
 
-| Group | Definitions and editable defaults |
-| --- | --- |
-| Challenge | Winter Arc 2026; September 1–December 1, 2026 |
-| Life areas | Health, Career, Learning, Finance, Relationships, Mindset, Creativity |
-| Daily habits | Creatine (3 g/day description/configuration), Meditation, Stammering practice |
-| Metrics | Protein target 130 g; water target 3.5 L; body weight observation; sleep and steps definitions |
-| Weekly targets | Gym 4 completed sessions; career study 5 completed sessions; walking 5 qualifying days |
-| Study categories | JavaScript, TypeScript, React, Next.js, Frontend System Design, DSA, Python, AI Engineering, Mock Interview, Portfolio, Applications |
-| Scoring categories | Fitness 30%, Career 30%, Recovery 15%, Nutrition 15%, Discipline 10% |
+The weekly summary is completed opportunities divided by scheduled opportunities on closed dates in the selected week, through yesterday. Today's records and all future dates are excluded from this closed summary. Show the counts and through-date, never a weighted score. Empty eligible history has an honest empty state, not 0% success. No streak rewards, rankings, four-domain heatmaps, trends dashboard, or separate Progress/Insights section.
 
-Sleep hours, step threshold, and study-duration targets are not prescribed by the brief. Offer them for user configuration during the applicable onboarding/setup step; a definition can remain unscored without a target. The examples of 150 minutes/day and 12 hours/week are illustrative, not mandatory defaults.
+The [history contract](docs/SCORING.md) defines date and eligibility calculations. Raw calendar dates are preserved across timezone edits.
 
-Starter trackers become effective on setup day by default, even when the challenge started earlier. Future-source targets may be stored before their feature exists but are excluded with “source not available” until that feature is delivered; do not invent workout/study/sleep data in Phase 2. A rolling update to starter setup must not re-create user-deleted defaults automatically.
+## Settings and privacy
 
-## Date, history, and privacy expectations
+Keep account names, login/logout, themes (dark/light/system), timezone (default Asia/Kolkata), week start (default Monday), and global Privacy Mode. Mask every habit name before rendering/serialization when Privacy Mode is enabled; never leave original names in hidden attributes or accessible names. Creation/name editing is unavailable while names are masked. Counts and dated statuses remain visible.
 
-- Initial timezone is Asia/Kolkata, week starts Monday, with editable preferences.
-- History retains its business dates. Backdated corrections are allowed within a tracker's effective range; future completions are not.
-- Expectation changes take effect prospectively, with period-boundary rules defined in SCORING.
-- Routine removal archives trackers; permanent deletion removes explicitly selected history.
-- Privacy Mode obscures private labels, notes, tooltips, and accessible names. Hiding private Today items is a separate preference. Calculations retain those items; privacy mode is not encryption or a sharing permission system.
-- Exports are private downloads containing the user's real data, including sensitive records. No public export links.
+Export is a private, versioned JSON download of all five owned application tables, without Auth credentials or other owners. Clearing habit data retains the account/profile/preferences. Account deletion independently verifies the current identity/password, deletes only that account, and clears owned descendants transactionally. Destructive controls use clear scope and confirmation.
 
-## Brand commitments
+Keep the existing public offline/PWA shell and install behavior only where the browser actually offers installation. No personal offline cache or sync, reminders, push notifications, or new PWA workflow.
 
-Name: Winter Arc OS. Mature, restrained, dark-first interface with readable density, compact typography, charcoal surfaces and cool violet/indigo accent. Also provide a complete light theme. Linear, Raycast, Vercel, and fitness dashboards are quality references only; create original layouts and copy. Avoid hype, excessive gradients, neon/glass effects, and childish gamification.
+## Explicit removals
 
-## Product principles
+Remove Fitness, Career, Metrics, Tasks, Goals, Insights, Reflection, Challenges, Track/Plan/More hubs, organization management, numerical logging, weekly/monthly quotas, timers, configurable scoring, starter bundles, and onboarding wizard. Their data models, actions, queries, routes, tests, dependencies, and unused shared code are removal scope, not hidden options.
 
-1. Make daily actions quick and reporting truthful.
-2. Respect the difference between behaviors, quotas, and measurements.
-3. Preserve historical expectations and raw data.
-4. Keep personal information private across accounts and presentation states.
-5. Prefer maintainable, tested functionality over speculative infrastructure.
+## Fresh-start boundary
 
-## Accessibility and inclusion
+Use the same configured development Supabase project. Discard all existing product history across that project; retain Auth identities, profiles, and essential account preferences. The new habit tables start empty. No import/preservation path for old product history is planned.
 
-Use semantic HTML, keyboard navigation, labelled controls, visible focus, appropriate contrast, reduced motion, large touch targets, and non-color status cues. Mobile must adapt interaction and hierarchy rather than shrink a desktop page. Charts require accompanying summaries and accessible alternatives.
+The hosted reset is deliberately destructive and may run only after image approval, locally verified migration/application replacement, matching project verification, live schema/history inspection, and review of the explicit affected scope. No data is deleted during planning or image design. Never substitute a remote database reset or another project.
 
-## Constraints and later work
+## Brand commitments and accessibility
 
-Use the required stack documented in README. No AI cost or API is necessary. Defer OAuth, wearables, Pomodoro, freeze tokens, full offline sync, CSV import/export, AI reviews, advanced drag-and-drop, billing, and social features. JSON export and account deletion remain V1 requirements.
+Retain Winter Arc OS, charcoal/violet, Geist, and complete light/dark themes. Use more open space, fewer panels, simple rows, and clear 44 px or larger touch controls. No decorative charts, gradients, neon/glass, hype, or childish rewards. The five approved boards govern composition; DESIGN records implemented tokens and verified behavior.
 
-## Evidence on hand
+Use semantic controls, keyboard navigation, visible focus, labelled forms, non-color date states, reduced motion, responsive editors, loading/empty/error states, and honest saved/failed feedback. Screenshots do not establish accessibility.
 
-The original written specification and accepted plan define the product. Phases 1–5, 7, and 8 have migrated development schemas; Phase 6 reuses owned source tables. Reflection stores only written responses and optional ratings; its adjacent statistics derive from source records through the Insights calculations. There are no production tracking records, integrations, or brand assets. Synthetic fixtures may be used in tests only; they must never be represented as the user's actual analytics.
+## Delivery and verification
 
-## Data controls and installation decisions — Phase 8
+Follow the six-step [roadmap](docs/ROADMAP.md), with one implementation gate at a time. The user authorized the overall plan; image approval is the required checkpoint before foundation work. No deployment, push, or merge is authorized.
 
-Privacy Mode removes hidden text from server-to-client records as well as rendered labels, attributes, tooltips, and accessible names. Numerical values, source identity, history, and scoring stay intact. Private text editors remain unavailable while masked. An explicit JSON download includes original private records with a clear notice.
-
-Workspace deletion removes all performance/organization/planning/reflection data and internal operation receipts but retains Auth, profile, calendar, theme, and privacy preferences. It resets challenge selection and starter/onboarding state. Account deletion also removes the identity, profile, and preferences. Both UI flows require typed confirmation and immediate current-password verification; account deletion is available only with the configured server-only administrative credential. Neither flow accepts another user's identity.
-
-Installation provides a standalone entry point; it does not grant offline access to personal data. Offline navigation shows a generic public reconnect screen. Open forms retain visible input after failed settings saves; no write queue or background synchronization exists in V1. Native device installation and production email delivery remain release verification items.
+Signup/confirmation/recovery email delivery remains unverified until custom SMTP checks before production. Historical old-product tests are not evidence that the simplified app passes. The simplified app and development schema are implemented and verified.
