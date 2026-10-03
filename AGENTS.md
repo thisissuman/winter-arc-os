@@ -2,73 +2,79 @@
 
 ## Start here
 
-Read this file and the canonical documents relevant to the requested phase before editing. Read any nearer `AGENTS.md` for a nested directory as well.
+For repository work, read this file and the canonical documentation before editing; read nearer AGENTS.md files if present.
 
-- [README](README.md): actual setup and command availability.
-- [PRODUCT](PRODUCT.md): accepted product requirements and defaults.
-- [Architecture](docs/ARCHITECTURE.md): application boundaries, routes, database design, security, and decisions.
-- [Scoring](docs/SCORING.md): scheduling, period evaluation, adherence, streaks, and historical calculations.
-- [Design](DESIGN.md): approved direction; implemented conventions once a UI exists.
-- [Roadmap](docs/ROADMAP.md): phase boundaries, dependencies, and acceptance criteria.
-- [QA](docs/QA.md): required verification and actual results.
+- [README](README.md): actual setup/commands and current implementation status.
+- [PRODUCT](PRODUCT.md): accepted simple-habit requirements.
+- [Architecture](docs/ARCHITECTURE.md): target routes/schema/auth/data contracts.
+- [History calculations](docs/SCORING.md): binary scheduling, eligibility, corrections, weekly consistency; no scores.
+- [Design](DESIGN.md): inherited tokens and proposals versus approved/implemented layouts.
+- [Roadmap](docs/ROADMAP.md): six sequential replacement gates.
+- [QA](docs/QA.md): required checks and actual evidence.
+- [Cleanup](docs/SIMPLIFICATION.md): exact removal inventory and reset/cutover.
+- [Design review](docs/DESIGN_REVIEW.md): artifact filenames and approval status.
 
-The [original specification](docs/MASTER_SPEC.md) is an unchanged historical reference. Accepted decisions in PRODUCT, ARCHITECTURE, and SCORING supersede conflicting examples or process instructions in that reference. Direct user instructions take precedence. Record a new accepted decision in its canonical document rather than silently changing a requirement.
+The [original specification](docs/MASTER_SPEC.md) stays unchanged. The broader product and verified workflows are preserved in [the historical snapshot](docs/history/2026-10-03-pre-simplification/README.md). Accepted current PRODUCT/ARCHITECTURE/SCORING supersede their retired requirements; direct user instructions take precedence.
 
-## Current state
+## Current state and authorization
 
-Phases 0–8 are implemented in the configured development project. `master` and the five prior `feature/phase-*` checkpoint branches are on `origin` at `https://github.com/thisissuman/winter-arc-os.git`; `master` contains the complete history through Phase 4. The active Supabase MCP URL matches `.env.local`. Applied migration versions are listed in README; Phase 7 adds `20261001160428_reflection`; Phase 8 adds `20261002004151_data_controls`. Hosted database types are regenerated and rollback-only security fixtures pass. Phase 6 Insights uses existing owned source tables without a migration; Phase 7 Reflection adds weekly/monthly tables and reuses Insights calculations. Read ROADMAP and QA for exact gate status and remaining release checks. The user authorized completing Phase 7 and starting Phase 8 on October 2; both development gates now pass. Do not begin Phase 9 without a new request. Phase 1 signup/confirmation/recovery email delivery remains deferred until SMTP before production.
+October 3, 2026: the user authorized implementing the simple-habit replacement plan. Target: Today/Habits/Settings only, binary check-ins, daily/selected weekdays, no seasons, numerical logging, scores, quotas, timers, fitness/career/planning/reflection/organization feature systems.
+
+Steps 1–2 documentation/inventory and all five design boards are delivered; the user **approved the designs October 3, 2026**. The user's plan requires “Create and approve new section images” before “Simplify the foundation.” That checkpoint is closed. The six implementation steps are delivered; retain the approved artifacts and proceed without repeated approval questions for already authorized work.
+
+The source and configured development schema now use five public tables, six habit/data RPCs, and exactly three navigation sections. Full types are regenerated; lint/typecheck/build, 22 unit cases, 23 database cases, hosted security checks, and all 26 real-auth desktop/mobile browser checks pass. Old QA remains historical evidence. SMTP email delivery is deferred before production; no deployment/push/merge is authorized.
+
+The same development project is the accepted fresh-start target: discard all existing product history, retain Auth identities/profiles/essential preferences. No old-history import is planned. Verify project/local URL, actual catalog/ledger and affected records before applying the destructive forward migration. Do not use a remote database reset or substitute another project.
 
 ## Phase workflow
 
-1. Select the earliest incomplete phase unless the user names another phase whose dependencies are complete. Read its acceptance criteria.
-2. Implement one requested phase at a time. Finish required validation and its handoff before proceeding to another phase.
-3. Keep changes within that phase. Do not implement future tables or expose inactive routes as working features.
-4. Update canonical documentation in the same change as implementation. Record repeated workflows and verified best practices here or in a linked document.
-5. Report delivered behavior, commands and outcomes, configuration still needed, known limitations, and the next phase. Do not repeatedly ask whether to continue within an authorized phase.
-6. If a required check is deferred or cannot run, record it as unverified and leave the corresponding gate incomplete. A later explicit testing request supersedes an earlier phase-specific test deferral; run checks and record their exact outcomes before closing the gate.
+1. Select the earliest open gate in the current six-step roadmap, respecting explicit image approval.
+2. Implement one gate/section at a time and finish validation/handoff before the next.
+3. Keep product scope to the accepted contract; never restore retired features behind hidden configuration.
+4. Update canonical documentation, inventory, operating memory, and QA in the same change as verified workflow/implementation changes.
+5. Report delivered behavior, checks/results, configuration still needed, limitations, and the next gate.
+6. An unavailable/deferred required check stays unverified and the corresponding gate open. Historical old-product success never closes replacement gates.
 
 ## Engineering invariants
 
-- Use the required stack and npm. Pin compatible stable dependencies in the lockfile at implementation time; verify current official documentation before adopting framework/auth patterns.
-- Prefer Server Components and authenticated Server Actions. Keep interactive components small and calculation logic outside UI components.
-- Validate every mutation with Zod and independently verify identity and ownership on the server.
-- Enable RLS for every user-owned table and secure every relationship against cross-owner references. Use the caller's identity for normal queries and mutations.
-- Never put privileged Supabase keys in client code. Never commit real secrets, environment files, build artifacts, or personal exports.
-- Habits, numerical metrics, and frequency targets remain distinct. Preserve raw values; do not synthesize user performance data.
-- Daily and weekly scores are separate. Shared trackers are logged once and reused across challenges. Follow SCORING for exclusions and duplicate-source rules.
-- Store timestamps in UTC and retain local business dates. Use inclusive challenge dates and effective-dated expectations; timezone or target edits must not silently rewrite history.
-- Archive tracking definitions by default to preserve history. Explicit permanent deletion is a separate action.
-- Use optimistic updates only with visible failure handling and rollback. Use transactions and retry identifiers where duplicate operations would corrupt data.
-- Accessibility, mobile behavior, privacy handling, loading/empty/error states, and truthful analytics are required in every relevant phase.
-- No fake APIs, fabricated analytics, inert buttons presented as complete, broad `any` types, or unfinished pages presented as delivered features.
+- Use npm and the retained stack; pin compatible dependencies in the lockfile and verify official docs before adopting new framework/auth patterns.
+- Prefer Server Components, small interactive components and authenticated Server Actions; keep date/domain logic outside UI.
+- Zod-validate mutations and independently verify caller identity/ownership.
+- RLS on all five owned tables; same-owner child FKs and covering indexes.
+- Never expose privileged keys or commit environment files, secrets, personal exports, credentials, build artifacts, or traces.
+- Completion is desired boolean plus revision, not blind toggle; preserve uniqueness and visibly handle conflicting/failed writes.
+- Store UTC timestamps and retained business dates; schedules edit tomorrow, archive cutoff tomorrow, no future/unscheduled writes.
+- Archive retains history; permanent deletion is separate and confirmed. No restore flow in the initial simplified product.
+- Weekly consistency covers closed dates only, excluding all today/future records. No synthetic logs or scores.
+- Global Privacy Mode masks every habit name before rendering/serialization and disables name editing; no per-habit privacy state.
+- Keyboard/mobile/accessibility, both themes, reduced motion, loading/empty/error states, and truthful save feedback remain required.
+- No fabricated analytics, inert completed-looking features, broad any types, or unfinished pages claimed as delivered.
 
 ## Database and command discipline
 
-Keep SQL migrations under `supabase/migrations`. Add tables, constraints, indexes, triggers, RLS, and policy tests together. Regenerate database TypeScript types after schema changes. Phase 1 creates foundation tables only; later phases add their own migrations.
+Keep historical applied SQL unchanged under supabase/migrations. Add a forward simplification migration, owned constraints/indexes/triggers/RLS and replacement policy tests together. Drop retired dependencies explicitly child-first; don't use broad CASCADE that can remove shared Auth infrastructure. Replay the whole migration chain locally.
 
-Use project-managed Supabase CLI commands documented in README. Do not use the historical `supabase db commit` example. Local `db reset` destroys local development data; never substitute a remote database reset. Remote migration deployment is a separate explicitly targeted operation.
+README owns project commands. Don't use the old supabase db commit example. db reset is local/disposable only; hosted migration application is an explicitly targeted separate operation. Never apply the simplified schema while a running build still queries retired tables.
 
-Keep project-specific commands in the repository. README lists actual scripts and their meaning. Before a handoff run `npm run lint`, `npm run typecheck`, relevant Vitest checks, and a production build. `npm run test:db` uses migrated PGlite PostgreSQL and test-only auth infrastructure; it cannot establish hosted Auth/email or a full Supabase stack. `npm run test:e2e` builds and tests production on port 3100; dedicated test credentials enable authenticated checks. Browser tests may need local port permission outside the sandbox. Never silently substitute mocked authentication.
+Before application handoff run lint, typecheck, relevant unit tests, database tests and a production build. Run typecheck and build sequentially: both write .next/types. Design-only gates use artifact/document verification plus old-app baseline checks, never target behavior claims. PGlite test:db supplies test-only Auth/roles; it does not verify hosted Auth/email or a full local Supabase stack.
 
-Run `npm run typecheck` and `npm run build` sequentially. Both write `.next/types`; concurrent execution can report missing generated route files even when each command passes alone.
+test:e2e builds production on port 3100. Use real confirmed/disposable development accounts, never mocked Auth or fabricated JWTs. Browser tests may require local port permission. Restore existing fixture profile/theme state in finally, narrowly clean synthetic fixtures, keep credentials/traces ignored, and use disposable accounts for deletion tests.
 
-Next.js uses `src/proxy.ts` for cookie refresh; pages/actions independently verify identity with `getClaims()`/`getUser()`. Preserve the proxy's response cookies and private/no-store headers. Redirects use validated `APP_ORIGIN` and a local allowlist. Local fonts and Webpack make this environment's production builds reproducible. ESLint uses the official compatibility adapter; revisit old bundled plugin peer ranges when upgrading.
+Compare the MCP/CLI project URL to local configuration and inspect live catalog/history before hosted changes. Never resolve mismatches by silently changing credentials. If MCP creates a migration timestamp, align the local filename before later CLI push.
 
-Before a hosted schema mutation, compare the MCP/CLI project URL with local configuration, inspect existing tables/history, and verify authorization targets that project. Never resolve a mismatch by silently changing credentials or applying to another project. If MCP creates a migration version, rename the local SQL file to that recorded timestamp before a subsequent CLI push. Hosted Auth/email settings are separate from migrations and local config. `/auth/confirm` supports both token-hash templates and default-template PKCE codes; the latter must open in the initiating browser. Custom templates are unavailable on the current free project without custom SMTP; see README for the verified setup path. Keep callback responses `no-referrer` in Next.js header configuration as well as the route, because global configured headers can override handler headers. Never print privileged keys or test passwords.
+Regenerate complete database types from the matching Supabase project after schema changes. Do not recreate the deleted partial PGlite type generator. CHECK-constrained text needs domain narrowing only while matching SQL constraints remain verified. Run hosted security/performance advisors; add follow-up indexes for verified unindexed FKs.
 
-Supabase MCP generated the Phase 8 `src/types/database.ts` after hosted migration. The former PGlite catalog generator covered only foundation types and was removed; do not recreate a script that can overwrite generated types with an incomplete schema. Apply and validate incremental SQL first, then regenerate full types from the matching project. Postgres CHECK-constrained text appears as `string` in generated types; narrow those fields at the domain boundary only while the matching SQL constraints remain verified. After adding owned child tables, run the hosted performance advisor and add covering indexes in a separate migration if it reports unindexed FKs. Preserve already applied SQL; fix routine defects in follow-up migrations.
+Keep cookie refresh in src/proxy.ts and private/no-store response cookies/headers. Pages/actions independently verify getClaims()/getUser(). Redirects use validated APP_ORIGIN/local allowlists. Auth confirmation supports token hashes and same-browser PKCE; callback no-referrer belongs in configured headers as well as route handlers. Custom SMTP/email setup is separate from SQL.
 
-`supabase/tests/hosted-foundation.sql`, `hosted-tracking.sql`, `hosted-fitness.sql`, `hosted-career.sql`, `hosted-planning.sql`, `hosted-reflection.sql`, and `hosted-data-controls.sql` verify hosted roles/RLS using temporary UUID fixtures inside rollback-only transactions. Validate them locally with `npm run test:db` before running them through an authorized development-project SQL connection. They do not test Auth HTTP flows or email delivery. Keep fixture setup out of deployed migrations and user analytics. Dedicated confirmed-account credentials in ignored `.env.local` enable actual authenticated Playwright checks; do not silently skip these gates when claiming a phase complete. The suite restores fixture profile/theme values in `finally` through ordinary user-scoped requests. Phase 3/4 browser flows remove test logs through the UI; Phase 7 browser checks create marked review fixtures that must be removed by narrowly targeted development-project queries after the full run; archived synthetic definitions and discarded test timers are cleaned by narrowly targeted development-project queries after runs. Refresh checks expire persisted session metadata while preserving real issued credentials; never forge a JWT or call that a real JWT-expiration test. Browser traces may contain credentials; keep them ignored and do not publish them.
+Rewrite export/delete allowlists against the five-table catalog. Export format_version becomes 2. Data clearing retains Auth/profile/preferences. Keep transactional Auth before-delete cleanup; never bypass it with independent admin REST table deletes. SUPABASE_SECRET_KEY is server-only/same-project and used only for immediately verified self-deletion.
 
-Phase 8 data controls use fixed export and child-first deletion allowlists checked against the public table catalog. Update both allowlists and their tests whenever product tables are added. Export includes 33 owned product tables and excludes three internal operation-receipt tables. The private Auth before-delete trigger clears restrictive children transactionally; never bypass it with independent admin REST table deletes in the product flow. `SUPABASE_SECRET_KEY` is server-only, same-project, and used only for immediately verified self-deletion. Ordinary exports, reads, and writes use caller identity. API responses remain private/no-store.
-
-Phase 8 browser data/PWA/privacy checks create dedicated disposable accounts using the configured development server key and delete them in `finally`; they must never use a personal account for deletion or run against production. Password verification traces are disabled for this file. Existing confirmed-account regression fixtures still need narrowly matched cleanup after runs. Service-worker caches contain only the public offline document and three icon files; bump the cache version when public assets change, and never include workspace/Auth/API/RSC/mutation responses. Keep settings inputs controlled so React action resets cannot erase unsaved input on offline failures.
+Keep controlled Settings fields across offline failures. Service-worker cache contains only public offline document/icons; bump version if those assets change and never cache workspace/Auth/API/RSC/mutations/exports. Only offer installation when the browser has a real prompt.
 
 ## Git and handoffs
 
-Use a feature branch with the `feature/` prefix. `master` is the GitHub default integration branch; make future feature changes on `feature/*` and merge through a reviewed pull request. Never push routine feature work directly to `master`. Use focused Conventional Commits, e.g. `docs: establish phased build documentation` or `feat(auth): add cookie-based sign-in`. Preserve unrelated work. Do not push, merge, or deploy unless authorized.
+Use feature/* branches. master is the GitHub default integration branch, origin https://github.com/thisissuman/winter-arc-os.git. Preserve unrelated changes, use focused Conventional Commits, review diffs before commits. Do not push/merge/deploy without authorization. Attach any created PR to this chat.
 
-The repository began with an unborn `master` branch and no remote. `origin` is now `https://github.com/thisissuman/winter-arc-os.git`. The user's branch cleanup established `master` at the verified Phase 4 tip, made it GitHub's default branch, and published the older phase checkpoints as `feature/phase-*`. This Git organization does not mean the incomplete V1 application is released or deployed. Review the diff before committing. Attach any created pull request to this chat.
+Keep old migration/spec/QA evidence, but do not keep retired runtime modules/tests as speculative future code. Mark old concept images superseded. Refresh graphify after code changes, with portable outputs versioned and machine-local caches ignored.
 
 <!-- BEGIN:nextjs-agent-rules -->
 
@@ -93,3 +99,11 @@ Rules:
 - If graphify-out/wiki/index.md exists, use it for broad navigation instead of raw source browsing.
 - Read graphify-out/GRAPH_REPORT.md only for broad architecture review or when query/path/explain do not surface enough context.
 - After modifying code, run `graphify update .` to keep the graph current (AST-only, no API cost).
+
+## Verified simplified workflows — October 3, 2026
+
+- Current schema migrations: original 14, 20261003090000_simple_habits, and 20261003103000_habit_conflict_response. Keep applied files immutable. The conflict fix preserves signatures/grants and returns PT409; never use SQLSTATE 40001 for business revision conflicts because PostgREST retries serialization failures.
+- Use a single controlled Preferences form for theme/timezone/week start/privacy. Hide the previous result while pending, and wait for the new response before navigation in browser tests.
+- Native dialog opening explicitly focuses its first input: React autoFocus alone does not cover editors mounted by client navigation. Use unique field IDs. Weekday checkbox inputs cover the whole 44px visible label; visually clipped one-pixel inputs are unsuitable as pointer targets.
+- Browser fixture cleanup must run even if resetting offline state fails after context shutdown. scripts/cleanup-browser-fixtures.mjs inspects only marked disposable accounts in the pinned development project after a supplied ISO timestamp; --apply deletes those test identities through Auth admin, never personal accounts. Never run it concurrently with active tests.
+- Vite 8.3.1 is an explicit dev dependency for retained Vitest after shadcn removal. Standard npm ci works; keep compatibility warnings separate from actual check results.

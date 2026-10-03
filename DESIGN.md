@@ -1,133 +1,270 @@
-# Winter Arc OS — design direction
+---
+name: Winter Arc OS
+description: A quiet daily checklist in charcoal and violet.
+colors:
+  primary-dark: "#a89af3"
+  primary-light: "#6852d6"
+  primary-hover-dark: "#b7abf5"
+  primary-hover-light: "#5943c7"
+  primary-ink-dark: "#181322"
+  primary-ink-light: "#ffffff"
+  background-dark: "#101115"
+  background-light: "#f7f7fa"
+  foreground-dark: "#ededf2"
+  foreground-light: "#202129"
+  sidebar-dark: "#15161b"
+  sidebar-light: "#efeff4"
+  surface-dark: "#181a20"
+  surface-light: "#ffffff"
+  raised-dark: "#1d2027"
+  inset-dark: "#111318"
+  inset-light: "#f5f5f8"
+  secondary-dark: "#22242c"
+  secondary-light: "#eeedf3"
+  selected-dark: "#28243b"
+  selected-light: "#e9e5fa"
+  muted-dark: "#a5a7b2"
+  muted-light: "#626875"
+  divider-dark: "#2b2d36"
+  divider-light: "#dddde5"
+  control-border-dark: "#707482"
+  control-border-light: "#858a97"
+  success-dark: "#87d5a4"
+  success-light: "#237844"
+  destructive-dark: "#ffb4ab"
+  destructive-light: "#b42318"
+typography:
+  headline:
+    fontFamily: "Geist, sans-serif"
+    fontSize: "1.875rem"
+    fontWeight: 600
+    lineHeight: 1.2
+    letterSpacing: "-0.025em"
+  section:
+    fontFamily: "Geist, sans-serif"
+    fontSize: "1.25rem"
+    fontWeight: 600
+    lineHeight: 1.3
+    letterSpacing: "-0.025em"
+  body:
+    fontFamily: "Geist, sans-serif"
+    fontSize: "0.875rem"
+    fontWeight: 400
+    lineHeight: 1.5
+  task:
+    fontFamily: "Geist, sans-serif"
+    fontSize: "1rem"
+    fontWeight: 400
+    lineHeight: 1.5
+  label:
+    fontFamily: "Geist, sans-serif"
+    fontSize: "0.875rem"
+    fontWeight: 500
+    lineHeight: "1.25rem"
+  caption:
+    fontFamily: "Geist, sans-serif"
+    fontSize: "0.75rem"
+    fontWeight: 400
+    lineHeight: 1.5
+rounded:
+  control: "8px"
+  container: "16px"
+  circle: "50%"
+spacing:
+  base: "4px"
+  control: "8px"
+  row: "12px"
+  compact: "16px"
+  panel: "20px"
+  panel-lg: "24px"
+  section: "32px"
+components:
+  button-primary-dark:
+    backgroundColor: "{colors.primary-dark}"
+    textColor: "{colors.primary-ink-dark}"
+    typography: "{typography.label}"
+    rounded: "{rounded.control}"
+    padding: "0 12px"
+    height: "44px"
+  button-primary-light:
+    backgroundColor: "{colors.primary-light}"
+    textColor: "{colors.primary-ink-light}"
+    typography: "{typography.label}"
+    rounded: "{rounded.control}"
+    padding: "0 12px"
+    height: "44px"
+  button-outline-dark:
+    backgroundColor: "{colors.inset-dark}"
+    textColor: "{colors.foreground-dark}"
+    rounded: "{rounded.control}"
+    height: "44px"
+  button-outline-light:
+    backgroundColor: "{colors.background-light}"
+    textColor: "{colors.foreground-light}"
+    rounded: "{rounded.control}"
+    height: "44px"
+  button-ghost:
+    backgroundColor: "transparent"
+    typography: "{typography.label}"
+    rounded: "{rounded.control}"
+    height: "44px"
+  button-destructive-dark:
+    textColor: "{colors.destructive-dark}"
+    rounded: "{rounded.control}"
+    height: "44px"
+  button-destructive-light:
+    textColor: "{colors.destructive-light}"
+    rounded: "{rounded.control}"
+    height: "44px"
+  field:
+    rounded: "{rounded.control}"
+    padding: "8px 12px"
+    height: "44px"
+  navigation-link:
+    typography: "{typography.label}"
+    rounded: "{rounded.control}"
+    height: "44px"
+  calendar-container:
+    rounded: "{rounded.container}"
+    padding: "8px"
+  completion-row:
+    typography: "{typography.task}"
+    rounded: "{rounded.control}"
+    padding: "16px 8px"
+    height: "64px"
+---
 
-## Status
+# Design System: Winter Arc OS
 
-**Foundation, core tracking, fitness, Career, Planning, Insights, and Reflection interfaces are implemented. UI/UX refinement Phases A–G have code implementations; physical-device and actual screen-reader verification remain open for F/G.** Phase 1 auth and shell retain their recorded visual and accessibility results. Phase 2 Today and tracking pages passed desktop/mobile browser and automated accessibility checks. Phase 3 adds Fitness measurement/sleep cards, recorded-day charts with text summaries, an exercise library, and responsive workout/set forms. Phase 4 adds study summaries, category distribution, session forms, and a persistent timer bar. Phase 5 adds a seven-day task board, selected-day forms, accessible order controls, carry-forward actions, and goal progress cards. Phase 6 adds bounded filters, a score trend, four numeric heatmaps, coverage cards, and ranked source summaries. Phase 7 adds readable prompt forms, optional 1–5 check-ins, a saved-review history, and adjacent source statistics. See QA for exact checks.
+## Overview
 
-Product truth lives in [PRODUCT](PRODUCT.md), route/component responsibilities in [ARCHITECTURE](docs/ARCHITECTURE.md), and validation in [QA](docs/QA.md).
+**Creative North Star: "A quiet daily checklist"**
 
-## Task and hierarchy
+Winter Arc OS is a private habit app designed to be used in under a minute. The approved charcoal/violet world gives ordinary routines a calm, readable setting: familiar controls, short labels, open space and prominent habit names. The identity is Winter Arc OS, with its existing snowflake mark and locally packaged Geist type.
 
-The user logs habits and measurements quickly on a phone, then reviews progress and plans on desktop. Today shows the selected challenge and date, distinct compact daily/weekly score summaries, due habits and quick measurements, then weekly/monthly progress and expandable score explanations. Unconfigured targets and unavailable sources receive honest empty/configuration states.
+This document records the implemented replacement, grounded in [the stylesheet](src/app/globals.css), [shared controls](src/components/ui), and Today/Habits/Settings. The five [desktop/phone boards](docs/DESIGN_REVIEW.md) were approved October 3, 2026; they are direction references rather than synchronized user data. The earlier broad-product concepts are superseded. The final real-auth desktop/mobile suite passed all 26 checks; hosted rollback-only security checks also passed. Detailed evidence and remaining actual-device, screen-reader and SMTP limitations belong to [QA](docs/QA.md). This design record does not claim those manual or email checks.
 
-Charts are secondary on Today and primary on feature/Insights pages. Keep elapsed challenge time visibly separate from achieved adherence. Daily and weekly scores have explicit labels.
+**Key Characteristics:**
 
-## Visual commitments
+- Solid charcoal and cool paper surfaces with a restrained violet accent.
+- Narrow task columns, divider rows and a three-destination shell.
+- Readable completed states, visible focus and large touch controls.
+- A name-and-schedule editor with quiet, literal save feedback.
+- Complete dark/light roles, without ornamental gradients, neon, glass or decorative imagery.
 
-- Restrained charcoal background and slightly elevated surfaces, with one cool violet/indigo accent.
-- Semantic success, warning, destructive, muted, and focus roles in CSS variables. Supply equivalent light-theme roles from Phase 1.
-- Geist as the interface font; compact application headings, readable body text, tabular numerals where useful.
-- Clear spacing and alignment, modest borders, minimal shadows, and information density without crowded controls.
-- Original application composition and copy; quality references are not layout templates.
-- No ornamental gradients, neon glows, excessive glass, hype language, or decorative animation libraries.
+## Colors
 
-Actual semantic variables live in `src/app/globals.css`:
+Violet identifies action, selection and focus; neutral tonal layers keep the routine itself prominent. The paired frontmatter values are normative for their respective themes. Runtime components use the semantic CSS variables, so a theme change updates the whole interface together.
 
-| Role | Dark | Light |
-| --- | --- | --- |
-| Background | `#101115` | `#f7f7fa` |
-| Text | `#ededf2` | `#202129` |
-| Card | `#181a20` | `#ffffff` |
-| Raised surface | `#1d2027` | `#ffffff` |
-| Inset control surface | `#111318` | `#f5f5f8` |
-| Sidebar | `#15161b` | `#efeff4` |
-| Primary / focus | `#a89af3` | `#6852d6` |
-| Primary hover | `#b7abf5` | `#5943c7` |
-| Primary text | `#181322` | `#ffffff` |
-| Secondary | `#22242c` | `#eeedf3` |
-| Muted text | `#a5a7b2` | `#626875` |
-| Accent | `#28243b` | `#e9e5fa` |
-| Selected surface / text / border | `#28243b` / `#ededf2` / `#a89af3` | `#e9e5fa` / `#202129` / `#6852d6` |
-| Border | `#2b2d36` | `#dddde5` |
-| Control border / input border | `#707482` | `#858a97` |
-| Success | `#87d5a4` | `#237844` |
-| Warning | `#eac079` | `#925600` |
-| Destructive | `#ffb4ab` | `#b42318` |
-| Success feedback surface / border | `#1a2921` / `#426650` | `#eef8f1` / `#a6cfb2` |
-| Warning feedback surface / border | `#2a241a` / `#84653b` | `#fff6e8` / `#d8b884` |
-| Error feedback surface / border | `#321f22` / `#995852` | `#fff0ee` / `#d59996` |
-| Chart primary / secondary | `#a89af3` / `#b8bfd4` | `#6852d6` / `#5e6884` |
-| Chart grid / label | `#373b48` / `#a5a7b2` | `#d5d8e1` / `#626875` |
+### Primary
 
-Geist variable sans is packaged locally and loaded with `next/font/local`. Phase A names the shared type roles: page title 30 px/1.2, section heading 20 px/1.3, key statistic 36 px/1.1, body and desktop control 14 px/1.5, caption and chart label 12 px. The auth introduction retains its larger desktop heading. The 4 px spacing base remains; named roles are control gap 8 px, related row gap 12 px, compact panel 16 px, panel 20 px, large panel 24 px, and section gap 32 px. Existing page gutters and layouts stay in place.
+- **Soft Violet:** dark-theme primary actions, active control borders, focus and the thin completion bar. Its dark ink maintains readable button labels.
+- **Clear Violet:** the corresponding light-theme action and focus color, paired with white button labels.
+- **Selected Violet:** a restrained tonal background for active navigation, selected dates and schedule choices; it is separate from the solid action fill.
 
-Control tokens are 32 px compact and 44 px touch. The default shared Button remains compact on desktop and gains a 44 px minimum height on phones; existing explicit 44 px buttons stay 44 px. Shared Input and native `controlClass` fields use 44 px height/minimum height. Phone text in inputs, selects, and textareas is 16 px even when a local `text-sm` class is present, preventing browser focus zoom; desktop form text can stay 14 px. The existing 6/8/14/16 px radius scale remains, with 8 px for controls. Only floating editor surfaces gain a restrained theme-specific shadow (`0 14px 36px rgb(27 28 40 / 12%)` light; `0 18px 48px rgb(0 0 0 / 40%)` dark). Focus keeps a 2 px theme-colored outline with 4 px offset; existing component focus rings and reduced-motion rules remain.
+### Neutral
 
-The stronger control border provides at least 3.23:1 contrast against its adjacent background in both themes; ordinary body, muted, feedback, selected, and chart-label text meet at least 4.5:1 on the reviewed solid surfaces. The line charts now use chart roles for grid, labels, and primary series, with theme-aware tooltip surfaces; Insights heatmap values use 12 px labels. These are presentation tokens only. Source coverage, missing-versus-zero behavior, chart animation settings, action feedback semantics, and all data calculations remain unchanged.
+- **Charcoal / Cool Paper:** workspace backgrounds. The sidebar occupies a subtly different neutral layer.
+- **Routine Surface:** framed calendars, menus and date controls. Raised and inset roles distinguish editors and fields without decorative material effects; light raised surfaces reuse the white surface role.
+- **Reading Ink / Muted Ink:** primary text and supporting dates/help. Completed habit names remain readable in muted ink.
+- **Quiet Divider / Control Stroke:** subtle section boundaries versus stronger interactive outlines. Do not substitute a divider for a field's control stroke.
 
-Shared shadcn primitives are Button, Input, Label, Badge, Separator, and Skeleton; interactive feature forms remain under their feature directories. Semantic colors, visible labels, actual pending/error feedback, and reduced-motion CSS apply across foundation screens.
+Success green identifies confirmed completion. Destructive red identifies errors and deletion; boxed feedback uses the existing success/warning/error surface and border variables from the stylesheet. Symbols, words and control state carry meaning alongside color.
 
-## Navigation and responsive behavior
+**The Meaningful Accent Rule.** Use violet for an available action, selection or focus. Keep ordinary rows and section backgrounds neutral.
 
-Implemented in source: desktop uses a 240 px sidebar from 768 px upward, groups Daily Work/Review/Manage, and scrolls its links independently on short screens; mobile uses a header and fixed five-link bottom navigation with safe-area spacing. The mobile links are Today, Track, Plan, Insights, and More; More links to Reflection, Challenges, and Settings. An active focus timer stacks directly above the mobile navigation or sits at the desktop bottom edge; shared inset tokens reserve scroll clearance for both bars. Phase G makes the persistent timer a named region rather than a live status, with the elapsed clock marked `aria-live="off"`; confirmed actions retain their separate feedback. The panel's elapsed time includes an accessible text prefix and actual clock value. Actual screen-reader announcement cadence remains unverified. Auth uses a split introduction/form layout from 1024 px upward and a single form column below it. Both presentations use the same URLs.
+## Typography
 
-At small widths, prioritize a single reading column, sheets for short editing flows, reachable quick-add controls, and clear sticky actions when useful. Weekly planners can show one selected day with a week switcher. The habit grid may scroll horizontally but keeps habit identity readable and supports keyboard cell interaction.
+**Display and Body Font:** locally loaded Geist variable sans, with a sans-serif fallback. No second display family or icon font is introduced.
 
-Only delivered features enter navigation. Do not use inactive buttons or empty future pages as a substitute for implementation.
+**Character:** compact and plain, with enough hierarchy to find the next action immediately. Page headings are semibold and slightly tightened; routine text and supporting copy use normal tracking. Counts use tabular numerals where the value changes.
 
-## Interaction conventions
+### Hierarchy
 
-- Quick logging uses clear saved/pending/failed feedback and restores state on failure.
-- Form labels remain visible; Zod errors are associated with fields. Dialogs/sheets preserve focus and return it to the trigger.
-- Tables and grids have semantic structure, meaningful accessible names, and non-color status indicators.
-- Today pending, explicit missed, skipped, unscheduled, completed, and future are distinct states.
-- Archive is the ordinary remove action for history-bearing trackers. Permanent deletion has explicit consequences and confirmation.
-- Subtle motion communicates feedback; honor reduced motion and keep content visible without animation.
-- Theme/privacy preferences must be applied before sensitive content flashes during initial render.
+- **Headline:** page titles using the headline token.
+- **Section:** editor titles and substantial empty-state headings; small Settings section labels instead use medium task-sized text.
+- **Task:** checklist names, date subtitles and ordinary prominent content.
+- **Body:** supporting copy, controls and routine schedule descriptions.
+- **Label:** visible form labels and medium-weight actions.
+- **Caption:** calendar weekday labels, helper text and short explanatory status.
 
-## Implemented shared presentation contracts (Phases B–D)
+There is no oversized display/stat tier in the simple product. Routine-list names use a modest intermediate heading size. Phone inputs, selects and textareas retain task-sized type (16 px) to avoid focus zoom, even when desktop controls use smaller body text. Long names wrap rather than forcing horizontal scrolling.
 
-`Panel` uses a quiet bordered surface at 16 px compact or 20–24 px standard padding. `StatSummary` presents one value with its period, state, and optional `CoverageLabel`; the compact variant is used for Today scores. `ActionRow` keeps action controls and current context together, while `DestinationRow` gives the Track/Plan/More hubs a consistent, full-row keyboard/touch target. `PeriodToolbar` groups existing date controls without owning route logic. `EmptyState` carries a clear next step. `ChartFrame` supplies title, unit, period, coverage, empty content, and text alternative on Fitness and Insights routes.
+**The Literal Label Rule.** Use sentence case and the name of the action or state. Keep visible labels and full accessible names; abbreviated weekdays still announce their full names.
 
-`PageHeader` retains its default sizing for other routes and offers a compact Today variant; `SectionHeader` aligns section titles and actions. `FormField` associates direct controls with label/hint/error IDs, preserves supplied `aria-describedby`, and marks errors with `aria-invalid` and an alert. `InlineFeedback` distinguishes success, warning, information, and failure without implying an unsaved mutation succeeded. The native dialog remains `EditorDialog` for current callers and is also exported as `ResponsiveEditor`; `Confirmation` supplies an explicit destructive scope while retaining Escape handling and focus return. The same privacy-aware names and score details are passed through these surfaces.
+## Layout
 
-Today now keeps setup/configuration notices early, shows compact separate daily and weekly score/coverage cards, then scheduled habits and measurements. The selected challenge's elapsed-days bar is a calendar marker, never an adherence score. Flexible targets and detailed score explanations follow the immediate actions. No score math, query, action, or tracker behavior changed.
+The desktop shell has a fixed sidebar (240 px) and a centered outer main container (maximum 920 px). Each section's task column is capped at 42 rem (672 px). Desktop content begins with generous top space (48 px); narrow layouts use a smaller top inset (32 px). Spacing follows the frontmatter's four-pixel rhythm.
 
-## Feature, mobile, and accessibility refinements (Phases E–G)
+At the desktop breakpoint (768 px), the sidebar replaces the phone header and bottom navigation. Below it, the three-link dock reserves its own safe-area-aware clearance. Narrow-phone horizontal gutters start at 16 px and honor display cutouts. The editor changes from a full-width bottom sheet to a centered dialog at 640 px, independently of the workspace sidebar breakpoint. Visual-viewport handling hides the dock while the keyboard is open and keeps editor actions reachable.
 
-Fitness places measurements and workout entry before trends, showing each measurement label once. Career puts the timer before duration summaries and manual/history sections, with category management later. Planning, Settings, and Reflection retain their existing actions and use consistent date/control styles. Reflection's optional ratings are a disclosure that opens initially when a saved rating exists. Auth password guidance is associated with its control and field errors. These changes retain existing source calculations, validation, ownership, and privacy masking.
+Headers can wrap their action below the title. New habit spans the phone's Routines header width; Today's Add a habit remains a quiet text action. Settings uses divider-separated Account, Preferences and Your data sections, with a two-column section label/content layout where space permits. History is one calendar rather than a wide routine matrix.
 
-Workout sets and timer actions wrap into reachable phone controls. The native editor keeps its header and close action outside a scrolling form body. Phone gutters and editor padding include safe-area roles, with a compact landscape shell. `MobileViewport` uses visual viewport contraction while an editing control is focused to hide the phone dock and fit the editor above the keyboard. Emulation verifies the response to viewport contraction; actual device keyboards and nonzero OS safe-area insets still require device review.
+**The Task Column Rule.** Preserve the readable centered column and let controls wrap on small screens. Extra screen width is breathing room, not a reason to add dashboard panels.
 
-The habit calendar is a named, focusable horizontal scroll region with keyboard instructions and a separated sticky identity column. Score/fitness trends expose exact dated values in keyboard/touch disclosures, including coverage and gaps; this also works when too few values exist to draw a line. Heatmaps retain their date/coverage disclosures and non-color numeric explanations. No data is synthesized to fill gaps. Recharts animation remains disabled.
+## Elevation & Depth
 
-Shared feedback uses atomic alert/status announcements. Buttons transition colors for 150 ms rather than all properties. Reduced-motion CSS removes animations and transitions and uses immediate scrolling; pending copy remains visible when the spinner is static. No new shadcn or Watermelon component, provider, or dependency was installed: existing local primitives were reused and the catalogs served as references.
+Most surfaces are flat: background changes, strokes and dividers establish structure. Only the modal editor and routine menu use the existing floating shadow; the editor also uses a dimmed modal backdrop. There is no ornamental glow, blur or glass layer. Exact theme-specific shadows and motion values live in [.impeccable/design.json](.impeccable/design.json).
 
-## Privacy and analytics
+**The Flat Workspace Rule.** Keep ordinary routine rows and Settings sections unraised. Use floating depth for content that overlays the workspace.
 
-Private names, descriptions, notes, tooltips, search results, and accessible names use the same privacy-aware presentation rules. Do not render hidden original text into attributes or screen-reader labels. Sensitive UI data does not enter telemetry.
+## Shapes
 
-Missing measurements do not display as measured zero. Empty scores read “No scheduled targets.” Open periods read “In progress.” Charts show units, ranges, coverage, and text summaries. Observation-only measurements are not implied to improve the score.
+Controls, navigation and date cells have gently curved corners using the control radius. Calendars, menus and dialogs use the container radius; the phone sheet rounds its upper corners. Completion markers and weekday selectors are circular. Thin divider lines separate rows; stronger strokes identify inputs and uncompleted markers.
 
-## Implementation recording checklist
+Default controls and icon actions have at least 44 px touch targets. Checklist rows are at least 64 px tall and calendar dates at least 56 px tall. These are minimums: wrapped names, feedback and short viewport scrolling may increase their size. Do not promote unused smaller primitive variants into ordinary app controls.
 
-- [x] Record actual semantic tokens for both themes.
-- [x] Record font/type/spacing rules from delivered components.
-- [x] Record responsive navigation and verify Phase 2/3 tracking interactions at desktop and mobile widths.
-- [x] Verify foundation mobile/tablet/desktop layouts, keyboard skip links, automated contrast/accessibility, and rendering with reduced motion enabled.
-- [x] Verify privacy masking across secondary labels and accessible names.
-- [x] Record regenerated auth/private-screen artifact filenames in [QA](docs/QA.md); artifacts are ignored, not committed as fixture data.
+## Components
 
-Phase 1 auth/empty-Today screenshots were inspected at 1440 px desktop and 390 px mobile, plus Today at 768 px tablet; light account Settings was inspected on desktop/mobile. Phase 2 tracking browser checks pass at desktop/mobile sizes: Today, Habits, and Metrics pass automated WCAG 2 A/AA and 2.1 AA scans; keyboard toggling and horizontal-overflow assertions pass. Phase 2 masks private labels before passing them to interactive components, uses text/symbol habit-grid states, and has optimistic logging with rollback. The complete cross-application privacy review is recorded with Phase 8 in QA. Generated browser artifacts remain ignored under `test-results/`; QA records outcomes.
+### Buttons
 
-Phase 3 browser checks cover Fitness at desktop/mobile widths, its WCAG 2 A/AA and 2.1 AA axe scan, and horizontal overflow. Recharts appears only on fitness routes and has adjacent numeric summaries with missing-day coverage; sparse history shows an explicit empty state. Workout names, exercise names, and sleep notes are hidden or uneditable in Privacy Mode. Exercise/set controls use labelled fields and keyboard-operable move buttons. The full cross-application privacy review is recorded with Phase 8 in QA.
+Compact, direct actions with the control radius and medium label text. Primary uses the theme's violet/ink pair; hover uses its primary-hover role. Outline actions use a control stroke and neutral fill. Ghost actions remain quiet until hover; destructive actions use a red tonal fill. Pending actions use explicit Saving/Deleting copy and disabled state.
 
-Phase 4 keeps Career summaries as text and proportional category bars with numeric alternatives. The timer shows a saved running/paused state and elapsed clock; action feedback distinguishes a confirmed save from a connectivity failure. Desktop/mobile browser checks cover offline finish feedback and recovery, navigation, refresh, two-tab reconciliation, automated accessibility, and horizontal overflow. Study topics, notes, and category names are masked in Privacy Mode. The full cross-application privacy review is recorded with Phase 8 in QA.
+The shared button uses a short color transition (150 ms, ease-out) and a small press offset. Keyboard focus uses the existing border/ring treatment; other native controls retain the global two-pixel outline with four-pixel offset. Reduced-motion mode removes transitions and animations.
 
-Phase 5 shows seven dates as reachable controls and the chosen day as a single-column task list on phones. Every task has labelled status, priority, estimate, and actual-duration fields; order buttons give a keyboard alternative to dragging. Carry-forward spells out move versus copy and reports the saved count. Goal cards distinguish 0% from an unconfigured milestone or missing metric value. The Planning browser flows passed desktop/mobile accessibility and horizontal-overflow checks. Private task and goal text is masked in Privacy Mode; the complete cross-application privacy audit is recorded with Phase 8 in QA.
+### Schedule Choices
 
-Phase 6 presents a daily score trend only on Insights, with a numeric summary and gaps for absent scores. Four seven-column heatmaps put a percentage or an em dash inside each cell, so zero and no eligible result remain distinct without relying on color. Each cell exposes its date and logged/expected coverage to assistive technology. Desktop uses two-column heatmap and source-summary grids; mobile keeps filter controls and cards in a single-column flow. The selected organizational category narrows source summaries, while policy scores retain their full scoring categories, with that distinction shown next to the filters. The route avoids fabricated values and masks private tracker/study-category labels before rendering. Automated desktop/mobile accessibility and overflow outcomes are recorded in QA; the cross-application privacy audit is recorded with Phase 8 in QA.
+Daily and Selected days are labelled native radios in rounded outlined choices. Selected choices use the selected fill and primary stroke. Weekday choices are circular labelled checkboxes with full weekday accessible names; choice targets retain the standard touch minimum. Focus highlights the whole label.
 
-Phase 7 keeps Reflection as a writing surface: prompts are labelled and spaced for long answers, optional ratings are grouped in a fieldset, and saved periods appear as date-only links. A four-card context panel sits beside the editor on wide screens and below it on phones. The panel displays the same score, coverage, study, and workout calculations as Insights, with a clear in-progress range. Privacy Mode hides the entire editor and written responses while leaving numerical context available. Desktop/mobile accessibility, privacy, and overflow checks are recorded in QA.
+### Cards / Containers
 
-Phase 8 preserves the charcoal/violet identity and adds section-based Settings and Data controls. Destructive actions appear under explicit scope explanations with typed confirmation and current-password fields. Organization uses labelled name/order/parent controls and archive/restore, preserving linked history. Settings forms keep user input visible when offline, with specific unsaved-state feedback; loading screens use valid status semantics. Installation controls appear only when the browser offers an actual prompt.
+Use a framed tonal container for the calendar, an overlay menu or an editor. Use divider rows for routines and Settings rather than wrapping every section in a card. Containers use the container radius and compact or panel spacing; only overlays receive the floating shadow.
 
-The public offline document contains a brand icon, reconnect explanation, and one working retry link. Its theme follows device appearance and contains no personal data. The privacy boundary masks hidden text before client serialization while keeping numerical calculations unchanged. A single Impeccable detector pass over the changed settings/connectivity/offline surfaces returned no findings. Rendered desktop/mobile Settings and light Data controls were inspected together; accessibility, keyboard, tablet overflow, and final browser results are recorded in QA. Generated artifacts remain ignored.
+### Inputs / Fields
 
-## Component adoption cancelled
+Visible labels sit above or alongside controls. Native inputs/selects/date fields use the control radius and stronger control border; inset or card fills follow the existing component context. Focus remains obvious, errors have associated text and destructive styling, and disabled controls visibly dim. Controlled fields keep unsaved values through failures.
 
-CA1–CA2 additions were reverted at the user’s request on October 2, 2026. CA3–CA5 were not implemented and are cancelled. The existing A–G UI refinement conventions and original native controls remain the source of truth. No further component-library adoption is authorized.
+### Navigation
 
-## Final A–G QA after adoption rollback
+Only Today, Habits and Settings appear in the main shell. Each link has an outline icon, medium label and a large target. The current link uses the selected fill and aria-current; other links are muted until hover. Desktop navigation is vertical, while the phone dock places icons above labels in three equal columns. Routines/History use a separate local underline navigation within Habits.
 
-October 2, 2026: existing native controls and A–G presentation conventions passed lint/typecheck, 42 unit cases, production build, and browser evidence for all 62 cases across a 60/62 full run and corrected 4/4 Fitness rerun. Both themes, requested widths, short/landscape timer clearance, accessible chart details, modal focus return, reduced motion, and simulated keyboard behavior were reviewed. No application presentation changes were required. Physical-device and actual screen-reader gates remain open; see [QA](docs/QA.md) for precise results and limits. Component adoption remains cancelled.
+### Completion Row
+
+The entire row is a semantic checkbox control with a circular marker, wrapped habit name and restrained neutral hover. Completion adds a green fill/check and muted readable text. Pending saves show the existing loading spinner and an announced state. Failure/conflict feedback appears beneath the row with a reload action; never display a failed change as saved.
+
+### Calendar
+
+The framed seven-column calendar has a visible chosen-habit label, month heading and large date cells. The selected date has a primary stroke/selected fill. Check, cross, open circle, dash and dot distinguish Completed, Not completed, Pending today, Not scheduled and Future; full date/state accessible labels accompany them. Noneligible dates remain inspectable and explain why completion is unavailable. The selected date's correction control sits beneath the calendar.
+
+### Editor and Feedback
+
+Use the existing native modal dialog with a labelled title, close action, focus return, Escape behavior and scrollable body. Habit editing exposes only name and schedule, with an honest start-today/tomorrow-change explanation. Cancel is an outline action and save is primary. Destructive confirmation states the actual scope. Status/error regions announce results; loading, empty, all-done, offline and privacy states keep the same typography and neutral structure.
+
+## Do's and Don'ts
+
+### Do:
+
+- **Do** use semantic theme roles, visible control strokes and consistent focus treatment.
+- **Do** keep habit names prominent, wrapping long content and preserving readable completed text.
+- **Do** keep touch targets large and reserve space for the phone dock and keyboard.
+- **Do** convey states with symbols or text as well as color.
+- **Do** mask habit names consistently in Privacy Mode, including editors and accessible labels.
+- **Do** use literal pending/error feedback and honor reduced motion.
+
+### Don't:
+
+- **Don't** add ornamental gradients, neon, glass, decorative imagery or an animation library.
+- **Don't** turn Today into score cards, charts, streak rewards or a reporting dashboard.
+- **Don't** add navigation destinations or required setup fields beyond the accepted product.
+- **Don't** treat illustrative board labels/counts as saved user data or QA evidence.
+- **Don't** weaken a readable control or hide its failure state to make a screenshot cleaner.

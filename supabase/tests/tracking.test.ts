@@ -1,130 +1,247 @@
-import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it } from "vitest";
+import {
+  afterAll,
+  afterEach,
+  beforeAll,
+  beforeEach,
+  describe,
+  expect,
+  it,
+} from "vitest";
 import type { PGlite } from "@electric-sql/pglite";
 import { foundationDatabase } from "../../scripts/database.mjs";
-
-const ownerA = "30000000-0000-4000-8000-000000000001";
-const ownerB = "30000000-0000-4000-8000-000000000002";
-const trackingTables = [
-  "challenges", "habits", "habit_schedules", "habit_logs", "metric_definitions",
-  "metric_targets", "metric_logs", "frequency_targets", "frequency_target_rules",
-  "score_categories", "score_policies", "score_category_weights", "score_items",
-  "challenge_habits", "challenge_metrics", "challenge_targets", "tracking_operations",
-] as const;
-let database: PGlite;
-
-async function authenticate(owner: string) {
-  await database.exec("set role authenticated");
-  await database.query("select set_config('request.jwt.claim.sub', $1, true)", [owner]);
+const A = "30000000-0000-4000-8000-000000000001",
+  B = "30000000-0000-4000-8000-000000000002";
+let db: PGlite;
+let today: string;
+async function auth(id = A) {
+  await db.exec("set role authenticated");
+  await db.query("select set_config('request.jwt.claim.sub',$1,true)", [id]);
 }
-async function rpc<T>(name: string, input: Record<string, unknown>): Promise<T> {
-  const result = await database.query<{ result: T }>(`select public.${name}($1::jsonb) as result`, [JSON.stringify(input)]);
-  return result.rows[0].result;
+async function create(days = [1, 2, 3, 4, 5, 6, 7]) {
+  return (
+    await db.query<{ h: { id: string; revision: number } }>(
+      "select save_habit('Read',$1::smallint[]) h",
+      [days],
+    )
+  ).rows[0].h;
 }
-async function today(): Promise<string> {
-  return (await database.query<{ date: string }>("select (now() at time zone 'Asia/Kolkata')::date::text as date")).rows[0].date;
+async function log(id: string, done: boolean, rev: number, date = today) {
+  return db.query<{
+    l: { revision: number; completed: boolean; timezone: string };
+  }>("select set_habit_completion($1,$2::date,$3,$4) l", [id, date, done, rev]);
 }
-async function expectDbError(operation: () => Promise<unknown>, code: string) {
-  await database.exec("savepoint expected_error");
-  try { await expect(operation()).rejects.toMatchObject({ code }); }
-  finally { await database.exec("rollback to savepoint expected_error; release savepoint expected_error;"); }
+async function error(fn: () => Promise<unknown>, code: string) {
+  await db.exec("savepoint expected_error");
+  try {
+    await expect(fn()).rejects.toMatchObject({ code });
+  } finally {
+    await db.exec(
+      "rollback to savepoint expected_error; release savepoint expected_error",
+    );
+  }
 }
-
 beforeAll(async () => {
-  database = await foundationDatabase();
-  await database.query("insert into auth.users(id,email) values ($1,'tracking-a@example.test'),($2,'tracking-b@example.test')", [ownerA, ownerB]);
+  db = await foundationDatabase();
+  await db.query(
+    "insert into auth.users(id,email) values($1,'a@example.test'),($2,'b@example.test')",
+    [A, B],
+  );
+  today = (
+    await db.query<{ date: string }>(
+      "select (now() at time zone 'Asia/Kolkata')::date::text date",
+    )
+  ).rows[0].date;
 });
-beforeEach(async () => { await database.exec("begin; set constraints all immediate;"); });
-afterEach(async () => { await database.exec("rollback; reset role;"); });
-afterAll(async () => { await database?.close(); });
-
-describe("Phase 2 ownership and transactions", () => {
-  it("protects each new table with RLS and read-only direct authenticated grants", async () => {
-    const { rows } = await database.query<{ relname: string; relrowsecurity: boolean }>("select relname, relrowsecurity from pg_class join pg_namespace on pg_namespace.oid = pg_class.relnamespace where nspname='public' and relkind='r'");
-    for (const table of trackingTables) {
-      expect(rows.find((row) => row.relname === table)?.relrowsecurity).toBe(true);
-      expect((await database.query<{ allowed: boolean }>("select has_table_privilege('authenticated',$1,'select') allowed", [`public.${table}`])).rows[0].allowed).toBe(true);
-      for (const privilege of ["insert", "update", "delete"])
-        expect((await database.query<{ allowed: boolean }>("select has_table_privilege('authenticated',$1,$2) allowed", [`public.${table}`, privilege])).rows[0].allowed).toBe(false);
-      await database.exec("set role anon");
-      await expectDbError(() => database.query(`select * from public.${table}`), "42501");
-      await database.exec("reset role");
+beforeEach(async () => {
+  await db.exec("begin");
+  await auth();
+});
+afterEach(async () => {
+  await db.exec("rollback; reset role");
+});
+afterAll(async () => {
+  await db?.close();
+});
+describe("owned binary habit transactions", () => {
+  it("creates name plus daily schedule starting today", async () => {
+    const h = await create();
+    expect(h.revision).toBe(1);
+    expect(
+      (
+        await db.query<{ d: string }>(
+          "select active_from::text d from habits where id=$1",
+          [h.id],
+        )
+      ).rows[0].d,
+    ).toBe(today);
+    expect(
+      (await db.query("select weekdays from habit_schedules")).rows[0],
+    ).toEqual({ weekdays: [1, 2, 3, 4, 5, 6, 7] });
+  });
+  it.each([{ days: [] }, { days: [1, 1] }, { days: [0] }, { days: [8] }])(
+    "rejects invalid weekday selection $days",
+    async ({ days }) => {
+      await error(() => create(days), "23514");
+    },
+  );
+  it("saves, retries and undoes without duplicate rows; rejects conflicting revisions", async () => {
+    const h = await create();
+    expect((await log(h.id, true, 0)).rows[0].l.revision).toBe(1);
+    expect((await log(h.id, true, 0)).rows[0].l.revision).toBe(1);
+    expect((await log(h.id, false, 1)).rows[0].l.revision).toBe(2);
+    await error(() => log(h.id, true, 1), "PT409");
+    expect(
+      (await db.query("select count(*)::int n from habit_logs")).rows[0],
+    ).toEqual({ n: 1 });
+  });
+  it("rejects future, pre-creation and unscheduled dates", async () => {
+    const h = await create();
+    for (const offset of [-1, 1]) {
+      const d = (
+        await db.query<{ d: string }>("select ($1::date+$2::int)::text d", [
+          today,
+          offset,
+        ])
+      ).rows[0].d;
+      await error(() => log(h.id, true, 0, d), "23514");
     }
+    const day = (
+      await db.query<{ n: number }>(
+        "select extract(isodow from $1::date)::int n",
+        [today],
+      )
+    ).rows[0].n;
+    const other = await create([day === 7 ? 1 : day + 1]);
+    await error(() => log(other.id, true, 0), "23514");
   });
-
-  it("rejects cross-owner associations and selected challenge references", async () => {
-    const challenge = (await database.query<{ id: string }>("insert into challenges(user_id,title,start_date,end_date) values($1,'B challenge',current_date,current_date+7) returning id", [ownerB])).rows[0].id;
-    const habit = (await database.query<{ id: string }>("insert into habits(user_id,name,active_from) values($1,'A habit',current_date) returning id", [ownerA])).rows[0].id;
-    await expectDbError(() => database.query("insert into challenge_habits(user_id,challenge_id,habit_id) values($1,$2,$3)", [ownerA, challenge, habit]), "23503");
-    await expectDbError(() => database.query("update user_preferences set selected_challenge_id=$1 where user_id=$2", [challenge, ownerA]), "23503");
-    const otherMetric = (await database.query<{ id: string }>("insert into metric_definitions(user_id,name,unit,source,active_from,source_available_from) values($1,'B metric','steps','manual',current_date,current_date) returning id", [ownerB])).rows[0].id;
-    await expectDbError(() => database.query("insert into frequency_targets(user_id,name,source,metric_id,count_mode,active_from) values($1,'Forged','metric_threshold',$2,'distinct_days',current_date)", [ownerA, otherMetric]), "23503");
+  it("changes schedules tomorrow and replaces repeated pending edits", async () => {
+    const h = await create();
+    await db.query("select save_habit('Read',$1::smallint[],$2,1)", [
+      [1, 3, 5],
+      h.id,
+    ]);
+    await db.query("select save_habit('Read',$1::smallint[],$2,2)", [
+      [2, 4],
+      h.id,
+    ]);
+    const { rows } = await db.query<{
+      weekdays: number[];
+      start: string;
+      end: string | null;
+    }>(
+      "select weekdays,effective_from::text start,effective_until::text end from habit_schedules order by effective_from",
+    );
+    expect(rows.length).toBe(2);
+    expect(rows[0].weekdays).toEqual([1, 2, 3, 4, 5, 6, 7]);
+    expect(rows[0].start).toBe(today);
+    expect(rows[0].end).toBe(rows[1].start);
+    expect(rows[1].weekdays).toEqual([2, 4]);
+    await log(h.id, true, 0);
   });
-
-  it("prevents overlapping effective rules for one source", async () => {
-    const habitId = (await database.query<{ id: string }>("insert into habits(user_id,name,active_from) values($1,'Scheduled',current_date) returning id", [ownerA])).rows[0].id;
-    await database.query("insert into habit_schedules(user_id,habit_id,frequency,required_count,effective_from,timezone,week_starts_on) values($1,$2,'DAILY',1,current_date,'Asia/Kolkata',1)", [ownerA, habitId]);
-    await expectDbError(() => database.query("insert into habit_schedules(user_id,habit_id,frequency,required_count,effective_from,timezone,week_starts_on) values($1,$2,'WEEKDAYS',1,current_date,'Asia/Kolkata',1)", [ownerA, habitId]), "23P01");
+  it("detects stale habit edits", async () => {
+    const h = await create();
+    await error(
+      () =>
+        db.query("select save_habit('Changed',array[1]::smallint[],$1,0)", [
+          h.id,
+        ]),
+      "PT409",
+    );
   });
-
-  it("reuses one tracker log across two challenge associations", async () => {
-    const date = await today();
-    await authenticate(ownerA);
-    const habitId = await rpc<string>("save_tracking_habit", { name: "Shared", timeOfDay: "anytime", frequency: "DAILY", requiredCount: 1, activeFrom: date });
-    const challengeInput = { title: "First", description: "", startDate: date, endDate: date, status: "active", habitIds: [habitId], metricIds: [], frequencyTargetIds: [] };
-    const first = await rpc<string>("save_tracking_challenge", challengeInput);
-    const second = await rpc<string>("save_tracking_challenge", { ...challengeInput, title: "Second" });
-    await rpc("write_tracking_habit_log", { habitId, date, status: "completed", completionCount: 1 });
-    expect(first).not.toBe(second);
-    expect((await database.query("select id from challenge_habits where habit_id=$1", [habitId])).rows).toHaveLength(2);
-    expect((await database.query("select id from habit_logs where habit_id=$1", [habitId])).rows).toHaveLength(1);
+  it("archives tomorrow retaining today and history; deletion is separate", async () => {
+    const h = await create();
+    await log(h.id, true, 0);
+    await db.query("select archive_habit($1,1)", [h.id]);
+    await log(h.id, false, 1);
+    expect(
+      (await db.query("select count(*)::int n from habit_logs")).rows[0],
+    ).toEqual({ n: 1 });
+    await error(
+      () => db.query("select delete_habit($1,2,'wrong')", [h.id]),
+      "23514",
+    );
+    await db.query("select delete_habit($1,2,'DELETE HABIT')", [h.id]);
+    expect((await db.query("select * from habit_schedules")).rows).toEqual([]);
   });
-
-  it("creates a tracker through its RPC, isolates it, and rejects a forged owner edit", async () => {
-    const date = await today();
-    await authenticate(ownerA);
-    const id = await rpc<string>("save_tracking_habit", { name: "Read", description: "", timeOfDay: "evening", isPrivate: false, frequency: "DAILY", requiredCount: 1, weekdays: [], activeFrom: date });
-    expect((await database.query("select id from habits where id=$1", [id])).rows).toHaveLength(1);
-    await database.exec("reset role");
-    await authenticate(ownerB);
-    expect((await database.query("select id from habits where id=$1", [id])).rows).toHaveLength(0);
-    await expectDbError(() => rpc("save_tracking_habit", { id, name: "Stolen", description: "", timeOfDay: "evening", isPrivate: false, frequency: "DAILY", requiredCount: 1, weekdays: [], activeFrom: date }), "42501");
+  it("isolates definitions, schedules, logs and every mutation between two accounts", async () => {
+    const h = await create();
+    await log(h.id, true, 0);
+    await auth(B);
+    for (const table of ["habits", "habit_schedules", "habit_logs"])
+      expect((await db.query("select * from " + table)).rows).toEqual([]);
+    await error(() => log(h.id, true, 0), "42501");
+    await error(
+      () =>
+        db.query("select save_habit('Forged',array[1]::smallint[],$1,1)", [
+          h.id,
+        ]),
+      "42501",
+    );
+    await error(() => db.query("select archive_habit($1,1)", [h.id]), "42501");
+    await error(
+      () => db.query("select delete_habit($1,1,'DELETE HABIT')", [h.id]),
+      "42501",
+    );
   });
-
-  it("guards habit revisions and preserves one log per tracker and date", async () => {
-    const date = await today();
-    await authenticate(ownerA);
-    const habitId = await rpc<string>("save_tracking_habit", { name: "Practice", timeOfDay: "morning", frequency: "DAILY", requiredCount: 1, activeFrom: date });
-    const input = { habitId, date, status: "completed", completionCount: 1, expectedRevision: null };
-    const saved = await rpc<{ revision: number }>("write_tracking_habit_log", input);
-    await expectDbError(() => rpc("write_tracking_habit_log", input), "40001");
-    const updated = await rpc<{ revision: number }>("write_tracking_habit_log", { ...input, completionCount: 2, expectedRevision: saved.revision });
-    expect(updated.revision).toBeGreaterThan(saved.revision);
-    expect((await database.query("select id from habit_logs where habit_id=$1", [habitId])).rows).toHaveLength(1);
+  it("enforces same-owner FKs and overlapping interval protection independently", async () => {
+    const h = await create();
+    await db.exec("reset role");
+    await error(
+      () =>
+        db.query(
+          "insert into habit_logs(user_id,habit_id,business_date,timezone,completed) values($1,$2,$3,'UTC',true)",
+          [B, h.id, today],
+        ),
+      "23503",
+    );
+    await error(
+      () =>
+        db.query(
+          "insert into habit_schedules(user_id,habit_id,weekdays,effective_from) values($1,$2,array[1]::smallint[],$3)",
+          [A, h.id, today],
+        ),
+      "23514",
+    );
   });
-
-  it("makes quick additions atomic and retry-safe", async () => {
-    const date = await today();
-    await authenticate(ownerA);
-    const metricId = await rpc<string>("save_tracking_metric", { name: "Water", unit: "ml", source: "manual", aggregation: "sum", targetPeriod: "daily", direction: "minimum", target: 3500, activeFrom: date });
-    const input = { metricId, date, amount: 250, operationId: "40000000-0000-4000-8000-000000000001" };
-    const first = await rpc<{ value: number; revision: number }>("increment_tracking_metric", input);
-    const retry = await rpc<{ value: number; revision: number }>("increment_tracking_metric", input);
-    expect(retry).toEqual(first);
-    await expectDbError(() => rpc("increment_tracking_metric", { ...input, amount: 500 }), "40001");
-    const second = await rpc<{ value: number }>("increment_tracking_metric", { ...input, amount: 500, operationId: "40000000-0000-4000-8000-000000000002" });
-    expect(Number(second.value)).toBe(750);
-    expect((await database.query("select id from metric_logs where metric_id=$1", [metricId])).rows).toHaveLength(1);
+  it("preserves recorded business dates/timezone when preferences change", async () => {
+    const h = await create();
+    await log(h.id, true, 0);
+    await db.query(
+      "update user_preferences set timezone='America/New_York',week_starts_on=7 where user_id=$1",
+      [A],
+    );
+    expect(
+      (
+        await db.query<{ d: string; timezone: string }>(
+          "select business_date::text d,timezone from habit_logs",
+        )
+      ).rows[0],
+    ).toEqual({ d: today, timezone: "Asia/Kolkata" });
   });
-
-  it("applies starter definitions once without fabricating logs", async () => {
-    await authenticate(ownerA);
-    const input = { timezone: "Asia/Kolkata", weekStartsOn: 1, applyStarter: true, stepThreshold: 8000 };
-    await rpc("complete_tracking_onboarding", input);
-    const count = (await database.query<{ count: number }>("select count(*)::integer as count from habits where user_id=$1", [ownerA])).rows[0].count;
-    await rpc("complete_tracking_onboarding", input);
-    expect((await database.query<{ count: number }>("select count(*)::integer as count from habits where user_id=$1", [ownerA])).rows[0].count).toBe(count);
-    expect(count).toBeGreaterThan(0);
-    expect((await database.query("select id from habit_logs where user_id=$1", [ownerA])).rows).toHaveLength(0);
-    expect((await database.query("select id from metric_logs where user_id=$1", [ownerA])).rows).toHaveLength(0);
+  it("corrects an archived past scheduled date without permitting post-archive logs", async () => {
+    const h = await create();
+    await db.exec("reset role");
+    await db.query(
+      "update habits set active_from=$1::date-7,archived_from=$1::date-1 where id=$2",
+      [today, h.id],
+    );
+    await db.query(
+      "update habit_schedules set effective_from=$1::date-7 where habit_id=$2",
+      [today, h.id],
+    );
+    await auth();
+    const past = (
+      await db.query<{ d: string }>("select ($1::date-2)::text d", [today])
+    ).rows[0].d;
+    await log(h.id, true, 0, past);
+    await log(h.id, false, 1, past);
+    await error(() => log(h.id, true, 0), "23514");
+  });
+  it("denies name changes while Privacy Mode is enabled", async () => {
+    await db.query(
+      "update user_preferences set privacy_mode=true where user_id=$1",
+      [A],
+    );
+    await error(() => create(), "23514");
   });
 });

@@ -1,5 +1,7 @@
-Status: In Progress
-Current phase: F — Responsive/Mobile Polish
+Status: Superseded October 3, 2026
+Current phase: None — historical reference
+
+The accepted simple-habit replacement in [PRODUCT](../PRODUCT.md) and [ROADMAP](ROADMAP.md) now owns future work. This broader interface refinement plan is not an active implementation queue. Its original evidence is preserved in the [pre-simplification snapshot](history/2026-10-03-pre-simplification/docs/UI_REFINEMENT_PLAN.md); current physical-device/screen-reader limitations remain documented in [QA](QA.md).
 
 # Winter Arc OS — UI/UX refinement plan
 

@@ -1,6 +1,0 @@
-import { BookOpenText, CalendarCheck2, ChartNoAxesCombined, Dumbbell, Gauge, Target } from "lucide-react";
-import { DestinationRow } from "@/components/presentation/surfaces";
-import { PageHeader } from "@/components/tracking/page-header";
-export const metadata = { title: "Track" };
-const links = [{href:"/habits",title:"Habits",description:"Log scheduled behaviors and view their monthly grid.",icon:CalendarCheck2},{href:"/metrics",title:"Metrics",description:"Record numerical measurements and targets.",icon:Gauge},{href:"/fitness",title:"Fitness",description:"Log sleep and workouts; review weight and recovery trends.",icon:Dumbbell},{href:"/career",title:"Career",description:"Log study sessions and run a recoverable focus timer.",icon:BookOpenText},{href:"/insights",title:"Insights",description:"See scored trends, coverage, heatmaps, and comparable weeks.",icon:ChartNoAxesCombined},{href:"/challenges",title:"Challenges",description:"Organize shared trackers across date ranges.",icon:Target}];
-export default function TrackPage() {return <><PageHeader title="Track" description="Choose what you want to log or organize." /><div className="mt-5 grid gap-3 md:grid-cols-2">{links.map((destination)=><DestinationRow key={destination.href} {...destination} />)}</div></>;}

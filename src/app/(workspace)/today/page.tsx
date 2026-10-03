@@ -1,70 +1,138 @@
 import Link from "next/link";
-import { ArrowLeft, ArrowRight } from "lucide-react";
-import { PageHeader, SectionHeader } from "@/components/tracking/page-header";
-import { ActionRow, EmptyState, Panel, PeriodToolbar } from "@/components/presentation/surfaces";
-import { TrackingUnavailable } from "@/components/tracking/tracking-unavailable";
-import { Button } from "@/components/ui/button";
-import { HabitLogger } from "@/features/today/habit-logger";
-import { MetricLogger } from "@/features/today/metric-logger";
-import { ChallengeSwitcher } from "@/features/today/challenge-switcher";
-import { ScoreExplanation, ScorePanel } from "@/features/today/score-panel";
-import { addDays, inclusiveChallengeProgress, parseDateQuery } from "@/features/tracking/dates";
-import { contextTrackers, evaluateHabit, frequencyProgress, metricDailyValue, metricPeriodValue, scoreForPeriod } from "@/features/tracking/domain";
-import { trackerDescription, trackerLabel, privateNotes, displayValue } from "@/features/tracking/presentation";
-import { loadTrackingSnapshot, TrackingSetupError } from "@/features/tracking/queries";
-
+import { ChevronLeft, ChevronRight } from "lucide-react";
+import { requireAccount } from "@/lib/auth/session";
+import { addDays, businessDate, parseDateQuery } from "@/lib/dates";
+import { loadHabits } from "@/features/habits/queries";
+import { isScheduled } from "@/features/habits/domain";
+import { Completion } from "@/features/habits/completion";
+import { DatePicker } from "@/features/habits/date-picker";
+import { HabitEditor } from "@/features/habits/editor";
 export const metadata = { title: "Today" };
-const groups = ["morning", "afternoon", "evening", "anytime"] as const;
-export default async function TodayPage({ searchParams }: { searchParams: Promise<{ date?: string }> }) {
-  const requested = (await searchParams).date;
-  let snapshot;
-  try { snapshot = await loadTrackingSnapshot(); } catch (error) { if (error instanceof TrackingSetupError) return <TrackingUnavailable />; throw error; }
-  const date = parseDateQuery(requested, snapshot.today);
-  const selectedChallenge = snapshot.challenges.find((item) => item.id === snapshot.selectedChallengeId) ?? null;
-  const challengeId = selectedChallenge?.id ?? null;
-  const trackers = contextTrackers(snapshot, challengeId);
-  const visible = <T extends { is_private: boolean }>(list: T[]) => snapshot.hidePrivateToday ? list.filter((item) => !item.is_private) : list;
-  const daily = scoreForPeriod(snapshot, { date, period: "daily", challengeId });
-  const weekly = scoreForPeriod(snapshot, { date, period: "weekly", challengeId });
-  const timing = selectedChallenge ? inclusiveChallengeProgress(selectedChallenge.start_date, selectedChallenge.end_date, date) : null;
-  const evaluatedHabits = visible(trackers.habits).map((habit) => ({ habit, evaluation: evaluateHabit(snapshot, habit, date, challengeId) }));
-  const datedHabits = evaluatedHabits.filter(({ evaluation }) => evaluation.state !== "inactive" && evaluation.state !== "unscheduled" && evaluation.period === "daily");
-  const flexibleHabits = evaluatedHabits.filter(({ evaluation }) => evaluation.period === "weekly" || evaluation.period === "monthly");
-  const metrics = visible(trackers.metrics).map((metric) => ({ metric, evaluation: metricDailyValue(snapshot, metric, date, challengeId) })).filter(({ evaluation }) => evaluation.state !== "inactive");
-  const frequencies = visible(trackers.frequencyTargets).map((target) => ({ target, progress: frequencyProgress(snapshot, target, date, undefined, challengeId) })).filter(({ progress }) => progress.state !== "inactive");
-  const periodMetrics = visible(trackers.metrics).flatMap((metric) => (["weekly", "monthly"] as const).map((period) => ({ metric, progress: metricPeriodValue(snapshot, metric, date, period, challengeId) })).filter(({ progress }) => progress.state !== "inactive"));
-  const noActions = datedHabits.length + flexibleHabits.length + metrics.length + frequencies.length + periodMetrics.length === 0;
-  return <>
-    <PageHeader compact title="Today" description={date === snapshot.today ? "Your current day and the week in progress." : `Tracking for ${date}.`} actions={<ChallengeSwitcher selected={challengeId} challenges={snapshot.challenges.filter((item) => item.status !== "archived").map(({ id, title }) => ({ id, title }))} />} />
-    <PeriodToolbar label="Choose tracking date" className="mt-4">
-      <Button asChild variant="outline" className="size-11 p-0"><Link href={`/today?date=${addDays(date, -1)}`} aria-label="Previous day"><ArrowLeft className="size-4" aria-hidden="true" /></Link></Button>
-      <form action="/today" className="flex items-center gap-2"><label htmlFor="today-date" className="sr-only">Tracking date</label><input id="today-date" name="date" type="date" max={snapshot.today} defaultValue={date} className="min-h-11 rounded-lg border border-input bg-background px-3 text-base sm:text-sm" /><Button variant="outline" className="min-h-11 px-4">View</Button></form>
-      {date < snapshot.today && <Button asChild variant="outline" className="size-11 p-0"><Link href={`/today?date=${addDays(date, 1)}`} aria-label="Next day"><ArrowRight className="size-4" aria-hidden="true" /></Link></Button>}
-      {date !== snapshot.today && <Button asChild variant="ghost" className="min-h-11 px-3"><Link href="/today">Return to today</Link></Button>}
-    </PeriodToolbar>
-    {selectedChallenge && timing && <Panel density="compact" className="mt-4" aria-label="Selected challenge timeline">
-      <div className="flex flex-wrap items-center justify-between gap-2"><div className="min-w-0 flex-1"><p className="text-xs uppercase tracking-[0.14em] text-muted-foreground">Selected challenge</p><h2 className="mt-1 break-words [overflow-wrap:anywhere] font-medium"><Link href={`/challenges/${selectedChallenge.id}`} className="hover:underline">{selectedChallenge.title}</Link></h2></div><span className="text-sm tabular-nums text-muted-foreground">{timing.elapsedDays} of {timing.totalDays} days elapsed</span></div>
-      <div className="mt-3 h-1.5 overflow-hidden rounded-full bg-secondary"><div className="h-full rounded-full bg-primary" style={{ width: `${timing.progress * 100}%` }} /></div>
-      <p className="mt-2 text-xs text-muted-foreground">{selectedChallenge.start_date} – {selectedChallenge.end_date}, inclusive · Elapsed time is separate from target achievement.</p>
-    </Panel>}
-    {!snapshot.onboardingComplete && <Panel density="compact" className="mt-4" aria-label="Complete setup"><h2 className="font-medium">Set your calendar and optional starters</h2><p className="mt-1 text-sm text-muted-foreground">Confirm your timezone and choose definitions. Setup never creates performance history.</p><Link href="/onboarding" className="mt-2 inline-flex min-h-11 items-center text-sm text-primary underline">Open setup</Link></Panel>}
-    <div className="mt-4 grid gap-3 lg:grid-cols-2"><ScorePanel title="Daily" result={daily} privacyMode={snapshot.privacyMode} compact /><ScorePanel title="Weekly" result={weekly} privacyMode={snapshot.privacyMode} compact /></div>
-    <div className="mt-3 flex flex-wrap gap-x-5 gap-y-1 text-sm"><Link href={`/fitness?date=${date}`} className="inline-flex min-h-11 items-center text-primary underline">Log sleep and fitness</Link><Link href="/fitness/workouts/new" className="inline-flex min-h-11 items-center text-primary underline">Log workout</Link></div>
-    {noActions && <EmptyState id="today-empty" title="No trackers are scheduled here" description={`${selectedChallenge ? "Add existing trackers to this challenge, or switch to personal tracking." : "Create a habit or metric, or add the optional starter definitions."} Private trackers may also be hidden by your Today preference.`} className="mt-5" actions={<><Link href="/habits" className="inline-flex min-h-11 items-center text-primary underline">Habits</Link><Link href="/metrics" className="inline-flex min-h-11 items-center text-primary underline">Metrics</Link><Link href="/challenges" className="inline-flex min-h-11 items-center text-primary underline">Challenges</Link></>} />}
-    {datedHabits.length > 0 && <section className="mt-7" aria-labelledby="today-habits">
-      <SectionHeader id="today-habits" title="Scheduled habits" actions={<Link href="/habits" className="text-primary underline">Monthly grid</Link>} />
-      <div className="mt-3 grid gap-3 lg:grid-cols-2">{groups.map((group) => { const rows = datedHabits.filter(({ habit }) => habit.time_of_day === group); if (!rows.length) return null; return <Panel key={group} density="compact" aria-label={group === "anytime" ? "Any time habits" : `${group} habits`}><h3 className="text-xs font-medium uppercase tracking-[0.12em] text-muted-foreground">{group === "anytime" ? "Any time" : group}</h3><div className="mt-1">{rows.map(({ habit, evaluation }) => { const name = trackerLabel(habit, snapshot); const masked = snapshot.privacyMode && habit.is_private; return <ActionRow key={habit.id} detail={trackerDescription(habit, snapshot)} status={evaluation.state}><HabitLogger key={`${habit.id}-${date}`} habitId={habit.id} date={date} name={name} count={evaluation.log?.completion_count ?? 0} status={evaluation.log?.status ?? null} revision={evaluation.log?.revision ?? null} requiredCount={evaluation.expectedCount ?? 1} notes={privateNotes(evaluation.log?.notes ?? "", habit.is_private, snapshot)} hideNotes={masked} disabled={date > snapshot.today || evaluation.state === "configuration" || evaluation.state === "future"} /></ActionRow>; })}</div></Panel>; })}</div>
-    </section>}
-    {metrics.length > 0 && <section className="mt-7" aria-labelledby="today-metrics">
-      <SectionHeader id="today-metrics" title="Measurements" actions={<Link href="/metrics" className="text-primary underline">Manage metrics</Link>} />
-      <div className="mt-3 grid gap-3 lg:grid-cols-2">{metrics.map(({ metric, evaluation }) => { const name = trackerLabel(metric, snapshot); const masked = snapshot.privacyMode && metric.is_private; return <Panel as="article" key={metric.id} density="compact"><p className="text-xs text-muted-foreground">{evaluation.target === null ? "Observation" : `${evaluation.direction === "minimum" ? "At least" : "At most"} ${evaluation.target} ${metric.unit}`}</p>{metric.source === "manual" ? <MetricLogger key={`${metric.id}-${date}`} metricId={metric.id} date={date} name={name} unit={metric.unit} quickAdd={metric.aggregation === "sum"} value={evaluation.rawValue} revision={evaluation.log?.revision ?? null} notes={privateNotes(evaluation.log?.notes ?? "", metric.is_private, snapshot)} hideNotes={masked} disabled={date > snapshot.today || date < metric.active_from || evaluation.state === "configuration" || evaluation.state === "future"} /> : <div className="mt-3"><h3 className="font-medium">{name}</h3><p className="mt-2 text-sm text-muted-foreground">{evaluation.state !== "unavailable" ? evaluation.rawValue === null ? `No ${metric.source === "study" ? "study" : "sleep"} recorded` : `${evaluation.rawValue.toFixed(2)} ${metric.unit} recorded` : evaluation.reason}</p><Link href={metric.source === "study" ? `/career?date=${date}` : `/fitness?date=${date}`} className="mt-2 inline-flex min-h-11 items-center text-sm text-primary underline">{metric.source === "study" ? "Log or edit study" : "Log or edit sleep"}</Link></div>}{evaluation.state === "missing" && <p className="mt-2 text-xs text-muted-foreground">Not logged; this required measurement currently contributes zero.</p>}</Panel>; })}</div>
-    </section>}
-    {(flexibleHabits.length > 0 || frequencies.length > 0 || periodMetrics.length > 0) && <section className="mt-7" aria-labelledby="period-targets">
-      <SectionHeader id="period-targets" title="Weekly and monthly progress" />
-      <div className="mt-3 grid gap-3 lg:grid-cols-2">{flexibleHabits.map(({ habit, evaluation }) => { const progress = frequencyProgress(snapshot, habit, date, evaluation.period === "monthly" ? "monthly" : "weekly", challengeId); const name = trackerLabel(habit, snapshot); return <Panel as="article" key={habit.id} density="compact"><div className="flex flex-wrap justify-between gap-2"><h3 className="font-medium">{name}</h3><span className="text-xs capitalize text-muted-foreground">{progress.period}</span></div><p className="mt-2 text-sm tabular-nums">{progress.actualCount} / {progress.requiredCount ?? "—"} occurrences</p><p className="mt-1 text-xs text-muted-foreground">{progress.reason ?? (progress.state === "in_progress" ? "In progress" : "Period evaluated")} · {progress.start}–{progress.end}</p><HabitLogger key={`${habit.id}-${date}`} habitId={habit.id} date={date} name={name} count={evaluation.log?.completion_count ?? 0} status={evaluation.log?.status ?? null} revision={evaluation.log?.revision ?? null} requiredCount={1} notes={privateNotes(evaluation.log?.notes ?? "", habit.is_private, snapshot)} hideNotes={snapshot.privacyMode && habit.is_private} disabled={date > snapshot.today || progress.state === "configuration" || progress.state === "future"} /></Panel>; })}{frequencies.map(({ target, progress }) => <Panel as="article" key={target.id} density="compact"><div className="flex flex-wrap justify-between gap-2"><h3 className="font-medium">{trackerLabel(target, snapshot)}</h3><span className="text-xs capitalize text-muted-foreground">{progress.period}</span></div><p className="mt-2 text-sm tabular-nums">{progress.state === "unavailable" ? "Source unavailable" : `${progress.actualCount} / ${progress.requiredCount ?? "—"} ${progress.countMode === "distinct_days" ? "days" : "sessions"}`}</p><p className="mt-1 text-xs text-muted-foreground">{progress.reason ?? (progress.state === "in_progress" ? "In progress" : "Period evaluated")} · {progress.start}–{progress.end}</p></Panel>)}{periodMetrics.map(({ metric, progress }) => <Panel as="article" key={`${metric.id}-${progress.period}`} density="compact"><div className="flex flex-wrap justify-between gap-2"><h3 className="font-medium">{trackerLabel(metric, snapshot)}</h3><span className="text-xs capitalize text-muted-foreground">{progress.period}</span></div><p className="mt-2 text-sm tabular-nums">{displayValue(progress.rawValue, metric.unit)} / {progress.target ?? "—"} {metric.unit}</p><p className="mt-1 text-xs text-muted-foreground">{progress.reason ?? (progress.state === "in_progress" ? "In progress" : "Period evaluated")} · {progress.start}–{progress.end}</p></Panel>)}</div>
-      <p className="mt-3 text-sm text-muted-foreground">Flexible targets contribute only to their matching period score.</p>
-    </section>}
-    <section className="mt-7" aria-labelledby="today-score-details"><SectionHeader id="today-score-details" title="Score details" /><div className="mt-3 grid gap-3 lg:grid-cols-2"><Panel density="compact" aria-label="Daily score details"><ScoreExplanation result={daily} privacyMode={snapshot.privacyMode} summaryLabel="How the daily score is calculated" standalone /></Panel><Panel density="compact" aria-label="Weekly score details"><ScoreExplanation result={weekly} privacyMode={snapshot.privacyMode} summaryLabel="How the weekly score is calculated" standalone /></Panel></div></section>
-    <footer className="mt-8 border-t pt-5 text-xs text-muted-foreground">Dates use {snapshot.timezone}. Week starts on {["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"][snapshot.weekStartsOn - 1]}. Historical logs keep their assigned dates.</footer>
-  </>;
+export default async function TodayPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ date?: string }>;
+}) {
+  const { preferences } = await requireAccount();
+  const today = businessDate(preferences.timezone);
+  const chosen = parseDateQuery((await searchParams).date, today);
+  const date = chosen > today ? today : chosen;
+  const data = await loadHabits(date, date);
+  const due = data.habits.filter((h) => isScheduled(h, data.schedules, date));
+  const done = due.filter((h) =>
+    data.logs.some((l) => l.habit_id === h.id && l.completed),
+  ).length;
+  const formatted = new Intl.DateTimeFormat("en", {
+    weekday: "long",
+    day: "numeric",
+    month: "long",
+    timeZone: "UTC",
+  }).format(new Date(`${date}T12:00:00Z`));
+  return (
+    <div className="mx-auto max-w-2xl">
+      <header className="flex flex-wrap items-start justify-between gap-6">
+        <div>
+          <h1 className="text-page font-semibold tracking-tight">Today</h1>
+          <p className="mt-2 text-base text-muted-foreground">{formatted}</p>
+        </div>
+        <div className="flex items-center gap-2">
+          <Link
+            href={`/today?date=${addDays(date, -1)}`}
+            aria-label="Previous date"
+            className="flex size-11 items-center justify-center rounded-lg border hover:bg-secondary"
+          >
+            <ChevronLeft size={18} />
+          </Link>
+          <DatePicker date={date} today={today} />
+          {date < today ? (
+            <Link
+              href={`/today?date=${addDays(date, 1)}`}
+              aria-label="Next date"
+              className="flex size-11 items-center justify-center rounded-lg border hover:bg-secondary"
+            >
+              <ChevronRight size={18} />
+            </Link>
+          ) : (
+            <button
+              disabled
+              aria-label="Next date unavailable"
+              className="flex size-11 items-center justify-center rounded-lg border text-muted-foreground opacity-40"
+            >
+              <ChevronRight size={18} />
+            </button>
+          )}
+        </div>
+      </header>
+      {date !== today && (
+        <Link
+          href="/today"
+          className="mt-4 inline-flex min-h-11 items-center text-sm text-primary underline"
+        >
+          Back to today
+        </Link>
+      )}
+      {due.length > 0 && (
+        <div className="mt-9">
+          <p className="text-base tabular-nums" aria-live="polite">
+            {done} of {due.length} done
+          </p>
+          <progress
+            aria-label="Habit completion"
+            className="habit-progress mt-3 h-1.5 w-full"
+            max={due.length}
+            value={done}
+          />
+        </div>
+      )}
+      <section aria-label="Your habits" className="mt-9">
+        {due.length > 0 && (
+          <h2 className="mb-3 text-sm text-muted-foreground">Your habits</h2>
+        )}
+        {due.map((habit) => {
+          const log = data.logs.find((l) => l.habit_id === habit.id);
+          return (
+            <Completion
+              key={`${habit.id}-${date}`}
+              habitId={habit.id}
+              name={habit.name}
+              date={date}
+              completed={log?.completed ?? false}
+              revision={log?.revision ?? 0}
+            />
+          );
+        })}
+        {!due.length && (
+          <div className="py-9">
+            <h2 className="text-xl font-medium">
+              {data.habits.length
+                ? "Nothing scheduled"
+                : "Add your first habit"}
+            </h2>
+            <p className="mt-3 text-sm text-muted-foreground">
+              {data.habits.length
+                ? "A little room in your day. Your other dates are here when you need them."
+                : "Start with 3–5 habits. A name and a schedule are all you need."}
+            </p>
+          </div>
+        )}
+        {due.length > 0 && done === due.length && (
+          <p role="status" className="mt-6 text-sm text-success">
+            All done. Enjoy the rest of your day.
+          </p>
+        )}
+      </section>
+      <div className="mt-7">
+        {preferences.privacy_mode ? (
+          <p className="text-sm text-muted-foreground">
+            Privacy Mode is on. Turn it off in Settings to add a habit.
+          </p>
+        ) : (
+          <HabitEditor
+            quiet
+            label={data.habits.length ? "Add a habit" : "Add your first habit"}
+          />
+        )}
+      </div>
+    </div>
+  );
 }
