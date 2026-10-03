@@ -1,12 +1,12 @@
 # Graph Report - winter-arc-os  (2026-10-03)
 
 ## Corpus Check
-- 141 files · ~605,780 words
+- 140 files · ~602,070 words
 - Verdict: corpus is large enough that graph structure adds value.
 - Unclassified: 8 file(s) not represented in the graph (top: (none) 5, .example 1, .css 1)
 
 ## Summary
-- 1117 nodes · 1876 edges · 73 communities (52 shown, 21 thin omitted)
+- 1101 nodes · 1861 edges · 79 communities (58 shown, 21 thin omitted)
 - Extraction: 97% EXTRACTED · 3% INFERRED · 0% AMBIGUOUS · INFERRED: 58 edges (avg confidence: 0.93)
 - Token cost: 0 input · 0 output
 
@@ -44,16 +44,20 @@
 - dependencies
 - devDependencies
 - habits/page.tsx
-- Components
+- Winter Arc OS — UI/UX refinement plan
 - What You Must Do When Invoked
 - 3. CORE DESIGN PRINCIPLE
 - Today and Habits UI concepts
 - auth-form.tsx
 - 8. TODAY DASHBOARD
-- Winter Arc OS — UI/UX refinement plan
+- Winter Arc OS — design direction
 - app/layout.tsx
 - scripts
+- settings-forms.tsx
+- editor.tsx
+- auth/validation.ts
 - Winter Arc OS — simple habit product
+- Winter Arc OS — UI/UX refinement plan
 - 2026-10-03-pre-simplification/README.md
 - 20261002004151_data_controls.sql
 - public.save_fitness_workout
@@ -67,11 +71,13 @@
 - bootstrap.sql
 - postcss.config.mjs
 - sw.js
+- FormField
 - Winter Arc OS — simple habit verification
 - Winter Arc OS — project operating instructions
+- Winter Arc OS — simple habit design
 - Simple habit design review
 - Winter Arc OS — project operating instructions
-- cleanup-browser-fixtures.mjs
+- @supabase/supabase-js
 - Winter Arc OS
 - This is NOT the Next.js you know
 - AGENTS.md
@@ -104,21 +110,21 @@
   docs/history/2026-10-03-pre-simplification/docs/UI_REFINEMENT_PLAN.md → src/components/forms/form-field.tsx
 - `Interface inconsistencies and hierarchy` --references--> `FormField()`  [INFERRED]
   docs/UI_REFINEMENT_PLAN.md → src/components/forms/form-field.tsx
+- `10. Regression risks` --references--> `FormField()`  [INFERRED]
+  docs/history/2026-10-03-pre-simplification/docs/UI_REFINEMENT_PLAN.md → src/components/forms/form-field.tsx
+- `10. Regression risks` --references--> `FormField()`  [INFERRED]
+  docs/UI_REFINEMENT_PLAN.md → src/components/forms/form-field.tsx
 - `Feature, mobile, and accessibility refinements (Phases E–G)` --references--> `MobileViewport()`  [INFERRED]
   docs/history/2026-10-03-pre-simplification/DESIGN.md → src/components/shell/mobile-viewport.tsx
-- `Phases E–G implementation decisions` --references--> `MobileViewport()`  [INFERRED]
-  docs/history/2026-10-03-pre-simplification/docs/UI_REFINEMENT_PLAN.md → src/components/shell/mobile-viewport.tsx
-- `Phases E–G implementation decisions` --references--> `MobileViewport()`  [INFERRED]
-  docs/UI_REFINEMENT_PLAN.md → src/components/shell/mobile-viewport.tsx
 
 ## Import Cycles
 - None detected.
 
-## Communities (73 total, 21 thin omitted)
+## Communities (79 total, 21 thin omitted)
 
 ### Community 0 - "Button"
-Cohesion: 0.05
-Nodes (77): Implemented shared presentation contracts (Phases B–D), 10. Regression risks, 3. Current UI findings, 6. Shared component strategy, 7. Watermelon/shadcn usage rules, Architecture and dependencies, Interface inconsistencies and hierarchy, Phases B–D implementation decisions and evidence (+69 more)
+Cohesion: 0.19
+Nodes (14): ErrorPage(), metadata, SettingsPage(), ResponsiveEditorProps, LogoutButton(), Button(), buttonVariants, logout() (+6 more)
 
 ### Community 1 - "2026-10-03-pre-simplification/docs/MASTER_SPEC.md"
 Cohesion: 0.04
@@ -178,7 +184,7 @@ Nodes (10): 52. DEVELOPMENT PROCESS, PHASE 1 — FOUNDATION, PHASE 2 — CORE TR
 
 ### Community 15 - "package.json"
 Cohesion: 0.09
-Nodes (21): eslintConfig, engines, node, name, private, type, version, class-variance-authority (+13 more)
+Nodes (23): eslintConfig, engines, node, name, private, type, version, class-variance-authority (+15 more)
 
 ### Community 16 - "Winter Arc OS — simple habit architecture"
 Cohesion: 0.22
@@ -225,12 +231,12 @@ Cohesion: 0.12
 Nodes (16): devDependencies, @axe-core/playwright, @electric-sql/pglite, eslint, @eslint/compat, eslint-config-next, @playwright/test, supabase (+8 more)
 
 ### Community 27 - "habits/page.tsx"
-Cohesion: 0.10
-Nodes (49): lucide-react, HabitsPage(), metadata, metadata, TodayPage(), failure(), refresh(), removeHabit() (+41 more)
+Cohesion: 0.08
+Nodes (57): lucide-react, AuthLayout(), HabitsPage(), metadata, WorkspaceLayout(), metadata, TodayPage(), Brand() (+49 more)
 
-### Community 28 - "Components"
-Cohesion: 0.09
-Nodes (22): Buttons, Calendar, Cards / Containers, Colors, Completion Row, Components, Design System: Winter Arc OS, Do: (+14 more)
+### Community 28 - "Winter Arc OS — UI/UX refinement plan"
+Cohesion: 0.14
+Nodes (15): 11. Validation checklist, 1. Goals, 2. Non-goals, 3. Current UI findings, 4. Approved design direction, 5. Design-system decisions, 7. Watermelon/shadcn usage rules, 8. Implementation phases A–G (+7 more)
 
 ### Community 29 - "What You Must Do When Invoked"
 Cohesion: 0.08
@@ -246,11 +252,11 @@ Nodes (3): Habits, Today, Today and Habits UI concepts
 
 ### Community 32 - "auth-form.tsx"
 Cohesion: 0.06
-Nodes (56): nextConfig, next, @supabase/ssr, @supabase/supabase-js, headers, POST(), reply(), dynamic (+48 more)
+Nodes (54): nextConfig, next, @supabase/ssr, headers, POST(), reply(), dynamic, GET() (+46 more)
 
-### Community 34 - "Winter Arc OS — UI/UX refinement plan"
-Cohesion: 0.06
-Nodes (37): Component adoption cancelled, Feature, mobile, and accessibility refinements (Phases E–G), Final A–G QA after adoption rollback, Implementation recording checklist, Interaction conventions, Navigation and responsive behavior, Privacy and analytics, Status (+29 more)
+### Community 34 - "Winter Arc OS — design direction"
+Cohesion: 0.08
+Nodes (25): Component adoption cancelled, Feature, mobile, and accessibility refinements (Phases E–G), Final A–G QA after adoption rollback, Implementation recording checklist, Interaction conventions, Navigation and responsive behavior, Privacy and analytics, Status (+17 more)
 
 ### Community 35 - "app/layout.tsx"
 Cohesion: 0.23
@@ -260,33 +266,57 @@ Nodes (8): next-themes, dynamic, geist, metadata, RootLayout(), viewport, Connec
 Cohesion: 0.18
 Nodes (11): scripts, build, db:reset, db:start, dev, lint, start, test (+3 more)
 
+### Community 39 - "settings-forms.tsx"
+Cohesion: 0.31
+Nodes (10): 10. Regression risks, 7. Watermelon/shadcn usage rules, Input(), Label(), updatePreferences(), updateProfile(), submitSettingsAction(), PreferencesForm() (+2 more)
+
+### Community 40 - "editor.tsx"
+Cohesion: 0.27
+Nodes (8): react, react-dom, FormFeedback(), controlClass, FieldControlProps, HabitForm(), deleteWorkspaceData(), DeleteDataForm()
+
+### Community 41 - "auth/validation.ts"
+Cohesion: 0.20
+Nodes (11): calendarSchema, preferencesSchema, appearanceSchema, email, initialFormState, loginSchema, password, passwordSchema (+3 more)
+
 ### Community 42 - "Winter Arc OS — simple habit product"
 Cohesion: 0.15
 Nodes (13): Brand commitments and accessibility, Delivery and verification, Explicit removals, Fresh-start boundary, Habit definition and recording, History and consistency, Platform, Positioning and operating context (+5 more)
+
+### Community 43 - "Winter Arc OS — UI/UX refinement plan"
+Cohesion: 0.17
+Nodes (12): 10. Regression risks, 11. Validation checklist, 1. Goals, 2. Non-goals, 3. Current UI findings, 4. Approved design direction, 5. Design-system decisions, 8. Implementation phases A–G (+4 more)
 
 ### Community 49 - "Winter Arc OS — habit history and consistency"
 Cohesion: 0.22
 Nodes (9): Calendar rules, Corrections and retries, Effective schedule changes, Five date states, Required cases, Status, Today count, Weekly consistency (+1 more)
 
+### Community 57 - "FormField"
+Cohesion: 0.49
+Nodes (10): Implemented shared presentation contracts (Phases B–D), 6. Shared component strategy, Phases B–D implementation decisions and evidence, 6. Shared component strategy, Phases B–D implementation decisions and evidence, Confirmation(), ResponsiveEditor(), close() (+2 more)
+
 ### Community 58 - "Winter Arc OS — simple habit verification"
-Cohesion: 0.20
-Nodes (10): Baseline and artifact results, Browser findings and fixes, Commands and evidence, Final development verification — October 3, 2026, Gate status, Replacement foundation evidence — October 3, 2026, Required replacement checks, Step 1–2 verification record — October 3, 2026 (+2 more)
+Cohesion: 0.22
+Nodes (9): Baseline and artifact results, Browser findings and fixes, Commands and evidence, Open gates, Replacement foundation evidence — October 3, 2026, Required replacement checks, Step 1–2 verification record — October 3, 2026, Truthful status (+1 more)
 
 ### Community 59 - "Winter Arc OS — project operating instructions"
 Cohesion: 0.29
 Nodes (7): Current state and authorization, Database and command discipline, Engineering invariants, Git and handoffs, Phase workflow, Start here, Winter Arc OS — project operating instructions
 
+### Community 60 - "Winter Arc OS — simple habit design"
+Cohesion: 0.29
+Nodes (7): Artifacts and approval, Authority and implementation status, Inherited tokens, Operate mode: a daily checklist, Proposed navigation and sections, States and interaction, Winter Arc OS — simple habit design
+
 ### Community 61 - "Simple habit design review"
 Cohesion: 0.29
-Nodes (7): Approval record, Approved direction, Approved review set, Following approval, Simple habit design review, Status, Superseded artifacts
+Nodes (7): Approval record, Direction to approve, Following approval, Proposed review set, Simple habit design review, Status, Superseded artifacts
 
 ### Community 62 - "Winter Arc OS — project operating instructions"
 Cohesion: 0.29
 Nodes (7): Current state, Database and command discipline, Engineering invariants, Git and handoffs, Phase workflow, Start here, Winter Arc OS — project operating instructions
 
-### Community 63 - "cleanup-browser-fixtures.mjs"
-Cohesion: 0.33
-Nodes (3): candidates, client, [since, mode]
+### Community 63 - "@supabase/supabase-js"
+Cohesion: 0.29
+Nodes (4): @supabase/supabase-js, candidates, client, [since, mode]
 
 ### Community 65 - "Winter Arc OS"
 Cohesion: 0.22
@@ -325,8 +355,8 @@ Cohesion: 0.50
 Nodes (4): 3. CORE DESIGN PRINCIPLE, HABIT, METRIC, TARGET
 
 ## Knowledge Gaps
-- **539 isolated node(s):** `eslintConfig`, `nextConfig`, `name`, `version`, `private` (+534 more)
-  These have ≤1 connection - possible missing edges or undocumented components. (Counts symbols only; 641 node(s) total have ≤1 connection when file, concept and rationale nodes are included.)
+- **527 isolated node(s):** `eslintConfig`, `nextConfig`, `name`, `version`, `private` (+522 more)
+  These have ≤1 connection - possible missing edges or undocumented components. (Counts symbols only; 629 node(s) total have ≤1 connection when file, concept and rationale nodes are included.)
 - **21 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
@@ -334,15 +364,15 @@ _Questions this graph is uniquely positioned to answer:_
 
 - **Why does `auth()` connect `20261001044053_fitness.sql` to `vitest`, `20261001004511_core_tracking.sql`, `20261001104654_planning.sql`, `20261001052104_career.sql`, `20260930180649_foundation.sql`?**
   _High betweenness centrality (0.222) - this node is a cross-community bridge._
-- **Why does `vitest` connect `vitest` to `Button`, `habits/page.tsx`, `package.json`?**
-  _High betweenness centrality (0.197) - this node is a cross-community bridge._
-- **Why does `Winter Arc OS — UI/UX refinement plan` connect `Button` to `Winter Arc OS — UI/UX refinement plan`, `AGENTS.md`?**
-  _High betweenness centrality (0.196) - this node is a cross-community bridge._
+- **Why does `vitest` connect `vitest` to `editor.tsx`, `auth/validation.ts`, `habits/page.tsx`, `package.json`?**
+  _High betweenness centrality (0.195) - this node is a cross-community bridge._
+- **Why does `Winter Arc OS — UI/UX refinement plan` connect `Winter Arc OS — UI/UX refinement plan` to `FormField`, `Winter Arc OS — design direction`, `AGENTS.md`, `settings-forms.tsx`?**
+  _High betweenness centrality (0.185) - this node is a cross-community bridge._
 - **Are the 6 inferred relationships involving `Button()` (e.g. with `10. Regression risks` and `7. Watermelon/shadcn usage rules`) actually correct?**
   _`Button()` has 6 INFERRED edges - model-reasoned connections that need verification._
 - **What connects `eslintConfig`, `nextConfig`, `name` to the rest of the system?**
-  _539 weakly-connected nodes found - possible documentation gaps or missing edges._
-- **Should `Button` be split into smaller, more focused modules?**
-  _Cohesion score 0.05183459522422831 - nodes in this community are weakly interconnected._
+  _527 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `2026-10-03-pre-simplification/docs/MASTER_SPEC.md` be split into smaller, more focused modules?**
   _Cohesion score 0.03773584905660377 - nodes in this community are weakly interconnected._
+- **Should `20261003090000_simple_habits.sql` be split into smaller, more focused modules?**
+  _Cohesion score 0.14333333333333334 - nodes in this community are weakly interconnected._

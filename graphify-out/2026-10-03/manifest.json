@@ -558,33 +558,33 @@
     "semantic_hash": ""
   },
   "AGENTS.md": {
-    "mtime": 1791015962.078412,
-    "seen": 1791016147.582648,
-    "ast_hash": "6f2d2053168c51a02e0ea0b01899ed60",
+    "mtime": 1791015624.080005,
+    "seen": 1791015679.610744,
+    "ast_hash": "dcf64ae614bd3de982f20bfa0044e901",
     "semantic_hash": ""
   },
   "DESIGN.md": {
-    "mtime": 1791016017.1100056,
-    "seen": 1791016147.582649,
-    "ast_hash": "16846eaa9e5d0fb436ff701bd81c792c",
+    "mtime": 1791012879.3893967,
+    "seen": 1791015149.772823,
+    "ast_hash": "2dc241786c145870d000b3bc82916626",
     "semantic_hash": ""
   },
   "PRODUCT.md": {
-    "mtime": 1791015962.0780225,
-    "seen": 1791016147.5826502,
-    "ast_hash": "0769a4c2cb475a21f3a94754a178e9fd",
+    "mtime": 1791014983.7856352,
+    "seen": 1791015149.772824,
+    "ast_hash": "1f0840727bae933f57bc25efecbff858",
     "semantic_hash": ""
   },
   "README.md": {
-    "mtime": 1791016047.4968529,
-    "seen": 1791016147.582651,
-    "ast_hash": "f5d5f64cc7a25d7afb62c66dc418bd2b",
+    "mtime": 1791015624.0818055,
+    "seen": 1791015679.6107469,
+    "ast_hash": "5496f4f594dbc8b41ff363d26a2706f9",
     "semantic_hash": ""
   },
   "docs/ARCHITECTURE.md": {
-    "mtime": 1791015962.0786614,
-    "seen": 1791016147.582651,
-    "ast_hash": "00059497df0d93957ccbe1ad6c1d42b9",
+    "mtime": 1791014563.2093832,
+    "seen": 1791015149.772825,
+    "ast_hash": "e6a6d2d29de1af5ce61f3f48209a177b",
     "semantic_hash": ""
   },
   "docs/MASTER_SPEC.md": {
@@ -594,21 +594,21 @@
     "semantic_hash": ""
   },
   "docs/QA.md": {
-    "mtime": 1791016025.35594,
-    "seen": 1791016147.582654,
-    "ast_hash": "856b570aa78a4b1a5fd10fe21178bca9",
+    "mtime": 1791015624.080263,
+    "seen": 1791015679.610751,
+    "ast_hash": "17ceb1b96abbfd6c3811e1aa39f32932",
     "semantic_hash": ""
   },
   "docs/ROADMAP.md": {
-    "mtime": 1791015962.0795543,
-    "seen": 1791016147.582655,
-    "ast_hash": "9158ccab9634b16196e835e2c9b9d940",
+    "mtime": 1791015624.0795896,
+    "seen": 1791015679.610752,
+    "ast_hash": "21be49fce42624c53933cd7dc29aeea5",
     "semantic_hash": ""
   },
   "docs/SCORING.md": {
-    "mtime": 1791015962.0788667,
-    "seen": 1791016147.582656,
-    "ast_hash": "a6a024d2d4b214f34f13bff8e96ba0ad",
+    "mtime": 1791014563.209658,
+    "seen": 1791015149.77283,
+    "ast_hash": "fe229885c632591fc1655a6fcb1c37a5",
     "semantic_hash": ""
   },
   "docs/UI_REFINEMENT_PLAN.md": {
@@ -672,9 +672,9 @@
     "semantic_hash": ""
   },
   "docs/simple-habits-inventory.json": {
-    "mtime": 1791015962.080878,
-    "seen": 1791016147.582527,
-    "ast_hash": "c9e7da949a177f5d4c54923aaf730c55",
+    "mtime": 1791015624.0814064,
+    "seen": 1791015679.610622,
+    "ast_hash": "119ce22e7dfd5f1a65dbc4e5d0f45423",
     "semantic_hash": ""
   },
   "src/components/forms/editor-dialog.tsx": {
@@ -780,15 +780,15 @@
     "semantic_hash": ""
   },
   "docs/DESIGN_REVIEW.md": {
-    "mtime": 1791015962.0799222,
-    "seen": 1791016147.5826519,
-    "ast_hash": "54cad02eb2822fca777fc0ab2cb86abe",
+    "mtime": 1791014563.2100613,
+    "seen": 1791015149.7728262,
+    "ast_hash": "d98ae92fb420d655e86f3381ade6b4a0",
     "semantic_hash": ""
   },
   "docs/SIMPLIFICATION.md": {
-    "mtime": 1791015962.080119,
-    "seen": 1791016147.582657,
-    "ast_hash": "a20e5b16bd5c81641bc9f25a38a85a3f",
+    "mtime": 1791014189.6011653,
+    "seen": 1791015149.772831,
+    "ast_hash": "cb3e3675374489436c82e2c3a99650cb",
     "semantic_hash": ""
   },
   "docs/history/2026-10-03-pre-simplification/AGENTS.md": {
@@ -915,12 +915,6 @@
     "mtime": 1791015495.397379,
     "seen": 1791015679.610633,
     "ast_hash": "28926326e996b1de4620d568ce269a4e",
-    "semantic_hash": ""
-  },
-  ".impeccable/design.json": {
-    "mtime": 1791016113.838305,
-    "seen": 1791016147.5825238,
-    "ast_hash": "5779f7d62632c6e166466fa117754313",
     "semantic_hash": ""
   }
 }
