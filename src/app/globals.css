@@ -1,6 +1,4 @@
 @import "tailwindcss";
-@import "tw-animate-css";
-@import "shadcn/tailwind.css";
 @custom-variant dark (&:is(.dark *));
 @theme inline {
   --font-sans: var(--font-geist-sans);
@@ -44,7 +42,7 @@
   --color-sidebar-border: var(--border);
   --radius-sm: 0.375rem;
   --radius-md: 0.5rem;
-  --radius-lg: 0.875rem;
+  --radius-lg: 0.5rem;
   --radius-xl: 1rem;
   --text-page: 1.875rem;
   --text-page--line-height: 1.2;
@@ -56,7 +54,6 @@
   --text-body--line-height: 1.5;
   --text-caption: 0.75rem;
   --text-caption--line-height: 1.5;
-  --text-chart: var(--chart-label-size);
 }
 :root {
   --space-control: 0.5rem;
@@ -65,11 +62,9 @@
   --space-panel: 1.25rem;
   --space-panel-lg: 1.5rem;
   --space-section: 2rem;
-  --control-compact: 2rem;
+  --control-compact: 2.75rem;
   --control-touch: 2.75rem;
   --mobile-nav-height: calc(4.75rem + env(safe-area-inset-bottom));
-  --timer-bar-height: 3.25rem;
-  --chart-label-size: 0.75rem;
   --radius-control: 0.5rem;
   --focus-width: 2px;
   --focus-offset: 4px;
@@ -101,10 +96,6 @@
   --feedback-warning-border: #d8b884;
   --feedback-error: #fff0ee;
   --feedback-error-border: #d59996;
-  --chart-primary: var(--primary);
-  --chart-secondary: #5e6884;
-  --chart-grid: #d5d8e1;
-  --chart-label: var(--muted-foreground);
   --shadow-float: 0 14px 36px rgb(27 28 40 / 12%);
   --sidebar: #efeff4;
   color-scheme: light;
@@ -138,10 +129,6 @@
   --feedback-warning-border: #84653b;
   --feedback-error: #321f22;
   --feedback-error-border: #995852;
-  --chart-primary: var(--primary);
-  --chart-secondary: #b8bfd4;
-  --chart-grid: #373b48;
-  --chart-label: var(--muted-foreground);
   --shadow-float: 0 18px 48px rgb(0 0 0 / 40%);
   --sidebar: #15161b;
   color-scheme: dark;
@@ -163,8 +150,7 @@
   }
 }
 .workspace-main { padding-bottom: calc(var(--mobile-nav-height) + 1.5rem); }
-.workspace-shell:has([data-persistent-timer]) .workspace-main { padding-bottom: calc(var(--mobile-nav-height) + var(--timer-bar-height) + 1.5rem); }
-html:has(.workspace-shell) { scroll-padding-bottom: calc(var(--mobile-nav-height) + var(--timer-bar-height)); }
+html:has(.workspace-shell) { scroll-padding-bottom: var(--mobile-nav-height); }
 @media (max-width: 47.999rem) {
   .workspace-mobile-header {
     padding-top: calc(1.25rem + env(safe-area-inset-top));
@@ -175,17 +161,12 @@ html:has(.workspace-shell) { scroll-padding-bottom: calc(var(--mobile-nav-height
     padding-left: max(0.5rem, env(safe-area-inset-left));
     padding-right: max(0.5rem, env(safe-area-inset-right));
   }
-  .persistent-timer-bar {
-    padding-left: max(1rem, env(safe-area-inset-left));
-    padding-right: max(1rem, env(safe-area-inset-right));
-  }
   .responsive-editor-dialog {
     max-height: min(90dvh, calc(var(--workspace-visual-height, 100dvh) - 1rem));
   }
   .responsive-editor-body { padding-bottom: calc(1.5rem + env(safe-area-inset-bottom)); }
   html[data-workspace-keyboard="open"] .workspace-mobile-dock { display: none; }
-  html[data-workspace-keyboard="open"] .workspace-main,
-  html[data-workspace-keyboard="open"] .workspace-shell:has([data-persistent-timer]) .workspace-main {
+  html[data-workspace-keyboard="open"] .workspace-main {
     padding-bottom: calc(1.5rem + env(safe-area-inset-bottom));
   }
   html[data-workspace-keyboard="open"] { scroll-padding-bottom: 2rem; }
@@ -211,7 +192,6 @@ html:has(.workspace-shell) { scroll-padding-bottom: calc(var(--mobile-nav-height
 @media (max-width: 47.999rem) and (max-height: 36rem) and (orientation: landscape) {
   :root {
     --mobile-nav-height: calc(4rem + env(safe-area-inset-bottom));
-    --timer-bar-height: 2.75rem;
   }
   .workspace-mobile-header { padding-top: calc(0.75rem + env(safe-area-inset-top)); padding-bottom: 0.75rem; }
 }
@@ -235,8 +215,7 @@ html:has(.workspace-shell) { scroll-padding-bottom: calc(var(--mobile-nav-height
 }
 @media (min-width: 48rem) {
   .workspace-main { padding-bottom: 3rem; }
-  .workspace-shell:has([data-persistent-timer]) .workspace-main { padding-bottom: calc(var(--timer-bar-height) + 3rem); }
-  html:has(.workspace-shell) { scroll-padding-bottom: var(--timer-bar-height); }
+  html:has(.workspace-shell) { scroll-padding-bottom: 3rem; }
 }
 @media (min-width: 48rem) and (max-height: 36rem) {
   .workspace-sidebar { padding-top: 1rem; padding-bottom: 1rem; }
@@ -246,3 +225,10 @@ html:has(.workspace-shell) { scroll-padding-bottom: calc(var(--mobile-nav-height
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
 }
+.habit-progress { appearance: none; overflow: hidden; border-radius: 999px; background: var(--secondary); }
+.habit-progress::-webkit-progress-bar { background: var(--secondary); }
+.habit-progress::-webkit-progress-value { background: var(--primary); border-radius: 999px; }
+.habit-progress::-moz-progress-bar { background: var(--primary); border-radius: 999px; }
+label:has(input:focus-visible) { outline: 2px solid var(--ring); outline-offset: 4px; }
+
+@media (max-width: 39.999rem) { .habit-create-action > button { width: 100%; } }

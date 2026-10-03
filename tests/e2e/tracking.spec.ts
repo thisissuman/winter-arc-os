@@ -1,92 +1,130 @@
-import { expect, test, type Page } from "@playwright/test";
-import AxeBuilder from "@axe-core/playwright";
-
-async function signIn(page: Page) {
-  await page.goto("/login");
-  await page.getByLabel("Email address").fill(process.env.E2E_AUTH_EMAIL!);
-  await page.getByLabel("Password", { exact: true }).fill(process.env.E2E_AUTH_PASSWORD!);
-  await page.getByRole("button", { name: "Sign in", exact: true }).click();
-  await expect(page).toHaveURL(/\/today$/);
-}
-
-test("owned habit and metric definitions log once and appear across tracking views", async ({ page }) => {
-  test.skip(!process.env.E2E_AUTH_EMAIL || !process.env.E2E_AUTH_PASSWORD, "Requires the dedicated confirmed test account.");
-  const suffix = crypto.randomUUID().slice(0, 8);
-  const habitName = `E2E practice ${suffix}`;
-  const metricName = `E2E water ${suffix}`;
-  let habitCreated = false;
-  let metricCreated = false;
-  await signIn(page);
+import { expect, test } from "@playwright/test";
+import { fixture, signIn } from "./fixtures";
+import { businessDate } from "../../src/lib/dates";
+test.use({ trace: "off" });
+test("daily creation, completion, undo, revision conflict, editor, history and archive", async ({
+  page,
+  context,
+}, info) => {
+  test.setTimeout(120000);
+  const value = await fixture();
   try {
-    await page.goto("/habits");
-    await page.getByRole("button", { name: "New habit" }).click();
-    const habitEditor = page.getByRole("dialog", { name: "New habit" });
-    await habitEditor.getByLabel("Habit name").fill(habitName);
-    await habitEditor.getByRole("button", { name: "Save habit" }).click();
-    await expect(habitEditor.getByRole("status")).toContainText("Habit saved.");
-    habitCreated = true;
-    await habitEditor.getByRole("button", { name: "Close editor" }).click();
+    await signIn(page, value);
+    await expect(
+      page.getByRole("heading", { name: "Add your first habit", exact: true }),
+    ).toBeVisible();
+    await page
+      .getByRole("button", { name: "Add your first habit", exact: true })
+      .click();
+    let dialog = page.getByRole("dialog");
+    await expect(dialog.getByLabel("Habit name")).toBeFocused();
+    await page.screenshot({
+      path: `test-results/editor-${info.project.name}.png`,
+      fullPage: true,
+    });
+    await dialog.getByLabel("Habit name").fill("Read a book");
+    await dialog
+      .getByRole("button", { name: "Create habit", exact: true })
+      .click();
+    await expect(dialog).not.toBeVisible();
+    let check = page.getByRole("checkbox", { name: /Read a book/ });
+    await expect(check).toHaveAttribute("aria-checked", "false");
+    await check.click();
+    await expect(check).toHaveAttribute("aria-checked", "true");
+    await expect(page.getByText("1 of 1 done", { exact: true })).toBeVisible();
     await page.reload();
-    await expect(page.getByRole("heading", { name: habitName })).toBeVisible();
-
-    await page.goto("/metrics");
-    await page.getByRole("button", { name: "New metric" }).click();
-    const metricEditor = page.getByRole("dialog", { name: "Create metric" });
-    await metricEditor.getByLabel("Name", { exact: true }).fill(metricName);
-    await metricEditor.getByLabel("Unit", { exact: true }).fill("ml");
-    await metricEditor.getByLabel("Target (selected unit)").fill("1000");
-    await metricEditor.getByRole("button", { name: "Create metric" }).click();
-    await expect(metricEditor.getByRole("status")).toContainText("Metric saved.");
-    metricCreated = true;
-    await metricEditor.getByRole("button", { name: "Close editor" }).click();
-
-    await page.goto("/today");
-    await page.getByLabel("Dashboard challenge").selectOption("");
-    await expect(page.getByRole("button", { name: `Complete ${habitName}` })).toBeVisible();
-    await page.getByRole("button", { name: `Complete ${habitName}` }).click();
-    await expect(page.getByRole("button", { name: `Clear completion for ${habitName}` })).toBeVisible();
-    const measurement = page.getByRole("article").filter({ hasText: metricName });
-    await measurement.getByRole("spinbutton", { name: new RegExp(metricName) }).fill("750");
-    await measurement.getByRole("button", { name: "Save", exact: true }).click();
-    await expect(measurement.getByText(/Saved: 0\.75 L/)).toBeVisible();
-    await page.reload();
-    await expect(page.getByRole("button", { name: `Clear completion for ${habitName}` })).toBeVisible();
-    await expect(page.getByRole("article").filter({ hasText: metricName }).getByRole("spinbutton", { name: new RegExp(metricName) })).toHaveValue("750");
-    await page.getByRole("button", { name: `Clear completion for ${habitName}` }).focus();
-    await page.keyboard.press("Space");
-    await expect(page.getByRole("button", { name: `Complete ${habitName}` })).toBeVisible();
-    await expect(page.getByRole("button", { name: `Complete ${habitName}` })).toBeEnabled();
-    await page.getByRole("button", { name: `Complete ${habitName}` }).focus();
-    await page.keyboard.press("Space");
-    await expect(page.getByRole("button", { name: `Clear completion for ${habitName}` })).toBeVisible();
-    expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
-    expect((await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa", "wcag21aa"]).analyze()).violations).toEqual([]);
-
+    check = page.getByRole("checkbox", { name: /Read a book/ });
+    await expect(check).toHaveAttribute("aria-checked", "true");
+    await check.press("Space");
+    await expect(check).toHaveAttribute("aria-checked", "false");
+    const owned = await value.client
+      .from("habits")
+      .select("id,revision")
+      .single();
+    expect(owned.error).toBeNull();
+    const id = owned.data!.id;
+    const today = businessDate("Asia/Kolkata");
+    expect(
+      (
+        await value.client.rpc("set_habit_completion", {
+          p_habit_id: id,
+          p_business_date: today,
+          p_completed: true,
+          p_expected_revision: 2,
+        })
+      ).error,
+    ).toBeNull();
+    expect(
+      (
+        await value.client.rpc("set_habit_completion", {
+          p_habit_id: id,
+          p_business_date: today,
+          p_completed: false,
+          p_expected_revision: 3,
+        })
+      ).error,
+    ).toBeNull();
+    await check.click();
+    await page.screenshot({
+      path: `test-results/conflict-${info.project.name}.png`,
+      fullPage: true,
+    });
+    await expect(
+      page.getByRole("alert").filter({ hasText: "changed elsewhere" }),
+    ).toBeVisible();
+    await page.getByRole("button", { name: "Reload saved state" }).click();
+    await expect(check).toHaveAttribute("aria-checked", "false");
+    await context.setOffline(true);
+    await check.click();
+    await expect(
+      page.getByRole("alert").filter({ hasText: "Check your connection" }),
+    ).toBeVisible();
+    await expect(check).toHaveAttribute("aria-checked", "false");
+    await context.setOffline(false);
     await page.goto("/habits");
-    await expect(page.getByRole("row", { name: new RegExp(habitName) })).toBeVisible();
-    expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
-    expect((await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa", "wcag21aa"]).analyze()).violations).toEqual([]);
-    await page.goto("/metrics");
-    await expect(page.getByRole("heading", { name: metricName })).toBeVisible();
-    expect((await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa", "wcag21aa"]).analyze()).violations).toEqual([]);
+    await page.getByLabel("Options for Read a book").click();
+    await page.getByRole("button", { name: "Edit Read a book" }).click();
+    dialog = page.getByRole("dialog");
+    await dialog.getByLabel("Selected days").check();
+    for (const day of ["Tuesday", "Thursday", "Saturday", "Sunday"])
+      await dialog.getByLabel(day, { exact: true }).uncheck();
+    await dialog.getByRole("button", { name: "Save habit" }).click();
+    await expect(dialog).not.toBeVisible();
+    await expect(
+      page.getByText("Mon · Wed · Fri · from tomorrow", { exact: true }),
+    ).toBeVisible();
+    await page.goto(`/habits?view=history&habit=${id}`);
+    await expect(page.getByLabel("History habit")).toHaveValue(id);
+    await expect(
+      page.getByRole("link", { name: `${today}: pending today`, exact: true }),
+    ).toBeVisible();
+    await page.screenshot({
+      path: `test-results/history-${info.project.name}.png`,
+      fullPage: true,
+    });
+    await page.goto("/habits");
+    await page.getByLabel("Options for Read a book").click();
+    await page.getByRole("button", { name: "Archive", exact: true }).click();
+    await expect(
+      page.getByRole("heading", { name: "Add your first habit", exact: true }),
+    ).toBeVisible();
+    await page.getByRole("link", { name: "Show archived" }).click();
+    await expect(
+      page.getByRole("heading", { name: "Read a book", exact: true }),
+    ).toBeVisible();
+    await page.getByLabel("Options for Read a book").click();
+    await page
+      .getByRole("button", { name: "Delete Read a book permanently" })
+      .click();
+    await page
+      .getByRole("dialog")
+      .getByRole("button", { name: "Delete habit and history" })
+      .click();
+    await expect(
+      page.getByRole("heading", { name: "No archived habits" }),
+    ).toBeVisible();
   } finally {
-    if (habitCreated) {
-      await page.goto("/habits");
-      const detail = page.getByRole("article").filter({ has: page.getByRole("heading", { name: habitName }) });
-      await detail.getByRole("button", { name: "Delete permanently" }).click();
-      const dialog = page.getByRole("dialog", { name: "Delete this habit permanently?" });
-      await dialog.getByLabel("Type DELETE to confirm").fill("DELETE");
-      await dialog.getByRole("button", { name: "Delete habit and history" }).click();
-      await expect(page.getByRole("heading", { name: habitName })).toHaveCount(0);
-    }
-    if (metricCreated) {
-      await page.goto("/metrics");
-      const detail = page.locator("section").filter({ has: page.getByRole("heading", { name: metricName }) });
-      await detail.getByRole("button", { name: "Delete history" }).click();
-      const dialog = page.getByRole("dialog", { name: `Permanently delete ${metricName}?` });
-      await dialog.getByLabel("Type DELETE to confirm").fill("DELETE");
-      await dialog.getByRole("button", { name: "Permanently delete" }).click();
-      await expect(page.getByRole("heading", { name: metricName })).toHaveCount(0);
-    }
+    await context.setOffline(false).catch(() => {});
+    await value.close();
   }
 });
